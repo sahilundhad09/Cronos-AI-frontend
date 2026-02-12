@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '@/services/api';
+import { toast } from 'sonner';
 
 export interface AIGeneration {
     id: string;
@@ -44,10 +45,18 @@ export const useAIStore = create<AIState>((set) => ({
                 generations: [newGen, ...state.generations],
                 isGenerating: false
             }));
+            toast.success('Tasks Generated!', {
+                description: `AI created ${newGen.generated_tasks.length} tasks. Review and deploy them to your board.`,
+                duration: 5000,
+            });
             return newGen;
         } catch (error: any) {
             const message = error.response?.data?.message || 'Neural engine failure. Transmission interrupted.';
             set({ error: message, isGenerating: false });
+            toast.error('Task Generation Failed', {
+                description: message,
+                duration: 6000,
+            });
             throw error;
         }
     },
@@ -68,8 +77,16 @@ export const useAIStore = create<AIState>((set) => ({
                 ),
                 isGenerating: false
             }));
+            toast.success('Tasks Deployed!', {
+                description: `${indices.length} AI-generated tasks have been added to your Kanban board.`,
+                duration: 5000,
+            });
         } catch (error: any) {
-            set({ error: error.response?.data?.message || 'Failed to initialize tasks.', isGenerating: false });
+            const message = error.response?.data?.message || 'Failed to initialize tasks.';
+            set({ error: message, isGenerating: false });
+            toast.error('Deployment Failed', {
+                description: message,
+            });
             throw error;
         }
     },

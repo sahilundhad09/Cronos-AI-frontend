@@ -8,6 +8,7 @@ import { useTaskStore } from '@/store/useTaskStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { format } from 'date-fns';
 import AssignTaskDialog from './AssignTaskDialog';
+import TaskDetailModal from '../task/TaskDetailModal';
 import { toast } from 'sonner';
 
 interface TaskCardProps {
@@ -17,6 +18,7 @@ interface TaskCardProps {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const { statuses, moveTask } = useTaskStore();
     const currentUser = useAuthStore((state) => state.user);
 
@@ -62,7 +64,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                         {...provided.dragHandleProps}
                         className={`mb-4 select-none ${snapshot.isDragging ? 'z-50' : ''}`}
                     >
-                        <Card className={`bg-[#0A0D18] border-white/5 hover:border-cyan-500/30 transition-all duration-300 group ${snapshot.isDragging ? 'shadow-2xl shadow-cyan-500/20 ring-1 ring-cyan-500/50' : ''}`}>
+                        <Card
+                            onClick={() => setIsDetailModalOpen(true)}
+                            className={`bg-[#0A0D18] border-white/5 hover:border-cyan-500/30 transition-all duration-300 group cursor-pointer ${snapshot.isDragging ? 'shadow-2xl shadow-cyan-500/20 ring-1 ring-cyan-500/50' : ''}`}
+                        >
                             <CardContent className="p-4 space-y-4">
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-center gap-2">
@@ -75,8 +80,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                                 onClick={handleQuickComplete}
                                                 disabled={!isAssignee}
                                                 className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${isAssignee
-                                                        ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 opacity-40 hover:opacity-100 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] cursor-pointer'
-                                                        : 'bg-slate-800/50 border border-slate-700/50 text-slate-600 cursor-not-allowed opacity-30'
+                                                    ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 opacity-40 hover:opacity-100 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] cursor-pointer'
+                                                    : 'bg-slate-800/50 border border-slate-700/50 text-slate-600 cursor-not-allowed opacity-30'
                                                     }`}
                                             >
                                                 <CheckCircle2 size={14} strokeWidth={3} />
@@ -159,6 +164,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                 task={task}
                 isOpen={isAssignDialogOpen}
                 onClose={() => setIsAssignDialogOpen(false)}
+            />
+
+            <TaskDetailModal
+                task={task}
+                isOpen={isDetailModalOpen}
+                onClose={() => setIsDetailModalOpen(false)}
+                projectId={task.project_id}
             />
         </>
     );
