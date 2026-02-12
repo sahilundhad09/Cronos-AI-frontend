@@ -5,8 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, MessageSquare, Paperclip, MoreHorizontal, UserPlus, CheckCircle2 } from 'lucide-react';
 import { useTaskStore } from '@/store/useTaskStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { format } from 'date-fns';
 import AssignTaskDialog from './AssignTaskDialog';
+import { toast } from 'sonner';
 
 interface TaskCardProps {
     task: Task;
@@ -16,15 +18,30 @@ interface TaskCardProps {
 const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
     const { statuses, moveTask } = useTaskStore();
+    const currentUser = useAuthStore((state) => state.user);
+
+    // Check if current user is assigned to this task
+    const isAssignee = task.assignees?.some((assignee: any) => assignee.user_id === currentUser?.id);
 
     const handleQuickComplete = (e: React.MouseEvent) => {
         e.stopPropagation();
+
+        if (!isAssignee) {
+            toast.error('Permission Denied', {
+                description: 'Only assigned team members can mark this task as complete.',
+            });
+            return;
+        }
+
         const doneStatus = statuses.find(s =>
             s.name.toLowerCase().includes('done') ||
             s.name.toLowerCase().includes('completed')
         );
         if (doneStatus) {
             moveTask(task.id, doneStatus.id, 0);
+            toast.success('Task Completed!', {
+                description: `"${task.title}" has been marked as done.`,
+            });
         }
     };
 
@@ -54,9 +71,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                         </Badge>
                                         {!task.completed_at && (
                                             <button
-                                                title="Quick Complete"
+                                                title={isAssignee ? "Quick Complete" : "Only assignees can complete this task"}
                                                 onClick={handleQuickComplete}
-                                                className="h-6 w-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500/20 transition-all opacity-40 hover:opacity-100 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                                                disabled={!isAssignee}
+                                                className={`h-6 w-6 rounded-lg flex items-center justify-center transition-all ${isAssignee
+                                                        ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 opacity-40 hover:opacity-100 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] cursor-pointer'
+                                                        : 'bg-slate-800/50 border border-slate-700/50 text-slate-600 cursor-not-allowed opacity-30'
+                                                    }`}
                                             >
                                                 <CheckCircle2 size={14} strokeWidth={3} />
                                             </button>

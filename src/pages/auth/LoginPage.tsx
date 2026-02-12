@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Brain, Loader2, Zap, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +24,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const setAuth = useAuthStore((state) => state.setAuth);
     const navigate = useNavigate();
 
@@ -38,7 +38,6 @@ const LoginPage = () => {
 
     const onSubmit = async (data: LoginFormValues) => {
         setIsLoading(true);
-        setError(null);
 
         try {
             const response = await api.post('/auth/login', {
@@ -48,9 +47,17 @@ const LoginPage = () => {
             const { user, accessToken, refreshToken } = response.data.data;
 
             setAuth(user, accessToken, refreshToken);
+
+            toast.success('Welcome Back!', {
+                description: `Logged in as ${user.name}`,
+            });
+
             navigate('/dashboard');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Authentication failed. Please check your credentials.');
+            const errorMessage = err.response?.data?.message || 'Authentication failed. Please check your credentials.';
+            toast.error('Login Failed', {
+                description: errorMessage,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -112,16 +119,6 @@ const LoginPage = () => {
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pt-4">
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="p-5 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-black rounded-2xl tracking-tight"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-
                         <div className="space-y-3 text-left">
                             <Label htmlFor="email" className="text-slate-500 font-black text-[10px] ml-1 uppercase tracking-[0.3em]">Command Center Email</Label>
                             <Input

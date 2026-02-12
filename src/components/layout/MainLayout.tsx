@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
-    Brain,
     LayoutDashboard,
-    Briefcase,
+    FolderKanban,
     Users,
     MessageSquare,
-    Settings,
-    LogOut,
-    Menu,
     Bell,
+    LogOut,
+    ChevronDown,
     Search,
     ChevronRight,
     Plus,
+    Check,
+    Briefcase,
+    Brain,
     ChevronsUpDown,
-    Check
+    Menu,
+    Settings
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -306,25 +309,40 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             await acceptProjectInvitation(projectId, invitationId);
             await markAsRead(notificationId);
             fetchNotifications();
+            toast.success('Project Invitation Accepted!', {
+                description: 'You have successfully joined the project.',
+            });
             // Redirect to the project or refresh
             navigate(`/projects/${projectId}`);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to accept project invitation', error);
+            toast.error('Failed to Accept Invitation', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
         }
     };
 
     const handleAcceptWorkspaceInvite = async (token: string, notificationId: string) => {
         if (!token) {
             console.error('Missing authorization token');
+            toast.error('Invalid Invitation', {
+                description: 'Missing authorization token.',
+            });
             return;
         }
         try {
             await acceptWorkspaceInvitation(token);
             await markAsRead(notificationId);
             fetchNotifications();
+            toast.success('Workspace Invitation Accepted!', {
+                description: 'You have successfully joined the workspace.',
+            });
             // Store has already refreshed workspaces
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to accept workspace invitation', error);
+            toast.error('Failed to Accept Invitation', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
         }
     };
 
@@ -338,13 +356,22 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             await declineWorkspaceInvitation(token);
             await markAsRead(notificationId);
             fetchNotifications();
-        } catch (error) {
+            toast.success('Invitation Declined', {
+                description: 'You have declined the workspace invitation.',
+            });
+        } catch (error: any) {
             console.error('Failed to decline workspace invitation', error);
+            toast.error('Failed to Decline Invitation', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
         }
     };
 
     const handleLogout = () => {
         logout();
+        toast.success('Logged Out', {
+            description: 'You have been successfully logged out.',
+        });
         navigate('/login');
     };
 

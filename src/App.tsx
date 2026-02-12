@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/sonner';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -38,6 +39,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
     return (
         <QueryClientProvider client={queryClient}>
+            <Toaster />
             <Router>
                 <Routes>
                     {/* Public Landing Page */}

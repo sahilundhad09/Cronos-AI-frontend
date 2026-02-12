@@ -127,30 +127,30 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId }) => {
                         </div>
                     </div>
 
-                    <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
+                    <div className="grid gap-4 overflow-y-auto pr-2 custom-scrollbar" style={{ maxHeight: 'calc(100vh - 600px)' }}>
                         {currentGen.generated_tasks.map((task, idx) => (
                             <Card key={idx} className="bg-[#0A0D18] border-white/5 hover:border-cyan-500/30 transition-all group">
-                                <CardContent className="p-4 flex items-center gap-6">
-                                    <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-cyan-400 transition-colors">
-                                        <span className="text-[10px] font-black">{idx + 1}</span>
+                                <CardContent className="p-5 flex items-start gap-6">
+                                    <div className="h-12 w-12 flex-shrink-0 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:border-cyan-500/40 transition-colors">
+                                        <span className="text-sm font-black text-cyan-400">{idx + 1}</span>
                                     </div>
-                                    <div className="flex-1 space-y-1">
-                                        <h4 className="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">{task.title}</h4>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight line-clamp-1">{task.description}</p>
-                                    </div>
-                                    <div className="flex items-center gap-6 text-[9px] font-black uppercase tracking-widest text-slate-600">
-                                        <div className="flex items-center gap-2">
-                                            <Flag className="h-3.5 w-3.5" />
-                                            <Badge variant="outline" className="text-[8px] border-slate-700 h-5 px-1.5">{task.priority || 'medium'}</Badge>
-                                        </div>
-                                        {task.estimated_hours && (
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="h-3.5 w-3.5" />
-                                                <span>{task.estimated_hours}h</span>
+                                    <div className="flex-1 space-y-2 min-w-0">
+                                        <h4 className="text-base font-bold text-white group-hover:text-cyan-400 transition-colors leading-snug">{task.title}</h4>
+                                        <p className="text-xs text-slate-500 font-bold uppercase tracking-tight line-clamp-2 leading-relaxed">{task.description}</p>
+                                        <div className="flex items-center gap-4 pt-2">
+                                            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-600">
+                                                <Flag className="h-3.5 w-3.5" />
+                                                <Badge variant="outline" className="text-[8px] border-slate-700 h-5 px-2">{task.priority || 'medium'}</Badge>
                                             </div>
-                                        )}
-                                        <ChevronRight className="h-4 w-4 text-slate-800" />
+                                            {task.estimated_hours && (
+                                                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-600">
+                                                    <Calendar className="h-3.5 w-3.5" />
+                                                    <span>{task.estimated_hours}h</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
+                                    <ChevronRight className="h-5 w-5 text-slate-700 group-hover:text-cyan-500 transition-colors flex-shrink-0" />
                                 </CardContent>
                             </Card>
                         ))}

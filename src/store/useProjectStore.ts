@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '@/services/api';
+import { toast } from 'sonner';
 
 export interface Project {
     id: string;
@@ -82,11 +83,17 @@ export const useProjectStore = create<ProjectState>((set) => ({
                 projects: [newProject, ...state.projects],
                 isLoading: false
             }));
+            toast.success('Project Created!', {
+                description: `"${data.name}" has been created successfully.`,
+            });
             return newProject;
         } catch (error: any) {
             set({
                 error: error.response?.data?.message || 'Failed to create project',
                 isLoading: false
+            });
+            toast.error('Failed to Create Project', {
+                description: error.response?.data?.message || 'Please try again.',
             });
             throw error;
         }
@@ -112,7 +119,13 @@ export const useProjectStore = create<ProjectState>((set) => ({
             // Refresh invitations
             const response = await api.get(`/projects/${projectId}/invites`);
             set({ projectInvitations: response.data.data });
+            toast.success('Invitation Sent!', {
+                description: 'Team member has been invited to the project.',
+            });
         } catch (error: any) {
+            toast.error('Failed to Send Invitation', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
             throw error;
         }
     },

@@ -5,11 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Brain, Loader2, Rocket, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuthStore } from '@/store/useAuthStore';
 import api from '@/services/api';
 
 const registerSchema = z.object({
@@ -26,42 +26,45 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const RegisterPage = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const setAuth = useAuthStore((state) => state.setAuth);
     const navigate = useNavigate();
 
     const {
         register,
         handleSubmit,
         formState: { errors },
+        reset,
     } = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
     });
 
     const onSubmit = async (data: RegisterFormValues) => {
         setIsLoading(true);
-        setError(null);
 
         try {
-            // 1. Register
             await api.post('/auth/register', {
                 name: data.name,
                 email: data.email,
                 password: data.password,
             });
 
-            // 2. Automatically login after registration
-            const loginResponse = await api.post('/auth/login', {
-                email: data.email,
-                password: data.password,
+            // Show success toast
+            toast.success('Registration Successful!', {
+                description: 'Your account has been created. Please sign in to continue.',
+                duration: 4000,
             });
 
-            const { user, accessToken, refreshToken } = loginResponse.data.data;
+            // Clear form
+            reset();
 
-            setAuth(user, accessToken, refreshToken);
-            navigate('/dashboard');
+            // Redirect to login page
+            setTimeout(() => {
+                navigate('/login');
+            }, 1000);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
+            toast.error('Registration Failed', {
+                description: errorMessage,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -127,16 +130,6 @@ const RegisterPage = () => {
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-2">
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="p-5 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-black rounded-2xl"
-                            >
-                                {error}
-                            </motion.div>
-                        )}
-
                         <div className="space-y-2 text-left">
                             <Label htmlFor="name" className="text-slate-500 font-black text-[10px] ml-1 uppercase tracking-[0.3em]">Identity Link (Name)</Label>
                             <Input

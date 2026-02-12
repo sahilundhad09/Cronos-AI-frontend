@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '@/services/api';
+import { toast } from 'sonner';
 
 interface Workspace {
     id: string;
@@ -84,10 +85,17 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
                 activeWorkspace: newWorkspace,
                 isLoading: false
             }));
+
+            toast.success('Workspace Created!', {
+                description: `"${data.name}" has been created successfully.`,
+            });
         } catch (error: any) {
             set({
                 error: error.response?.data?.message || 'Failed to create workspace',
                 isLoading: false
+            });
+            toast.error('Failed to Create Workspace', {
+                description: error.response?.data?.message || 'Please try again.',
             });
             throw error;
         }

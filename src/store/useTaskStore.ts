@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '@/services/api';
+import { toast } from 'sonner';
 
 export interface Task {
     id: string;
@@ -74,8 +75,14 @@ export const useTaskStore = create<TaskState>((set, get) => ({
                 tasks: [...state.tasks, newTask],
                 isLoading: false
             }));
+            toast.success('Task Created!', {
+                description: `"${data.title}" has been added to the board.`,
+            });
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to create task', isLoading: false });
+            toast.error('Failed to Create Task', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
             throw error;
         }
     },
@@ -107,8 +114,14 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             set((state) => ({
                 tasks: state.tasks.map(t => t.id === taskId ? updatedTask : t)
             }));
+            toast.success('Task Updated!', {
+                description: 'Task has been updated successfully.',
+            });
         } catch (error: any) {
             console.error('Failed to update task', error);
+            toast.error('Failed to Update Task', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
         }
     },
 
@@ -118,8 +131,14 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             set((state) => ({
                 tasks: state.tasks.filter(t => t.id !== taskId)
             }));
+            toast.success('Task Deleted!', {
+                description: 'Task has been removed from the board.',
+            });
         } catch (error: any) {
             console.error('Failed to delete task', error);
+            toast.error('Failed to Delete Task', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
         }
     },
 
@@ -132,8 +151,14 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             set((state) => ({
                 tasks: state.tasks.map(t => t.id === taskId ? updatedTask : t)
             }));
+            toast.success('Members Assigned!', {
+                description: 'Team members have been assigned to the task.',
+            });
         } catch (error: any) {
             console.error('Failed to assign members', error);
+            toast.error('Failed to Assign Members', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
             throw error;
         }
     },
