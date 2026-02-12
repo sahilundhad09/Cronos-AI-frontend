@@ -23,13 +23,14 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId }) => {
     const { generateTasks, acceptGeneration, isGenerating } = useAIStore();
     const { fetchProjectTasks } = useTaskStore();
     const [prompt, setPrompt] = useState('');
+    const [taskCount, setTaskCount] = useState(8);
     const [currentGen, setCurrentGen] = useState<AIGeneration | null>(null);
 
     const handleGenerate = async () => {
         if (!prompt.trim()) return;
 
         try {
-            const gen = await generateTasks(projectId, prompt);
+            const gen = await generateTasks(projectId, prompt, taskCount);
             console.log('✅ Tasks generated:', gen.generated_tasks.length);
             setCurrentGen(gen);
         } catch (err: any) {
@@ -74,9 +75,28 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId }) => {
                             className="bg-transparent border-none focus-visible:ring-0 text-white placeholder:text-slate-700 resize-none min-h-[80px] font-bold text-sm leading-relaxed p-0"
                         />
                         <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                            <div className="flex items-center gap-4">
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">Engine: Groq / Llama 3.3 70B</span>
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">Latency: Optimized</span>
+                            <div className="flex items-center gap-6 flex-1">
+                                <div className="flex items-center gap-3 flex-1 max-w-xs">
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] whitespace-nowrap">Task Count:</span>
+                                    <div className="flex-1 relative">
+                                        <input
+                                            type="range"
+                                            min="3"
+                                            max="15"
+                                            value={taskCount}
+                                            onChange={(e) => setTaskCount(parseInt(e.target.value))}
+                                            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 hover:accent-cyan-400 transition-colors"
+                                            style={{
+                                                background: `linear-gradient(to right, rgb(6 182 212) 0%, rgb(6 182 212) ${((taskCount - 3) / 12) * 100}%, rgb(30 41 59) ${((taskCount - 3) / 12) * 100}%, rgb(30 41 59) 100%)`
+                                            }}
+                                        />
+                                    </div>
+                                    <span className="text-xs font-black text-cyan-400 tabular-nums min-w-[2ch] text-center">{taskCount}</span>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">Engine: Groq / Llama 3.3 70B</span>
+                                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">Latency: Optimized</span>
+                                </div>
                             </div>
                             <Button
                                 onClick={handleGenerate}

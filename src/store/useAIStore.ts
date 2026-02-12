@@ -15,7 +15,7 @@ interface AIState {
     generations: AIGeneration[];
     isGenerating: boolean;
     error: string | null;
-    generateTasks: (projectId: string, description: string) => Promise<AIGeneration>;
+    generateTasks: (projectId: string, description: string, count?: number) => Promise<AIGeneration>;
     acceptGeneration: (projectId: string, generationId: string, taskIndices?: number[]) => Promise<void>;
     fetchGenerations: (projectId: string) => Promise<void>;
 }
@@ -34,11 +34,12 @@ export const useAIStore = create<AIState>((set) => ({
         }
     },
 
-    generateTasks: async (projectId: string, prompt: string) => {
+    generateTasks: async (projectId: string, prompt: string, count?: number) => {
         set({ isGenerating: true, error: null });
         try {
             const response = await api.post(`/projects/${projectId}/ai/generate-tasks`, {
-                prompt
+                prompt,
+                count: count || 8
             });
             const newGen = response.data.data;
             set((state) => ({
