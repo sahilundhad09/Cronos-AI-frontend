@@ -48,12 +48,14 @@ api.interceptors.response.use(
                 localStorage.setItem('accessToken', accessToken);
                 localStorage.setItem('refreshToken', newRefreshToken);
 
+                // Update store if needed (though localStorage update might be enough for next reload, 
+                // for the retry to work we need headers)
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                // If refresh fails, log out the user
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                // If refresh fails, log out the user cleanly
+                const { useAuthStore } = await import('@/store/useAuthStore');
+                useAuthStore.getState().logout();
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             }
