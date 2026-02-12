@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
     LayoutDashboard,
-    FolderKanban,
     Users,
-    MessageSquare,
     Bell,
     LogOut,
-    ChevronDown,
     Search,
     ChevronRight,
     Plus,
@@ -391,7 +388,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Briefcase, label: 'Projects', path: '/projects' },
         { icon: Users, label: 'Team', path: '/team' },
-        { icon: MessageSquare, label: 'AI Engine', path: '/ai-chat' },
     ];
 
     const sidebarProps = {

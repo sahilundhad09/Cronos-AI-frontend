@@ -14,10 +14,6 @@ import { useProjectStore, Project } from '@/store/useProjectStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-    Dialog,
-    DialogContent,
-} from "@/components/ui/dialog";
 import { CreateProjectDialog } from '@/components/project/CreateProjectDialog';
 import {
     DropdownMenu,

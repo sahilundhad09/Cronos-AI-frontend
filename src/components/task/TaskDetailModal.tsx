@@ -53,15 +53,13 @@ interface Attachment {
     created_at: string;
 }
 
-const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose, projectId }) => {
+const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose }) => {
     const { updateTask, deleteTask } = useTaskStore();
     const [isEditing, setIsEditing] = useState(false);
     const [editedTask, setEditedTask] = useState<Partial<Task>>({});
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
     const [attachments, setAttachments] = useState<Attachment[]>([]);
-    const [isLoadingComments, setIsLoadingComments] = useState(false);
-    const [isLoadingAttachments, setIsLoadingAttachments] = useState(false);
 
     useEffect(() => {
         if (task && isOpen) {
@@ -73,27 +71,21 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
 
     const fetchComments = async () => {
         if (!task) return;
-        setIsLoadingComments(true);
         try {
             const response = await api.get(`/tasks/${task.id}/comments`);
             setComments(response.data.data || []);
         } catch (error) {
             console.error('Failed to fetch comments:', error);
-        } finally {
-            setIsLoadingComments(false);
         }
     };
 
     const fetchAttachments = async () => {
         if (!task) return;
-        setIsLoadingAttachments(true);
         try {
             const response = await api.get(`/tasks/${task.id}/attachments`);
             setAttachments(response.data.data || []);
         } catch (error) {
             console.error('Failed to fetch attachments:', error);
-        } finally {
-            setIsLoadingAttachments(false);
         }
     };
 
