@@ -15,6 +15,7 @@ import ProjectsPage from './pages/ProjectsPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import { ProjectSettingsPage } from './pages/ProjectSettingsPage';
 import { WorkspaceSettingsPage } from './pages/WorkspaceSettingsPage';
+import ProfilePage from './pages/ProfilePage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -105,6 +106,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <WorkspaceSettingsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute>
+                                <ProfilePage />
                             </ProtectedRoute>
                         }
                     />

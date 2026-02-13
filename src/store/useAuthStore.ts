@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import api from '@/services/api';
 
 interface User {
     id: string;
     name: string;
     email: string;
     avatar_url?: string;
+    phone?: string;
     role?: string;
 }
 
@@ -17,11 +19,13 @@ interface AuthState {
     setAuth: (user: User, accessToken: string, refreshToken: string) => void;
     logout: () => void;
     updateUser: (user: Partial<User>) => void;
+    updateProfile: (data: Partial<User>) => Promise<void>;
+    changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             user: null,
             isAuthenticated: false,
             accessToken: null,
@@ -36,10 +40,17 @@ export const useAuthStore = create<AuthState>()(
                 localStorage.removeItem('refreshToken');
                 set({ user: null, isAuthenticated: false, accessToken: null, refreshToken: null });
             },
-            updateUser: (updatedUser) =>
+            updateUser: (updatedUser: Partial<User>) =>
                 set((state) => ({
                     user: state.user ? { ...state.user, ...updatedUser } : null,
                 })),
+            updateProfile: async (data: Partial<User>) => {
+                const response = await api.put('/auth/profile', data);
+                get().updateUser(response.data.data);
+            },
+            changePassword: async (currentPassword, newPassword) => {
+                await api.post('/auth/change-password', { currentPassword, newPassword });
+            },
         }),
         {
             name: 'auth-storage',
