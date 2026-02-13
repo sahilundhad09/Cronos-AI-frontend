@@ -245,8 +245,8 @@ const SidebarContent = ({
         <div className="p-4 border-t border-white/5 space-y-2">
             <PermissionGate roles={['owner', 'admin']}>
                 <Link
-                    to="/settings"
-                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${location.pathname === '/settings'
+                    to={activeWorkspace?.id ? `/workspaces/${activeWorkspace.id}/settings` : '/settings'}
+                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${location.pathname.includes('/settings')
                         ? 'bg-white/5 text-white border border-white/10'
                         : 'text-slate-500 hover:text-white hover:bg-white/5 border border-transparent'
                         }`}
@@ -611,7 +611,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </header>
 
                 {/* Dynamic Page Content */}
-                <main className="flex-1 overflow-hidden bg-[#030408]">
+                <main className="flex-1 overflow-y-auto bg-[#030408]">
                     {children}
                 </main>
             </div>

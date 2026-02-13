@@ -29,6 +29,7 @@ import { useNotificationStore } from '@/store/useNotificationStore';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
+import { AIChatPanel } from '@/components/ai/AIChatPanel';
 
 const ProjectDetailsPage = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -48,6 +49,7 @@ const ProjectDetailsPage = () => {
     const { user } = useAuthStore();
 
     const [project, setProject] = useState<any>(null);
+    const [showChat, setShowChat] = useState(false);
 
     const { fetchGenerations } = useAIStore();
     const { tasks, statuses } = useTaskStore();
@@ -143,9 +145,29 @@ const ProjectDetailsPage = () => {
                                     />
                                 </div>
                             </div>
-                            <PermissionGate roles={['owner', 'admin']}>
-                                <CreateTaskDialog projectId={projectId!} />
-                            </PermissionGate>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    onClick={() => navigate(`/projects/${projectId}/settings`)}
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-9 px-4 bg-slate-800/50 border-white/10 hover:border-cyan-500/50 text-white font-black uppercase text-[10px] tracking-widest gap-2 transition-all"
+                                >
+                                    <Settings className="h-4 w-4" />
+                                    Settings
+                                </Button>
+                                <Button
+                                    onClick={() => setShowChat(!showChat)}
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-9 px-4 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border-purple-500/30 hover:border-cyan-500/50 text-white font-black uppercase text-[10px] tracking-widest gap-2 transition-all"
+                                >
+                                    <Brain className="h-4 w-4 text-purple-400" />
+                                    AI Assistant
+                                </Button>
+                                <PermissionGate roles={['owner', 'admin']}>
+                                    <CreateTaskDialog projectId={projectId!} />
+                                </PermissionGate>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -373,6 +395,22 @@ const ProjectDetailsPage = () => {
                     </div>
                 </Tabs>
             </main>
+
+            {/* AI Chat Sliding Panel */}
+            <div
+                className={`fixed top-0 right-0 h-full w-[28rem] bg-slate-900 shadow-2xl border-l border-white/10 transition-transform duration-300 ease-in-out z-50 ${showChat ? 'translate-x-0' : 'translate-x-full'
+                    }`}
+            >
+                <AIChatPanel projectId={projectId!} onClose={() => setShowChat(false)} />
+            </div>
+
+            {/* Overlay when chat is open */}
+            {showChat && (
+                <div
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
+                    onClick={() => setShowChat(false)}
+                />
+            )}
         </div>
     );
 };

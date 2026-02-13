@@ -31,7 +31,12 @@ const AssignTaskDialog: React.FC<AssignTaskDialogProps> = ({ task, isOpen, onClo
     }, [isOpen, task.project_id, fetchProjectMembers]);
 
     const isAssigned = (memberId: string) => {
-        return task.assignees?.some((a: any) => a.project_member_id === memberId || a.id === memberId);
+        // memberId here is the project_member_id
+        return task.assignees?.some((a: any) =>
+            a.project_member_id === memberId ||
+            a.id === memberId ||
+            a.user?.id === memberId // Fallback for various data structures
+        );
     };
 
     const handleToggleAssignment = async (memberId: string) => {
@@ -80,7 +85,7 @@ const AssignTaskDialog: React.FC<AssignTaskDialogProps> = ({ task, isOpen, onClo
                         <div className="h-[300px] pr-2 overflow-y-auto custom-scrollbar">
                             <div className="space-y-2">
                                 {projectMembers.map((member) => {
-                                    const assigned = isAssigned(member.user.id);
+                                    const assigned = isAssigned(member.id);
                                     return (
                                         <div
                                             key={member.id}

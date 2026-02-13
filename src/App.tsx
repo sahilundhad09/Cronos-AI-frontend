@@ -13,6 +13,8 @@ const queryClient = new QueryClient();
 import TeamPage from './pages/TeamPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ProjectDetailsPage from './pages/ProjectDetailsPage';
+import { ProjectSettingsPage } from './pages/ProjectSettingsPage';
+import { WorkspaceSettingsPage } from './pages/WorkspaceSettingsPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -87,6 +89,22 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ProjectDetailsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/projects/:projectId/settings"
+                        element={
+                            <ProtectedRoute>
+                                <ProjectSettingsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/workspaces/:workspaceId/settings"
+                        element={
+                            <ProtectedRoute>
+                                <WorkspaceSettingsPage />
                             </ProtectedRoute>
                         }
                     />

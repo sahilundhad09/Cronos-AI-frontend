@@ -23,7 +23,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
     const currentUser = useAuthStore((state) => state.user);
 
     // Check if current user is assigned to this task
-    const isAssignee = task.assignees?.some((assignee: any) => assignee.user_id === currentUser?.id);
+    const isAssignee = task.assignees?.some((assignee: any) =>
+        assignee.user_id === currentUser?.id || assignee.user?.id === currentUser?.id
+    );
 
     const handleQuickComplete = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -135,12 +137,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                                 <div
                                                     key={i}
                                                     className="h-6 w-6 rounded-lg bg-slate-800 border-2 border-[#0A0D18] flex items-center justify-center text-[8px] font-black text-slate-500 overflow-hidden"
-                                                    title={a.name}
+                                                    title={a.user?.name || a.name}
                                                 >
-                                                    {a.avatar_url ? (
-                                                        <img src={a.avatar_url} alt={a.name} className="h-full w-full object-cover" />
+                                                    {(a.user?.avatar_url || a.avatar_url) ? (
+                                                        <img src={a.user?.avatar_url || a.avatar_url} alt={a.user?.name || a.name} className="h-full w-full object-cover" />
                                                     ) : (
-                                                        a.name?.substring(0, 1).toUpperCase() || 'U'
+                                                        (a.user?.name || a.name)?.substring(0, 1).toUpperCase() || 'U'
                                                     )}
                                                 </div>
                                             ))
