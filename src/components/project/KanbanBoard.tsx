@@ -25,6 +25,20 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
         }
     }, [projectId, fetchProjectTasks, fetchProjectStatuses]);
 
+    // Debug logging - must be before early returns
+    useEffect(() => {
+        if (tasks.length > 0 && statuses.length > 0) {
+            console.log('[KanbanBoard] Tasks by status:');
+            statuses.forEach(status => {
+                const statusTasks = tasks.filter(t => t.status_id === status.id);
+                console.log(`  ${status.name} (${status.id.substring(0, 8)}): ${statusTasks.length} tasks`);
+                if (statusTasks.length > 0) {
+                    console.log(`    Sample: ${statusTasks[0].title}`);
+                }
+            });
+        }
+    }, [tasks, statuses]);
+
     const onDragEnd = (result: DropResult) => {
         const { destination, source, draggableId } = result;
 

@@ -25,6 +25,7 @@ import { useTaskStore, Task } from '@/store/useTaskStore';
 import { format } from 'date-fns';
 import api from '@/services/api';
 import { toast } from 'sonner';
+import CommentSummarizer from '../project/CommentSummarizer';
 
 interface TaskDetailModalProps {
     task: Task | null;
@@ -310,6 +311,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                 <MessageSquare className="h-4 w-4" />
                                 Comments ({comments.length})
                             </label>
+
+                            <CommentSummarizer
+                                projectId={task.project_id}
+                                comments={comments}
+                            />
 
                             <div className="space-y-3">
                                 {comments.map((comment) => (

@@ -25,26 +25,36 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId }) => {
     const [prompt, setPrompt] = useState('');
     const [taskCount, setTaskCount] = useState(8);
     const [currentGen, setCurrentGen] = useState<AIGeneration | null>(null);
+    const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
     const handleGenerate = async () => {
         if (!prompt.trim()) return;
 
         try {
             const gen = await generateTasks(projectId, prompt, taskCount);
-            console.log('✅ Tasks generated:', gen.generated_tasks.length);
             setCurrentGen(gen);
+            // Select all by default when new tasks are generated
+            setSelectedIndices(gen.generated_tasks.map((_, i) => i));
         } catch (err: any) {
             console.error('❌ Error generating tasks:', err.message);
         }
     };
 
+    const toggleTaskSelection = (idx: number) => {
+        setSelectedIndices(prev =>
+            prev.includes(idx)
+                ? prev.filter(i => i !== idx)
+                : [...prev, idx]
+        );
+    };
+
     const handleAccept = async () => {
-        if (!currentGen) return;
+        if (!currentGen || selectedIndices.length === 0) return;
         try {
-            const indices = currentGen.generated_tasks.map((_, i) => i);
-            await acceptGeneration(projectId, currentGen.id, indices);
+            await acceptGeneration(projectId, currentGen.id, selectedIndices);
             await fetchProjectTasks(projectId);
             setCurrentGen(null);
+            setSelectedIndices([]);
             setPrompt('');
         } catch (err: any) {
             console.error(err);
@@ -129,48 +139,84 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId }) => {
                         <div className="flex gap-3">
                             <Button
                                 variant="ghost"
-                                onClick={() => setCurrentGen(null)}
+                                onClick={() => setSelectedIndices(currentGen.generated_tasks.map((_, i) => i))}
+                                disabled={selectedIndices.length === currentGen.generated_tasks.length}
                                 className="text-slate-500 hover:text-white uppercase font-black text-[9px] tracking-widest"
                             >
-                                Reject All
+                                Select All
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                onClick={() => setSelectedIndices([])}
+                                disabled={selectedIndices.length === 0}
+                                className="text-slate-500 hover:text-white uppercase font-black text-[9px] tracking-widest"
+                            >
+                                Deselect All
                             </Button>
                             <Button
                                 onClick={handleAccept}
-                                disabled={isGenerating}
+                                disabled={isGenerating || selectedIndices.length === 0}
                                 className="bg-emerald-500 hover:bg-emerald-400 text-[#030408] font-black h-10 rounded-xl px-6 uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/20 gap-3"
                             >
-                                <CheckCircle2 className="h-4 w-4" /> Deploy to Workspace
+                                <CheckCircle2 className="h-4 w-4" /> Deploy {selectedIndices.length} {selectedIndices.length === 1 ? 'Task' : 'Tasks'}
                             </Button>
                         </div>
                     </div>
 
                     <div className="grid gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                        {currentGen.generated_tasks.map((task, idx) => (
-                            <Card key={idx} className="bg-[#0A0D18] border-white/5 hover:border-cyan-500/30 transition-all group">
-                                <CardContent className="p-4 flex items-start gap-4">
-                                    <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:border-cyan-500/40 transition-colors">
-                                        <span className="text-sm font-black text-cyan-400">{idx + 1}</span>
-                                    </div>
-                                    <div className="flex-1 space-y-2 min-w-0">
-                                        <h4 className="text-base font-bold text-white group-hover:text-cyan-400 transition-colors leading-snug">{task.title}</h4>
-                                        <p className="text-xs text-slate-500 font-bold uppercase tracking-tight line-clamp-2 leading-relaxed">{task.description}</p>
-                                        <div className="flex items-center gap-4 pt-1">
-                                            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-600">
-                                                <Flag className="h-3.5 w-3.5" />
-                                                <Badge variant="outline" className="text-[8px] border-slate-700 h-5 px-2">{task.priority || 'medium'}</Badge>
-                                            </div>
-                                            {task.estimated_hours && (
-                                                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-600">
-                                                    <Calendar className="h-3.5 w-3.5" />
-                                                    <span>{task.estimated_hours}h</span>
-                                                </div>
+                        {currentGen.generated_tasks.map((task, idx) => {
+                            const isSelected = selectedIndices.includes(idx);
+                            return (
+                                <Card
+                                    key={idx}
+                                    onClick={() => toggleTaskSelection(idx)}
+                                    className={`bg-[#0A0D18] border transition-all group cursor-pointer ${isSelected
+                                        ? 'border-emerald-500/50 bg-emerald-500/5'
+                                        : 'border-white/5 hover:border-cyan-500/30'
+                                        }`}
+                                >
+                                    <CardContent className="p-4 flex items-start gap-4">
+                                        <div className={`h-10 w-10 flex-shrink-0 rounded-xl flex items-center justify-center transition-all border ${isSelected
+                                            ? 'bg-emerald-500/20 border-emerald-500/40'
+                                            : 'bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-cyan-500/20 group-hover:border-cyan-500/40'
+                                            }`}>
+                                            {isSelected ? (
+                                                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                                            ) : (
+                                                <span className="text-sm font-black text-cyan-400">{idx + 1}</span>
                                             )}
                                         </div>
-                                    </div>
-                                    <ChevronRight className="h-5 w-5 text-slate-700 group-hover:text-cyan-500 transition-colors flex-shrink-0" />
-                                </CardContent>
-                            </Card>
-                        ))}
+                                        <div className="flex-1 space-y-2 min-w-0">
+                                            <h4 className={`text-base font-bold transition-colors leading-snug ${isSelected ? 'text-emerald-400' : 'text-white group-hover:text-cyan-400'
+                                                }`}>{task.title}</h4>
+                                            <p className="text-xs text-slate-500 font-bold uppercase tracking-tight line-clamp-2 leading-relaxed">{task.description}</p>
+                                            <div className="flex items-center gap-4 pt-1">
+                                                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-600">
+                                                    <Flag className="h-3.5 w-3.5" />
+                                                    <Badge variant="outline" className="text-[8px] border-slate-700 h-5 px-2">{task.priority || 'medium'}</Badge>
+                                                </div>
+                                                {task.estimated_hours && (
+                                                    <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-600">
+                                                        <Calendar className="h-3.5 w-3.5" />
+                                                        <span>{task.estimated_hours}h</span>
+                                                    </div>
+                                                )}
+                                                {task.suggested_assignee && (
+                                                    <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-cyan-500/80">
+                                                        <div className="h-4 w-4 rounded bg-cyan-500/10 flex items-center justify-center text-[8px]">
+                                                            {task.suggested_assignee.charAt(0).toUpperCase()}
+                                                        </div>
+                                                        <span>Assign to: {task.suggested_assignee}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <ChevronRight className={`h-5 w-5 transition-colors flex-shrink-0 ${isSelected ? 'text-emerald-500' : 'text-slate-700 group-hover:text-cyan-500'
+                                            }`} />
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                 </div>
             )}

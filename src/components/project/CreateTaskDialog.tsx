@@ -12,8 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Zap, Loader2 } from 'lucide-react';
+import { Plus, Zap, Loader2, Sparkles } from 'lucide-react';
 import { useTaskStore } from '@/store/useTaskStore';
+import { useAIStore } from '@/store/useAIStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 
@@ -26,12 +27,27 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
     const queryClient = useQueryClient();
     const { activeWorkspace } = useWorkspaceStore();
     const { createTask, isLoading, statuses, fetchProjectStatuses } = useTaskStore();
+    const { detailTask } = useAIStore();
 
     const [isOpen, setIsOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
     const [statusId, setStatusId] = useState('');
+    const [isDetailing, setIsDetailing] = useState(false);
+
+    const handleAIDetail = async () => {
+        if (!title.trim()) return;
+        setIsDetailing(true);
+        try {
+            const detailed = await detailTask(projectId, title, description);
+            setDescription(detailed);
+        } catch (error) {
+            console.error('AI Detailer error:', error);
+        } finally {
+            setIsDetailing(false);
+        }
+    };
 
     useEffect(() => {
         if (isOpen && statuses.length === 0) {
@@ -102,7 +118,23 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="t-desc" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Description</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="t-desc" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Description</Label>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={handleAIDetail}
+                                    disabled={isDetailing || !title.trim()}
+                                    className="h-6 px-2 rounded-lg text-[9px] font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 gap-2"
+                                >
+                                    {isDetailing ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                        <Sparkles className="h-3 w-3" />
+                                    )}
+                                    AI Detailer
+                                </Button>
+                            </div>
                             <Textarea
                                 id="t-desc"
                                 value={description}

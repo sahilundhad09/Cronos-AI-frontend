@@ -21,6 +21,7 @@ import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import api from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { CreateProjectDialog } from '@/components/project/CreateProjectDialog';
+import ProjectPulse from '@/components/project/ProjectPulse';
 import { useNavigate } from 'react-router-dom';
 
 const DashboardStatCard = ({ label, value, trend, icon, color, isLoading }: { label: string; value: string; trend: string; icon: React.ReactNode; color: string; isLoading?: boolean }) => (
@@ -360,6 +361,11 @@ const DashboardPage = () => {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* Project Pulse Widget */}
+                        {projectsData && projectsData.length > 0 && (
+                            <ProjectPulse projectId={projectsData[0].id} />
+                        )}
 
                         {/* AI Analysis Result Display */}
                         {analysisResult && (

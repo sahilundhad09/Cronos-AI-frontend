@@ -148,9 +148,20 @@ export const useTaskStore = create<TaskState>((set, get) => ({
                 project_member_ids: memberIds
             });
             const updatedTask = response.data.data;
+
+            // Update the task in the store
             set((state) => ({
                 tasks: state.tasks.map(t => t.id === taskId ? updatedTask : t)
             }));
+
+            // Refetch all tasks to ensure Kanban board updates correctly
+            // This is necessary because status_id changes need to trigger column re-rendering
+            const projectId = updatedTask.project_id;
+            if (projectId) {
+                const tasksResponse = await api.get(`/projects/${projectId}/tasks`);
+                set({ tasks: tasksResponse.data.data });
+            }
+
             toast.success('Members Assigned!', {
                 description: 'Team members have been assigned to the task.',
             });

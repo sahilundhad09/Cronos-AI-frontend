@@ -7,10 +7,10 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { Shield, UserPlus, Loader2, Check, Users } from 'lucide-react';
+import { Shield, UserPlus, Loader2, Check, Users, Sparkles, Info } from 'lucide-react';
 import { useTaskStore, Task } from '@/store/useTaskStore';
+import { useAIStore } from '@/store/useAIStore';
 import { useProjectStore } from '@/store/useProjectStore';
-import { Badge } from '@/components/ui/badge';
 
 interface AssignTaskDialogProps {
     task: Task;
@@ -21,8 +21,19 @@ interface AssignTaskDialogProps {
 const AssignTaskDialog: React.FC<AssignTaskDialogProps> = ({ task, isOpen, onClose }) => {
     const { projectMembers, fetchProjectMembers } = useProjectStore();
     const { assignMembers, removeAssignee } = useTaskStore();
+    const { suggestAssignment, isGenerating: isGeneratingAI } = useAIStore();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [aiSuggestion, setAiSuggestion] = useState<any>(null);
+
+    const handleAISuggest = async () => {
+        try {
+            const result = await suggestAssignment(task.project_id!, task.id);
+            setAiSuggestion(result.suggestion);
+        } catch (err) {
+            console.error('AI Suggestion failed', err);
+        }
+    };
 
     useEffect(() => {
         if (isOpen && task.project_id) {
@@ -77,10 +88,36 @@ const AssignTaskDialog: React.FC<AssignTaskDialogProps> = ({ task, isOpen, onClo
                             <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                                 <Users size={14} className="text-cyan-500" /> Project Roster
                             </h4>
-                            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[9px] uppercase font-black">
-                                {projectMembers.length} Specialists Available
-                            </Badge>
+                            <Button
+                                variant="ghost"
+                                onClick={handleAISuggest}
+                                disabled={isGeneratingAI}
+                                className="h-7 px-3 rounded-lg text-[9px] font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 gap-2 border border-cyan-500/20"
+                            >
+                                {isGeneratingAI ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                    <Sparkles className="h-3.5 w-3.5" />
+                                )}
+                                AI recommend
+                            </Button>
                         </div>
+
+                        {aiSuggestion && (
+                            <div className="p-4 rounded-2xl bg-cyan-500/5 border border-cyan-500/20 space-y-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                                <div className="flex items-center gap-2 text-cyan-400">
+                                    <Info className="h-4 w-4" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Neural Suggestion: {aiSuggestion.suggested_member_name}</span>
+                                </div>
+                                <p className="text-[11px] text-slate-400 font-bold leading-relaxed">
+                                    <span className="text-white">Reason:</span> {aiSuggestion.reason}
+                                </p>
+                                <div className="pt-1 flex items-center gap-2">
+                                    <Shield className="h-3 w-3 text-cyan-500/50" />
+                                    <span className="text-[8px] text-slate-600 font-black uppercase tracking-widest italic">{aiSuggestion.workload_analysis}</span>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="h-[300px] pr-2 overflow-y-auto custom-scrollbar">
                             <div className="space-y-2">

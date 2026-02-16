@@ -18,6 +18,10 @@ interface AIState {
     generateTasks: (projectId: string, description: string, count?: number) => Promise<AIGeneration>;
     acceptGeneration: (projectId: string, generationId: string, taskIndices?: number[]) => Promise<void>;
     fetchGenerations: (projectId: string) => Promise<void>;
+    detailTask: (projectId: string, title: string, description?: string) => Promise<string>;
+    summarizeComments: (projectId: string, comments: any[]) => Promise<string>;
+    suggestAssignment: (projectId: string, taskId?: string, title?: string, description?: string) => Promise<any>;
+    getProjectPulse: (projectId: string) => Promise<any>;
 }
 
 export const useAIStore = create<AIState>((set) => ({
@@ -87,6 +91,75 @@ export const useAIStore = create<AIState>((set) => ({
             set({ error: message, isGenerating: false });
             toast.error('Deployment Failed', {
                 description: message,
+            });
+            throw error;
+        }
+    },
+
+    detailTask: async (projectId: string, title: string, description?: string) => {
+        set({ isGenerating: true });
+        try {
+            const response = await api.post(`/projects/${projectId}/ai/detail-task`, {
+                title,
+                description
+            });
+            set({ isGenerating: false });
+            return response.data.data.detailed_description;
+        } catch (error: any) {
+            set({ isGenerating: false });
+            toast.error('Detailer Engine Offline', {
+                description: error.response?.data?.message || 'Failed to expand task details.'
+            });
+            throw error;
+        }
+    },
+
+    summarizeComments: async (projectId: string, comments: any[]) => {
+        set({ isGenerating: true });
+        try {
+            const response = await api.post(`/projects/${projectId}/ai/summarize-comments`, {
+                comments
+            });
+            set({ isGenerating: false });
+            return response.data.data.summary;
+        } catch (error: any) {
+            set({ isGenerating: false });
+            toast.error('Summarizer Failure', {
+                description: error.response?.data?.message || 'Failed to condense discussion.'
+            });
+            throw error;
+        }
+    },
+
+    suggestAssignment: async (projectId: string, taskId?: string, title?: string, description?: string) => {
+        set({ isGenerating: true });
+        try {
+            const response = await api.post(`/projects/${projectId}/ai/suggest-assignment`, {
+                taskId,
+                title,
+                description
+            });
+            set({ isGenerating: false });
+            return response.data.data;
+        } catch (error: any) {
+            set({ isGenerating: false });
+            toast.error('Assignment Engine Offline', {
+                description: error.response?.data?.message || 'Failed to get assignment suggests.'
+            });
+            throw error;
+        }
+    },
+
+    getProjectPulse: async (projectId: string) => {
+        set({ isGenerating: true });
+        try {
+            const response = await api.get(`/projects/${projectId}/ai/pulse`);
+            set({ isGenerating: false });
+            return response.data.data;
+        } catch (error: any) {
+            set({ isGenerating: false });
+            toast.error('Pulse Engine Offline', {
+                description: error.response?.data?.message || 'Failed to get project pulse.'
             });
             throw error;
         }
