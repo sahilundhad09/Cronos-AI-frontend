@@ -14,7 +14,8 @@ import {
     Brain,
     ChevronsUpDown,
     Menu,
-    Settings
+    Settings,
+    BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -45,6 +46,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PermissionGate } from '@/components/auth/PermissionGate';
+import { useSocketInit, useNotificationSocket } from '@/hooks/useSocket';
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -288,6 +290,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const { notifications, unreadCount, fetchNotifications, fetchUnreadCount, markAsRead } = useNotificationStore();
     const { acceptProjectInvitation } = useProjectStore();
 
+    // Initialize socket connection and notification listener
+    useSocketInit();
+    useNotificationSocket();
+
     useEffect(() => {
         fetchWorkspaces();
         fetchNotifications();
@@ -388,6 +394,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Briefcase, label: 'Projects', path: '/projects' },
         { icon: Users, label: 'Team', path: '/team' },
+        { icon: Brain, label: 'Neural Engine', path: '/ai-chat' },
+        { icon: BarChart3, label: 'Analytics', path: '/analytics' },
     ];
 
     const sidebarProps = {

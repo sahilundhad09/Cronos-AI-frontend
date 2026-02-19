@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     Zap,
@@ -11,7 +11,16 @@ import {
     Activity as ActivityIcon,
     AlertCircle,
     Loader2,
-    CheckCircle2
+    CheckCircle2,
+    Clock,
+    AlertTriangle,
+    Calendar,
+    Brain,
+    BarChart3,
+    Users,
+    MessageSquare,
+    Rocket,
+    Flame
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -19,11 +28,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import api from '@/services/api';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format, isPast, isToday, isTomorrow } from 'date-fns';
 import { CreateProjectDialog } from '@/components/project/CreateProjectDialog';
 import ProjectPulse from '@/components/project/ProjectPulse';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 
+// ─── Stat Card ────────────────────────────────────────────────────────────────
 const DashboardStatCard = ({ label, value, trend, icon, color, isLoading }: { label: string; value: string; trend: string; icon: React.ReactNode; color: string; isLoading?: boolean }) => (
     <Card className="bg-[#0A0D18] border-white/5 hover:border-white/10 transition-all duration-300 group">
         <CardContent className="p-6">
@@ -51,6 +62,7 @@ const DashboardStatCard = ({ label, value, trend, icon, color, isLoading }: { la
     </Card>
 );
 
+// ─── Skeletons ────────────────────────────────────────────────────────────────
 const ProjectCardSkeleton = () => (
     <Card className="bg-[#0A0D18] border-white/5 animate-pulse">
         <CardContent className="p-6 space-y-4">
@@ -77,14 +89,100 @@ const ActivitySkeleton = () => (
     </div>
 );
 
+// ─── Completion Ring ──────────────────────────────────────────────────────────
+const CompletionRing = ({ percentage, size = 80, strokeWidth = 6 }: { percentage: number; size?: number; strokeWidth?: number }) => {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (percentage / 100) * circumference;
+    const color = percentage >= 70 ? '#22c55e' : percentage >= 40 ? '#f59e0b' : '#ef4444';
+
+    return (
+        <div className="relative" style={{ width: size, height: size }}>
+            <svg className="transform -rotate-90" width={size} height={size}>
+                <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={strokeWidth} />
+                <circle
+                    cx={size / 2} cy={size / 2} r={radius} fill="none"
+                    stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"
+                    strokeDasharray={circumference} strokeDashoffset={offset}
+                    className="transition-all duration-1000 ease-out"
+                    style={{ filter: `drop-shadow(0 0 6px ${color}60)` }}
+                />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-black text-white">{percentage}%</span>
+            </div>
+        </div>
+    );
+};
+
+// ─── Quick Action Button ──────────────────────────────────────────────────────
+const QuickAction = ({ icon: Icon, label, onClick, color }: { icon: any; label: string; onClick: () => void; color: string }) => (
+    <button
+        onClick={onClick}
+        className={`flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-${color}-500/30 hover:bg-${color}-500/5 transition-all group cursor-pointer`}
+    >
+        <div className={`p-2.5 rounded-xl bg-${color}-500/10 text-${color}-400 group-hover:scale-110 transition-transform`}>
+            <Icon className="h-5 w-5" />
+        </div>
+        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest group-hover:text-white transition-colors text-center leading-tight">{label}</span>
+    </button>
+);
+
+// ─── Deadline Item ────────────────────────────────────────────────────────────
+const DeadlineItem = ({ task, onClick }: { task: any; onClick: () => void }) => {
+    const dueDate = new Date(task.due_date);
+    const overdue = isPast(dueDate) && !task.completed_at;
+    const dueToday = isToday(dueDate);
+    const dueTomorrow = isTomorrow(dueDate);
+
+    let urgencyColor = 'text-slate-400 border-white/5';
+    let urgencyLabel = format(dueDate, 'MMM d');
+    let urgencyIcon = <Calendar className="h-3.5 w-3.5" />;
+
+    if (overdue) {
+        urgencyColor = 'text-red-400 border-red-500/20 bg-red-500/5';
+        urgencyLabel = 'Overdue';
+        urgencyIcon = <AlertTriangle className="h-3.5 w-3.5" />;
+    } else if (dueToday) {
+        urgencyColor = 'text-amber-400 border-amber-500/20 bg-amber-500/5';
+        urgencyLabel = 'Today';
+        urgencyIcon = <Flame className="h-3.5 w-3.5" />;
+    } else if (dueTomorrow) {
+        urgencyColor = 'text-orange-400 border-orange-500/20 bg-orange-500/5';
+        urgencyLabel = 'Tomorrow';
+        urgencyIcon = <Clock className="h-3.5 w-3.5" />;
+    }
+
+    return (
+        <div
+            onClick={onClick}
+            className={`flex items-center justify-between p-3 rounded-xl border ${urgencyColor} hover:bg-white/[0.02] transition-all cursor-pointer group`}
+        >
+            <div className="flex items-center gap-3 min-w-0">
+                <div className={`flex-shrink-0 p-1.5 rounded-lg ${overdue ? 'bg-red-500/10' : dueToday ? 'bg-amber-500/10' : 'bg-white/5'}`}>
+                    {urgencyIcon}
+                </div>
+                <div className="min-w-0">
+                    <p className="text-xs font-bold text-white truncate group-hover:text-cyan-400 transition-colors">{task.title}</p>
+                    <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{task.project?.name || 'Project'}</p>
+                </div>
+            </div>
+            <div className={`flex-shrink-0 px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${urgencyColor}`}>
+                {urgencyLabel}
+            </div>
+        </div>
+    );
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━ DASHBOARD PAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const DashboardPage = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
     const { activeWorkspace } = useWorkspaceStore();
-    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-    const [analysisResult, setAnalysisResult] = React.useState<string | null>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisResult, setAnalysisResult] = useState<string | null>(null);
 
-    // Fetch User Performance (Pending Tasks)
+    // Fetch User Performance
     const { data: userPerformance } = useQuery({
         queryKey: ['user-performance', user?.id],
         queryFn: async () => {
@@ -131,12 +229,25 @@ const DashboardPage = () => {
         }
     };
 
+    // Derive upcoming deadlines from pending tasks
+    const upcomingDeadlines = (userPerformance?.pendingTasks || [])
+        .filter((t: any) => t.due_date)
+        .sort((a: any, b: any) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+        .slice(0, 5);
+
+    const overdueCount = upcomingDeadlines.filter((t: any) => isPast(new Date(t.due_date))).length;
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
-            transition: { staggerChildren: 0.1 }
+            transition: { staggerChildren: 0.08 }
         }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 16 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
     };
 
     if (!activeWorkspace && !analyticsLoading) {
@@ -155,8 +266,8 @@ const DashboardPage = () => {
 
     return (
         <div className="h-full overflow-y-auto custom-scrollbar">
-            <div className="p-6 lg:p-10 max-w-7xl mx-auto space-y-10">
-                {/* Header Section */}
+            <div className="p-6 lg:p-10 max-w-7xl mx-auto space-y-8">
+                {/* ─── Header ─────────────────────────────────────────────── */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-2">
                         <h1 className="text-4xl font-heading font-black tracking-tighter uppercase italic">
@@ -167,8 +278,8 @@ const DashboardPage = () => {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button variant="outline" className="border-white/5 bg-white/5 hover:bg-white/10 text-white font-bold h-12 rounded-xl px-6 uppercase tracking-widest text-[10px] hidden sm:flex">
-                            Intelligence Report
+                        <Button variant="outline" className="border-white/5 bg-white/5 hover:bg-white/10 text-white font-bold h-12 rounded-xl px-6 uppercase tracking-widest text-[10px] hidden sm:flex" onClick={() => navigate('/analytics')}>
+                            <BarChart3 className="mr-2 h-4 w-4" /> Analytics
                         </Button>
                         <CreateProjectDialog
                             trigger={
@@ -180,12 +291,40 @@ const DashboardPage = () => {
                     </div>
                 </div>
 
-                {/* Stats Grid */}
+                {/* ─── Quick Actions ──────────────────────────────────────── */}
+                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                    <motion.div variants={itemVariants}>
+                        <QuickAction icon={Plus} label="New Project" onClick={() => { }} color="cyan" />
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                        <QuickAction icon={Brain} label="AI Chat" onClick={() => navigate('/ai-chat')} color="purple" />
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                        <QuickAction icon={BarChart3} label="Analytics" onClick={() => navigate('/analytics')} color="emerald" />
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                        <QuickAction icon={Users} label="Team" onClick={() => navigate('/team')} color="amber" />
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="hidden lg:block">
+                        <QuickAction icon={Target} label="Projects" onClick={() => navigate('/projects')} color="cyan" />
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="hidden lg:block">
+                        <QuickAction icon={MessageSquare} label="AI Chat" onClick={() => navigate('/ai-chat')} color="teal" />
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="hidden lg:block">
+                        <QuickAction icon={Rocket} label="Deploy" onClick={() => { }} color="indigo" />
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="hidden lg:block">
+                        <QuickAction icon={Zap} label="Quick Task" onClick={() => { }} color="rose" />
+                    </motion.div>
+                </motion.div>
+
+                {/* ─── Stats Grid ─────────────────────────────────────────── */}
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                    className="grid grid-cols-2 md:grid-cols-4 gap-4"
                 >
                     <DashboardStatCard
                         label="Active Projects"
@@ -221,13 +360,15 @@ const DashboardPage = () => {
                     />
                 </motion.div>
 
-                {/* Main Content Grid */}
+                {/* ─── Main Content Grid ──────────────────────────────────── */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Active Projects */}
-                    <div className="lg:col-span-2 space-y-10">
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h2 className="text-xl font-heading font-black tracking-tight uppercase italic flex items-center gap-2">
+                    {/* Left Column (2/3) */}
+                    <div className="lg:col-span-2 space-y-8">
+
+                        {/* Active Projects */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between px-1">
+                                <h2 className="text-lg font-heading font-black tracking-tight uppercase italic flex items-center gap-2">
                                     <Target className="h-5 w-5 text-cyan-400" /> Active <span className="text-slate-500">Orchestrations</span>
                                 </h2>
                                 <Button
@@ -239,7 +380,7 @@ const DashboardPage = () => {
                                 </Button>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {projectsLoading ? (
                                     [1, 2, 3, 4].map((i) => <ProjectCardSkeleton key={i} />)
                                 ) : projectsData && projectsData.length > 0 ? (
@@ -249,7 +390,7 @@ const DashboardPage = () => {
                                             className="bg-[#0A0D18] border-white/5 hover:border-cyan-500/30 transition-all duration-500 group overflow-hidden cursor-pointer"
                                             onClick={() => navigate(`/projects/${project.id}`)}
                                         >
-                                            <CardContent className="p-6 space-y-4">
+                                            <CardContent className="p-5 space-y-3">
                                                 <div className="flex justify-between items-start">
                                                     <div className="bg-white/5 p-2 rounded-lg">
                                                         <Layers className="h-5 w-5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
@@ -259,16 +400,21 @@ const DashboardPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <h3 className="text-lg font-heading font-black text-white group-hover:text-cyan-400 transition-colors truncate">{project.name}</h3>
-                                                    <p className="text-xs text-slate-500 font-bold uppercase tracking-tight line-clamp-1">{project.description || 'No description provided'}</p>
+                                                    <h3 className="text-base font-heading font-black text-white group-hover:text-cyan-400 transition-colors truncate">{project.name}</h3>
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight line-clamp-1">{project.description || 'No description provided'}</p>
                                                 </div>
-                                                <div className="space-y-2 pt-2">
+                                                <div className="space-y-1.5 pt-1">
                                                     <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-500">
-                                                        <span>Protocol Sync</span>
+                                                        <span>Progress</span>
                                                         <span>{project.progress || 0}%</span>
                                                     </div>
                                                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                                        <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${project.progress || 0}%` }} />
+                                                        <motion.div
+                                                            initial={{ width: 0 }}
+                                                            animate={{ width: `${project.progress || 0}%` }}
+                                                            transition={{ duration: 1, delay: 0.3 }}
+                                                            className="h-full bg-gradient-to-r from-cyan-500 to-teal-400 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                                                        />
                                                     </div>
                                                 </div>
                                             </CardContent>
@@ -282,14 +428,19 @@ const DashboardPage = () => {
                             </div>
                         </div>
 
-                        {/* Pending Tasks Section - The specialist's command hub */}
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h2 className="text-xl font-heading font-black tracking-tight uppercase italic flex items-center gap-2">
+                        {/* Pending Tasks */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between px-1">
+                                <h2 className="text-lg font-heading font-black tracking-tight uppercase italic flex items-center gap-2">
                                     <Zap className="h-5 w-5 text-emerald-400" /> Assigned <span className="text-slate-500">Milestones</span>
                                 </h2>
+                                {userPerformance?.pendingTasks?.length > 0 && (
+                                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-full border border-emerald-500/20">
+                                        {userPerformance.pendingTasks.length} Pending
+                                    </span>
+                                )}
                             </div>
-                            <div className="grid gap-4">
+                            <div className="grid gap-3">
                                 {userPerformance?.pendingTasks && userPerformance.pendingTasks.length > 0 ? (
                                     userPerformance.pendingTasks.map((task: any) => (
                                         <Card
@@ -299,15 +450,25 @@ const DashboardPage = () => {
                                         >
                                             <CardContent className="p-4 flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-[#030408] transition-all">
+                                                    <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-[#030408] transition-all flex-shrink-0">
                                                         <Bot size={18} />
                                                     </div>
-                                                    <div className="space-y-1">
-                                                        <h4 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors uppercase italic">{task.title}</h4>
+                                                    <div className="space-y-0.5 min-w-0">
+                                                        <h4 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors truncate">{task.title}</h4>
                                                         <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Sector: {task.project?.name || 'Unknown'}</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-3 flex-shrink-0">
+                                                    {task.due_date && (
+                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${isPast(new Date(task.due_date)) ? 'text-red-400 border-red-500/30 bg-red-500/5' :
+                                                            isToday(new Date(task.due_date)) ? 'text-amber-400 border-amber-500/30 bg-amber-500/5' :
+                                                                'text-slate-500 border-white/5'
+                                                            }`}>
+                                                            {isPast(new Date(task.due_date)) ? 'Overdue' :
+                                                                isToday(new Date(task.due_date)) ? 'Today' :
+                                                                    format(new Date(task.due_date), 'MMM d')}
+                                                        </span>
+                                                    )}
                                                     <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border transition-colors ${task.priority === 'urgent' ? 'border-red-500/30 text-red-500 bg-red-500/5' :
                                                         task.priority === 'high' ? 'border-orange-500/30 text-orange-500 bg-orange-500/5' :
                                                             'border-emerald-500/30 text-emerald-500 bg-emerald-500/5'
@@ -320,16 +481,80 @@ const DashboardPage = () => {
                                         </Card>
                                     ))
                                 ) : (
-                                    <div className="py-12 text-center bg-white/[0.02] border border-dashed border-white/5 rounded-2xl">
-                                        <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest italic">No pending mission objectives assigned to your signature.</p>
+                                    <div className="py-10 text-center bg-white/[0.02] border border-dashed border-white/5 rounded-2xl">
+                                        <CheckCircle2 className="h-6 w-6 text-emerald-500/30 mx-auto mb-2" />
+                                        <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest italic">All clear — no pending objectives</p>
                                     </div>
                                 )}
                             </div>
                         </div>
                     </div>
 
-                    {/* AI Assistant Utility / Activity Feed */}
-                    <div className="space-y-8">
+                    {/* Right Column (1/3) */}
+                    <div className="space-y-6">
+
+                        {/* Personal Performance Ring */}
+                        <Card className="bg-[#0A0D18] border-white/5 overflow-hidden">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <TrendingUp className="h-3.5 w-3.5 text-cyan-400" /> Personal Stats
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-2">
+                                <div className="flex items-center gap-6">
+                                    <CompletionRing percentage={userPerformance?.completionRate || 0} />
+                                    <div className="space-y-2">
+                                        <div>
+                                            <p className="text-2xl font-black text-white">{userPerformance?.tasksCompleted || 0}<span className="text-slate-600 text-sm">/{userPerformance?.tasksAssigned || 0}</span></p>
+                                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Tasks Done</p>
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <div>
+                                                <p className="text-sm font-black text-white">{userPerformance?.onTimeDelivery || 0}%</p>
+                                                <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">On-Time</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-black text-white">{userPerformance?.averageCompletionTime || 0}d</p>
+                                                <p className="text-[7px] font-bold text-slate-600 uppercase tracking-widest">Avg Time</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Upcoming Deadlines */}
+                        <Card className="bg-[#0A0D18] border-white/5 overflow-hidden">
+                            <CardHeader className="pb-2">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                        <Calendar className="h-3.5 w-3.5 text-amber-400" /> Deadline Tracker
+                                    </CardTitle>
+                                    {overdueCount > 0 && (
+                                        <span className="text-[8px] font-black bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/20">
+                                            {overdueCount} overdue
+                                        </span>
+                                    )}
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-2 space-y-2">
+                                {upcomingDeadlines.length > 0 ? (
+                                    upcomingDeadlines.map((task: any) => (
+                                        <DeadlineItem
+                                            key={task.id}
+                                            task={task}
+                                            onClick={() => navigate(`/projects/${task.project_id}`)}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="py-6 text-center">
+                                        <Clock className="h-5 w-5 text-slate-700 mx-auto mb-2" />
+                                        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">No upcoming deadlines</p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
                         {/* AI Assistant Card */}
                         <Card className="bg-gradient-to-br from-[#0A0D18] to-[#0D1222] border border-cyan-500/20 shadow-2xl shadow-cyan-500/5 overflow-hidden relative group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-cyan-500/10 transition-all" />
@@ -338,25 +563,30 @@ const DashboardPage = () => {
                                     <Bot className="h-5 w-5 text-cyan-500" /> Neural Assistant
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
+                            <CardContent className="space-y-4">
                                 <p className="text-xs text-slate-400 font-semibold leading-relaxed">
                                     {userPerformance?.pendingTasks?.length > 0
-                                        ? `"Operator, you have ${userPerformance.pendingTasks.length} pending tasks. Re-allocation suggests focusing on high-priority links first."`
+                                        ? `"Operator, you have ${userPerformance.pendingTasks.length} pending tasks. ${overdueCount > 0 ? `⚠️ ${overdueCount} are overdue!` : 'Focus on high-priority items first.'}" `
                                         : '"Neural circuits idle. Initialize a project or invite specialists to begin synchronization protocols."'}
                                 </p>
-                                <div className="space-y-3">
+                                <div className="flex gap-2">
                                     <Button
                                         onClick={handleAnalyzeWorkspace}
                                         disabled={isAnalyzing}
-                                        className="w-full bg-cyan-500/10 hover:bg-cyan-500 hover:text-[#030408] text-cyan-400 font-black h-10 rounded-xl text-[10px] uppercase tracking-widest transition-all border border-cyan-500/20 gap-2"
+                                        className="flex-1 bg-cyan-500/10 hover:bg-cyan-500 hover:text-[#030408] text-cyan-400 font-black h-9 rounded-xl text-[9px] uppercase tracking-widest transition-all border border-cyan-500/20 gap-1"
                                     >
                                         {isAnalyzing ? (
-                                            <>
-                                                <Loader2 className="h-4 w-4 animate-spin" /> ANALYZING...
-                                            </>
+                                            <><Loader2 className="h-3 w-3 animate-spin" /> Analyzing...</>
                                         ) : (
-                                            'Analyze Workspace'
+                                            <><Brain className="h-3 w-3" /> Analyze</>
                                         )}
+                                    </Button>
+                                    <Button
+                                        onClick={() => navigate('/ai-chat')}
+                                        variant="outline"
+                                        className="border-white/10 text-white font-black h-9 rounded-xl text-[9px] uppercase tracking-widest hover:border-cyan-500/30 gap-1"
+                                    >
+                                        <MessageSquare className="h-3 w-3" /> Chat
                                     </Button>
                                 </div>
                             </CardContent>
@@ -367,7 +597,7 @@ const DashboardPage = () => {
                             <ProjectPulse projectId={projectsData[0].id} />
                         )}
 
-                        {/* AI Analysis Result Display */}
+                        {/* AI Analysis Result */}
                         {analysisResult && (
                             <Card className="bg-[#0A0D18] border-cyan-500/20 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
                                 <CardHeader className="pb-2 border-b border-white/5 bg-cyan-500/5">
@@ -378,31 +608,45 @@ const DashboardPage = () => {
                                         <button onClick={() => setAnalysisResult(null)} className="text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest">Dismiss</button>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="p-6">
-                                    <div className="prose prose-invert prose-xs max-w-none prose-p:text-slate-400 prose-p:leading-relaxed prose-strong:text-cyan-400 prose-ul:list-disc prose-ul:pl-4 prose-li:text-slate-400 prose-li:mb-2 whitespace-pre-line text-xs font-medium">
-                                        {analysisResult}
+                                <CardContent className="p-5">
+                                    <div className="prose prose-invert prose-xs max-w-none text-slate-300">
+                                        <ReactMarkdown
+                                            components={{
+                                                p: ({ children }) => <p className="mb-2 last:mb-0 text-xs text-slate-400 leading-relaxed">{children}</p>,
+                                                strong: ({ children }) => <strong className="text-cyan-400 font-black">{children}</strong>,
+                                                ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                                                ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                                                li: ({ children }) => <li className="text-xs text-slate-400">{children}</li>,
+                                                h1: ({ children }) => <h1 className="text-sm font-black text-white mb-2">{children}</h1>,
+                                                h2: ({ children }) => <h2 className="text-xs font-black text-white mb-1.5">{children}</h2>,
+                                                h3: ({ children }) => <h3 className="text-xs font-black text-white mb-1">{children}</h3>,
+                                            }}
+                                        >
+                                            {analysisResult}
+                                        </ReactMarkdown>
                                     </div>
                                 </CardContent>
                             </Card>
                         )}
 
                         {/* Activity Stream */}
-                        <div className="space-y-6">
-                            <h3 className="text-sm font-heading font-black text-slate-400 uppercase italic tracking-widest flex items-center gap-2 px-2">
-                                <ActivityIcon className="h-4 w-4 text-emerald-500" /> Data <span className="text-slate-600">Stream</span>
+                        <div className="space-y-4">
+                            <h3 className="text-[10px] font-heading font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
+                                <ActivityIcon className="h-3.5 w-3.5 text-emerald-500" /> Live Feed
                             </h3>
-                            <div className="space-y-5 border-l border-white/5 ml-4 pl-6 relative min-h-[100px]">
+                            <div className="space-y-4 border-l border-white/5 ml-3 pl-5 relative min-h-[80px]">
                                 {analyticsLoading ? (
                                     Array.from({ length: 3 }).map((_, i) => <ActivitySkeleton key={i} />)
                                 ) : analytics?.recentActivity && analytics.recentActivity.length > 0 ? (
                                     analytics.recentActivity.map((activity: any) => (
                                         <div key={activity.id || Math.random()} className="relative">
-                                            <div className="absolute -left-[1.55rem] top-1.5 w-2 h-2 rounded-full bg-cyan-500/50 border border-[#030408]" />
-                                            <div className="space-y-1">
+                                            <div className="absolute -left-[1.39rem] top-1 w-2 h-2 rounded-full bg-cyan-500/50 border border-[#030408]" />
+                                            <div className="space-y-0.5">
                                                 <p className="text-[11px] text-white font-bold leading-tight">
-                                                    <span className="text-cyan-400">@{activity.actor?.name.split(' ')[0] || 'System'}</span> {activity.description || activity.action?.replace(/_/g, ' ')}
+                                                    <span className="text-cyan-400">@{activity.actor?.name?.split(' ')[0] || 'System'}</span>{' '}
+                                                    {activity.description || activity.action?.replace(/_/g, ' ')}
                                                 </p>
-                                                <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">
+                                                <p className="text-[8px] text-slate-600 font-black uppercase tracking-widest">
                                                     {formatDistanceToNow(new Date(activity.created_at || activity.timestamp))} ago
                                                 </p>
                                             </div>

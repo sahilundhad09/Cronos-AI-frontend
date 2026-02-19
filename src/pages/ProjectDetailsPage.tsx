@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { AIChatPanel } from '@/components/ai/AIChatPanel';
+import { useProjectSocket } from '@/hooks/useSocket';
 
 const ProjectDetailsPage = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -47,6 +48,9 @@ const ProjectDetailsPage = () => {
     } = useProjectStore();
     const { activeWorkspace } = useWorkspaceStore();
     const { user } = useAuthStore();
+
+    // Real-time WebSocket updates for this project
+    useProjectSocket(projectId);
 
     const [project, setProject] = useState<any>(null);
     const [showChat, setShowChat] = useState(false);

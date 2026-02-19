@@ -16,6 +16,8 @@ import ProjectDetailsPage from './pages/ProjectDetailsPage';
 import { ProjectSettingsPage } from './pages/ProjectSettingsPage';
 import { WorkspaceSettingsPage } from './pages/WorkspaceSettingsPage';
 import ProfilePage from './pages/ProfilePage';
+import AIChatPage from './pages/ai/AIChatPage';
+import AnalyticsDashboardPage from './pages/reports/AnalyticsDashboardPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -129,10 +131,15 @@ function App() {
                         path="/ai-chat"
                         element={
                             <ProtectedRoute>
-                                <div className="p-10 text-center">
-                                    <h2 className="text-4xl font-heading font-black text-white italic uppercase">Neural <span className="text-cyan-400">Engine</span></h2>
-                                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4">Module coming soon // Synchronizing data...</p>
-                                </div>
+                                <AIChatPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/analytics"
+                        element={
+                            <ProtectedRoute>
+                                <AnalyticsDashboardPage />
                             </ProtectedRoute>
                         }
                     />
