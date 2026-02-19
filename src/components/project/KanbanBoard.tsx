@@ -79,7 +79,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
     return (
         <div className="h-full flex flex-col overflow-hidden min-h-0">
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="flex gap-6 flex-1 h-full min-h-0 overflow-x-auto custom-scrollbar">
+                <div className="flex gap-3 sm:gap-4 md:gap-6 flex-1 h-full min-h-0 overflow-x-auto custom-scrollbar pb-2 px-1">
                     {statuses
                         .sort((a, b) => a.position - b.position)
                         .map((status) => (

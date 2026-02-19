@@ -142,11 +142,11 @@ const AnalyticsDashboardPage = () => {
     return (
         <div className="h-full flex flex-col bg-[#030408] overflow-hidden">
             {/* Header */}
-            <header className="border-b border-white/5 bg-[#030408]/50 backdrop-blur-xl px-6 py-4 flex-shrink-0">
+            <header className="border-b border-white/5 bg-[#030408]/50 backdrop-blur-xl px-4 sm:px-6 py-4 flex-shrink-0">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-white/10">
-                            <BarChart3 className="h-7 w-7 text-emerald-400" />
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-white/10">
+                            <BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 text-emerald-400" />
                         </div>
                         <div>
                             <h1 className="text-3xl font-heading font-black tracking-tighter uppercase italic text-white">
@@ -200,8 +200,8 @@ const AnalyticsDashboardPage = () => {
                                         key={project.id}
                                         onClick={() => setSelectedProject(project)}
                                         className={`rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer mb-1 ${selectedProject?.id === project.id
-                                                ? 'bg-cyan-500/10 text-cyan-400'
-                                                : 'hover:bg-white/5'
+                                            ? 'bg-cyan-500/10 text-cyan-400'
+                                            : 'hover:bg-white/5'
                                             }`}
                                     >
                                         <span className="text-xs font-bold truncate">{project.name}</span>
@@ -215,7 +215,7 @@ const AnalyticsDashboardPage = () => {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto custom-scrollbar px-6 py-6 space-y-6">
+            <main className="flex-1 overflow-y-auto custom-scrollbar px-4 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
                 {isLoading && !ws ? (
                     <div className="flex items-center justify-center h-64">
                         <div className="flex flex-col items-center gap-4">

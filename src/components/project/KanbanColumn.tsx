@@ -12,7 +12,7 @@ interface KanbanColumnProps {
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, tasks }) => {
     return (
-        <div className="flex flex-col w-96 h-full bg-white/[0.03] border border-white/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 backdrop-blur-sm">
+        <div className="flex flex-col w-72 sm:w-80 md:w-96 flex-shrink-0 h-full bg-white/[0.03] border border-white/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 backdrop-blur-sm">
             <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.01]">
                 <div className="flex items-center gap-3">
                     <div
