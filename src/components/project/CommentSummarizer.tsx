@@ -4,8 +4,6 @@ import {
     MessageSquare,
     Sparkles,
     Loader2,
-    ChevronDown,
-    ChevronUp,
     Quote
 } from 'lucide-react';
 import { useAIStore } from '@/store/useAIStore';
@@ -19,14 +17,14 @@ interface CommentSummarizerProps {
 const CommentSummarizer: React.FC<CommentSummarizerProps> = ({ projectId, comments }) => {
     const { summarizeComments, isGenerating } = useAIStore();
     const [summary, setSummary] = useState<string | null>(null);
-    const [isExpanded, setIsExpanded] = useState(false);
+
 
     const handleSummarize = async () => {
         if (comments.length === 0) return;
         try {
             const result = await summarizeComments(projectId, comments);
             setSummary(result);
-            setIsExpanded(true);
+
         } catch (error) {
             console.error('Failed to summarize comments', error);
         }
