@@ -77,16 +77,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
     };
 
     return (
-        <div className="flex flex-col h-full bg-gradient-to-b from-slate-900 to-slate-950 border-l border-white/10">
+        <div className="flex flex-col h-full bg-background border-l border-border">
             {/* Header */}
-            <div className="flex-shrink-0 px-6 py-4 border-b border-white/10 bg-slate-900/50 backdrop-blur-sm">
+            <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-border bg-[hsl(var(--app-header-bg))] backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center">
                             <Brain className="h-5 w-5 text-purple-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-heading font-black text-white uppercase tracking-tight">
+                            <h2 className="text-base font-heading font-black text-foreground uppercase tracking-tight">
                                 AI <span className="text-cyan-400">Assistant</span>
                             </h2>
                             <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
@@ -120,18 +120,18 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
 
             {/* Tabs for Chat and History */}
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'chat' | 'history')} className="flex-1 flex flex-col min-h-0">
-                <div className="border-b border-white/10 px-6 flex-shrink-0">
+                <div className="border-b border-border px-4 sm:px-6 flex-shrink-0">
                     <TabsList className="bg-transparent h-10 p-0 gap-4">
                         <TabsTrigger
                             value="chat"
-                            className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-10 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                            className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-10 px-0 text-muted-foreground data-[state=active]:text-foreground font-black uppercase text-[10px] tracking-widest transition-all gap-2"
                         >
                             <MessageSquare className="h-3.5 w-3.5" />
                             Chat
                         </TabsTrigger>
                         <TabsTrigger
                             value="history"
-                            className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-10 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                            className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-10 px-0 text-muted-foreground data-[state=active]:text-foreground font-black uppercase text-[10px] tracking-widest transition-all gap-2"
                         >
                             <History className="h-3.5 w-3.5" />
                             History
@@ -141,7 +141,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
 
                 <TabsContent value="chat" className="flex-1 flex flex-col min-h-0 m-0">
                     {/* Messages Area */}
-                    <ScrollArea className="flex-1 px-6 py-4">
+                    <ScrollArea className="flex-1 px-4 sm:px-6 py-4">
                         {isLoading && messages.length === 0 ? (
                             <div className="flex items-center justify-center h-full">
                                 <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
@@ -151,7 +151,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
                                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-white/5 flex items-center justify-center mb-4">
                                     <Sparkles className="h-8 w-8 text-cyan-400" />
                                 </div>
-                                <h3 className="text-lg font-heading font-black text-white mb-2">
+                                <h3 className="text-lg font-heading font-black text-foreground mb-2">
                                     Start a Conversation
                                 </h3>
                                 <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
@@ -160,14 +160,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
                                 <div className="mt-6 space-y-2 w-full max-w-xs">
                                     <button
                                         onClick={() => setInput("What's the current status of this project?")}
-                                        className="w-full text-left px-4 py-3 rounded-xl bg-slate-800/50 border border-white/5 hover:border-cyan-500/30 hover:bg-slate-800/70 transition-all text-sm text-slate-300"
+                                        className="w-full text-left px-4 py-3 rounded-xl bg-card border border-border hover:border-cyan-500/30 hover:bg-accent/50 transition-all text-sm text-muted-foreground"
                                     >
                                         <MessageSquare className="h-4 w-4 inline mr-2 text-cyan-400" />
                                         What's the project status?
                                     </button>
                                     <button
                                         onClick={() => setInput("Create 5 tasks for user authentication")}
-                                        className="w-full text-left px-4 py-3 rounded-xl bg-slate-800/50 border border-white/5 hover:border-cyan-500/30 hover:bg-slate-800/70 transition-all text-sm text-slate-300"
+                                        className="w-full text-left px-4 py-3 rounded-xl bg-card border border-border hover:border-cyan-500/30 hover:bg-accent/50 transition-all text-sm text-muted-foreground"
                                     >
                                         <Sparkles className="h-4 w-4 inline mr-2 text-purple-400" />
                                         Create tasks for me
@@ -190,7 +190,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
                                             <Brain className="h-4 w-4 text-purple-400" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="rounded-2xl px-4 py-3 bg-slate-800/50 border border-white/5 inline-block">
+                                            <div className="rounded-2xl px-4 py-3 bg-card border border-border inline-block">
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex gap-1">
                                                         <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
@@ -224,7 +224,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
             </Tabs>
 
             {/* Input Area */}
-            <div className="flex-shrink-0 p-4 border-t border-white/10 bg-slate-900/50 backdrop-blur-sm">
+            <div className="flex-shrink-0 p-4 border-t border-border bg-[hsl(var(--app-header-bg))] backdrop-blur-sm">
                 <div className="relative">
                     <Textarea
                         ref={textareaRef}
@@ -232,7 +232,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({ projectId, onClose }) 
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Ask me anything about your project..."
-                        className="min-h-[60px] max-h-[120px] resize-none bg-slate-800/50 border-white/10 focus:border-cyan-500/50 text-white placeholder:text-slate-500 pr-12 text-sm"
+                        className="min-h-[60px] max-h-[120px] resize-none bg-card border-border focus:border-cyan-500/50 text-foreground placeholder:text-muted-foreground pr-12 text-sm"
                         disabled={isSending}
                     />
                     <Button

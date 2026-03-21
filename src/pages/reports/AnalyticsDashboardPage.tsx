@@ -140,9 +140,9 @@ const AnalyticsDashboardPage = () => {
     })) || [];
 
     return (
-        <div className="h-full flex flex-col bg-[#030408] overflow-hidden">
+        <div className="h-full flex flex-col bg-background text-foreground overflow-hidden">
             {/* Header */}
-            <header className="border-b border-white/5 bg-[#030408]/50 backdrop-blur-xl px-4 sm:px-6 py-4 flex-shrink-0">
+            <header className="border-b border-border bg-[hsl(var(--app-header-bg))] backdrop-blur-xl px-4 sm:px-6 py-4 flex-shrink-0">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-white/10">

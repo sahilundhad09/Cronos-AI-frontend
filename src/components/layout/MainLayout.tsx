@@ -15,7 +15,10 @@ import {
     ChevronsUpDown,
     Menu,
     Settings,
-    BarChart3
+    BarChart3,
+    Sun,
+    Moon,
+    Palette
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -47,6 +50,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { useSocketInit, useNotificationSocket } from '@/hooks/useSocket';
+import { useThemeStore } from '@/store/useThemeStore';
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -191,14 +195,14 @@ const SidebarContent = ({
     location,
     handleLogout
 }: any) => (
-    <div className="flex flex-col h-full bg-[#030408] border-r border-white/5 pt-8">
+    <div className="flex flex-col h-full bg-[hsl(var(--app-sidebar-bg))] border-r border-border pt-8">
         {/* Logo */}
         <div className="px-6 mb-12">
             <Link to="/" className="flex items-center gap-3">
                 <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-xl shadow-lg shadow-cyan-500/20">
                     <Brain className="h-6 w-6 text-[#030408]" />
                 </div>
-                <span className="font-heading font-black text-2xl tracking-tighter text-white uppercase italic">Cronos <span className="text-cyan-400">AI</span></span>
+                <span className="font-heading font-black text-2xl tracking-tighter text-foreground uppercase italic">Cronos <span className="text-cyan-400">AI</span></span>
             </Link>
         </div>
 
@@ -227,7 +231,7 @@ const SidebarContent = ({
                         to={item.path}
                         className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive
                             ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                            : 'text-slate-500 hover:text-white hover:bg-white/5 border border-transparent'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-accent/60 border border-transparent'
                             }`}
                     >
                         <item.icon className={`h-5 w-5 ${isActive ? 'text-cyan-400' : 'group-hover:text-cyan-400'}`} />
@@ -244,13 +248,23 @@ const SidebarContent = ({
         </nav>
 
         {/* Footer / Settings */}
-        <div className="p-4 border-t border-white/5 space-y-2">
+        <div className="p-4 border-t border-border space-y-2">
+            <Link
+                to="/theme-selector"
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${location.pathname === '/theme-selector'
+                    ? 'bg-accent text-foreground border border-border'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/60 border border-transparent'
+                    }`}
+            >
+                <Palette className="h-5 w-5 group-hover:text-cyan-400 transition-colors" />
+                <span className="font-bold text-sm tracking-tight uppercase tracking-[0.05em]">Theme</span>
+            </Link>
             <PermissionGate roles={['owner', 'admin']}>
                 <Link
                     to={activeWorkspace?.id ? `/workspaces/${activeWorkspace.id}/settings` : '/settings'}
                     className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${location.pathname.includes('/settings')
-                        ? 'bg-white/5 text-white border border-white/10'
-                        : 'text-slate-500 hover:text-white hover:bg-white/5 border border-transparent'
+                        ? 'bg-accent text-foreground border border-border'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/60 border border-transparent'
                         }`}
                 >
                     <Settings className="h-5 w-5 group-hover:text-cyan-400 transition-colors" />
@@ -289,6 +303,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
     const { notifications, unreadCount, fetchNotifications, fetchUnreadCount, markAsRead } = useNotificationStore();
     const { acceptProjectInvitation } = useProjectStore();
+    const mode = useThemeStore((state) => state.mode);
+    const setMode = useThemeStore((state) => state.setMode);
 
     // Initialize socket connection and notification listener
     useSocketInit();
@@ -416,7 +432,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
 
     return (
-        <div className="min-h-screen bg-[#030408] flex overflow-hidden">
+        <div className="min-h-screen bg-background text-foreground flex overflow-hidden">
             {/* Desktop Sidebar */}
             <aside className="hidden lg:block w-72 h-screen sticky top-0">
                 <SidebarContent {...sidebarProps} />
@@ -425,16 +441,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 {/* Navbar */}
-                <header className="h-20 border-b border-white/5 px-6 flex items-center justify-between bg-[#030408]/80 backdrop-blur-xl z-40">
+                <header className="h-20 border-b border-border px-4 sm:px-6 flex items-center justify-between bg-[hsl(var(--app-header-bg))] backdrop-blur-xl z-40">
                     <div className="flex items-center gap-4">
                         {/* Mobile Sheet Toggle */}
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="lg:hidden text-white hover:bg-white/10">
+                                <Button variant="ghost" size="icon" className="lg:hidden text-foreground hover:bg-accent">
                                     <Menu className="h-6 w-6" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="p-0 w-72 bg-[#030408] border-r border-white/5 text-white">
+                            <SheetContent side="left" className="p-0 w-72 bg-[hsl(var(--app-sidebar-bg))] border-r border-border text-foreground">
                                 <SheetHeader>
                                     <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                     <SheetDescription className="sr-only">
@@ -446,37 +462,48 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         </Sheet>
 
                         {/* Breadcrumbs / Page Title Placeholder */}
-                        <div className="flex items-center gap-2 text-slate-500 font-bold text-sm tracking-widest uppercase">
-                            <span className="hover:text-white cursor-pointer transition-colors max-w-[150px] truncate">
+                        <div className="flex items-center gap-2 text-muted-foreground font-bold text-xs sm:text-sm tracking-widest uppercase">
+                            <span className="hover:text-foreground cursor-pointer transition-colors max-w-[120px] sm:max-w-[180px] truncate">
                                 {activeWorkspace?.name || 'Workspace'}
                             </span>
                             <ChevronRight className="h-4 w-4" />
-                            <span className="text-white">Dashboard</span>
+                            <span className="text-foreground hidden sm:inline">Dashboard</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
                         {/* Command Hub Search */}
-                        <div className="hidden md:flex items-center gap-2 bg-white/[0.03] border border-white/5 px-4 h-11 rounded-xl w-64 focus-within:border-cyan-500/30 focus-within:bg-white/[0.05] transition-all group">
-                            <Search className="h-4 w-4 text-slate-500 group-focus-within:text-cyan-400" />
+                        <div className="hidden md:flex items-center gap-2 bg-card border border-border px-4 h-11 rounded-xl w-56 lg:w-64 focus-within:border-primary/40 transition-all group">
+                            <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-primary" />
                             <input
                                 type="text"
                                 placeholder="COMMAND HUB (⌘K)"
-                                className="bg-transparent border-none outline-none text-xs font-bold text-white placeholder:text-slate-700 w-full"
+                                className="bg-transparent border-none outline-none text-xs font-bold text-foreground placeholder:text-muted-foreground/80 w-full"
                             />
                         </div>
+
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl"
+                            onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+                            aria-label="Toggle theme mode"
+                            title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                        >
+                            {mode === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                        </Button>
 
                         {/* Notifications */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/10 rounded-xl">
+                                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary hover:bg-accent rounded-xl">
                                     <Bell className="h-5 w-5" />
                                     {unreadCount > 0 && (
-                                        <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-cyan-500 rounded-full border-2 border-[#030408]" />
+                                        <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background" />
                                     )}
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-80 bg-[#0A0D18] border-white/5 text-white rounded-2xl p-2" align="end">
+                            <DropdownMenuContent className="w-80 bg-popover border-border text-popover-foreground rounded-2xl p-2" align="end">
                                 <DropdownMenuLabel className="flex justify-between items-center px-2 py-1.5">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Neural Alerts</span>
                                     {unreadCount > 0 && (
@@ -487,7 +514,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                 <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                     {notifications.length === 0 ? (
                                         <div className="p-8 text-center">
-                                            <Bell className="h-8 w-8 text-slate-700 mx-auto mb-3 opacity-20" />
+                                            <Bell className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-30" />
                                             <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">No Active Signals</p>
                                         </div>
                                     ) : (
@@ -578,7 +605,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                         ))
                                     )}
                                 </div>
-                                <DropdownMenuSeparator className="bg-white/5" />
+                                <DropdownMenuSeparator className="bg-border" />
                                 <DropdownMenuItem className="justify-center text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-white rounded-xl py-2 cursor-pointer">
                                     Signal History
                                 </DropdownMenuItem>
@@ -595,7 +622,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56 bg-[#0A0D18] border-white/5 text-white rounded-2xl p-2" align="end" forceMount>
+                            <DropdownMenuContent className="w-56 bg-popover border-border text-popover-foreground rounded-2xl p-2" align="end" forceMount>
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1 p-2">
                                         <p className="text-sm font-black leading-none tracking-tight">{user?.name}</p>
@@ -609,6 +636,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                 <DropdownMenuItem className="rounded-xl hover:bg-cyan-500 hover:text-[#030408] font-bold uppercase text-[10px] tracking-widest transition-colors cursor-pointer p-3" onClick={() => navigate('/settings')}>
                                     Settings
                                 </DropdownMenuItem>
+                                <DropdownMenuItem className="rounded-xl hover:bg-cyan-500 hover:text-[#030408] font-bold uppercase text-[10px] tracking-widest transition-colors cursor-pointer p-3" onClick={() => navigate('/theme-selector')}>
+                                    Theme Selector
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator className="bg-white/5" />
                                 <DropdownMenuItem className="rounded-xl hover:bg-red-500/20 hover:text-red-400 font-bold uppercase text-[10px] tracking-widest transition-colors cursor-pointer p-3" onClick={handleLogout}>
                                     Terminate Session
@@ -619,7 +649,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </header>
 
                 {/* Dynamic Page Content */}
-                <main className="flex-1 overflow-y-auto bg-[#030408]">
+                <main className="flex-1 overflow-y-auto bg-[linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--card)/0.35)_100%)]">
                     {children}
                 </main>
             </div>

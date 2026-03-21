@@ -12,25 +12,22 @@ interface KanbanColumnProps {
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, tasks }) => {
     return (
-        <div className="flex flex-col w-72 sm:w-80 md:w-96 flex-shrink-0 h-full bg-white/[0.03] border border-white/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 backdrop-blur-sm">
-            <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.01]">
+        <div className="flex flex-col w-[86vw] sm:w-80 md:w-96 lg:w-[26rem] flex-shrink-0 h-full bg-card/70 border border-border rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm">
+            <div className="p-3 sm:p-4 flex items-center justify-between border-b border-border bg-background/30">
                 <div className="flex items-center gap-3">
-                    <div
-                        className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(var(--color))] "
-                        style={{ backgroundColor: status.color, boxShadow: `0 0 8px ${status.color}80` } as React.CSSProperties}
-                    />
-                    <h3 className="text-xs font-black uppercase text-white tracking-widest leading-none">
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+                    <h3 className="text-[11px] sm:text-xs font-black uppercase text-foreground tracking-widest leading-none truncate max-w-[120px] sm:max-w-[180px]">
                         {status.name}
                     </h3>
-                    <span className="text-[10px] font-black text-slate-600 bg-white/5 px-1.5 py-0.5 rounded-md leading-none">
+                    <span className="text-[10px] font-black text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md leading-none">
                         {tasks.length}
                     </span>
                 </div>
                 <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-slate-600 hover:text-white">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground">
                         <Plus className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-slate-600 hover:text-white">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground">
                         <MoreVertical className="h-3.5 w-3.5" />
                     </Button>
                 </div>
@@ -41,7 +38,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, tasks }) => {
                     <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`flex-1 p-4 overflow-y-auto custom-scrollbar min-h-0 transition-colors ${snapshot.isDraggingOver ? 'bg-cyan-500/5' : ''}`}
+                        className={`flex-1 p-3 sm:p-4 overflow-y-auto custom-scrollbar min-h-0 transition-colors ${snapshot.isDraggingOver ? 'bg-primary/10' : ''}`}
                     >
                         {tasks
                             .sort((a, b) => a.position - b.position)

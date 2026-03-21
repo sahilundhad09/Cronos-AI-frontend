@@ -51,20 +51,20 @@ export const ChatSessionList: React.FC<ChatSessionListProps> = ({
                             key={session.id}
                             className={`group relative rounded-xl p-3 cursor-pointer transition-all ${isActive
                                     ? 'bg-cyan-500/10 border border-cyan-500/30'
-                                    : 'bg-slate-800/30 border border-white/5 hover:bg-slate-800/50 hover:border-white/10'
+                                    : 'bg-card/60 border border-border hover:bg-accent/60 hover:border-border'
                                 }`}
                             onClick={() => onSelectSession(session)}
                         >
                             <div className="flex items-start gap-3">
                                 <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${isActive
                                         ? 'bg-cyan-500/20 border border-cyan-500/30'
-                                        : 'bg-slate-700/50 border border-white/5'
+                                        : 'bg-secondary border border-border'
                                     }`}>
                                     <MessageSquare className={`h-4 w-4 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
                                 </div>
 
                                 <div className="flex-1 min-w-0">
-                                    <h4 className={`text-sm font-bold truncate ${isActive ? 'text-white' : 'text-slate-300'
+                                    <h4 className={`text-sm font-bold truncate ${isActive ? 'text-foreground' : 'text-muted-foreground'
                                         }`}>
                                         {session.title}
                                     </h4>

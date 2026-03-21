@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Loader2, Save, Trash2, ShieldAlert, Info, Users, AlertTriangle } from 'lucide-react';
+import { Loader2, Save, Trash2, ShieldAlert, Info, Users, AlertTriangle, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import { WorkspaceMemberManagement } from '@/components/settings/WorkspaceMemberManagement';
+import { ThemeCustomization } from '@/components/settings/ThemeCustomization';
 
 export const WorkspaceSettingsPage: React.FC = () => {
     const { workspaceId } = useParams<{ workspaceId: string }>();
@@ -86,6 +87,7 @@ export const WorkspaceSettingsPage: React.FC = () => {
     const tabs = [
         { id: 'general', label: 'General', icon: <Info className="h-4 w-4" /> },
         { id: 'members', label: 'Members', icon: <Users className="h-4 w-4" /> },
+        { id: 'theme', label: 'Theme', icon: <Palette className="h-4 w-4" /> },
         { id: 'advanced', label: 'Advanced', icon: <AlertTriangle className="h-4 w-4" /> }
     ];
 
@@ -206,6 +208,11 @@ export const WorkspaceSettingsPage: React.FC = () => {
                 <div className="bg-slate-900/50 border border-white/10 rounded-xl p-6">
                     <WorkspaceMemberManagement workspaceId={workspaceId!} />
                 </div>
+            </TabsContent>
+
+            {/* Theme Tab */}
+            <TabsContent value="theme" className="space-y-6 m-0">
+                <ThemeCustomization />
             </TabsContent>
 
             {/* Advanced Tab */}

@@ -1,21 +1,24 @@
 import { Toaster as Sonner } from "sonner"
+import { useThemeStore } from "@/store/useThemeStore"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
+    const mode = useThemeStore((state) => state.mode)
+
     return (
         <Sonner
-            theme="dark"
+            theme={mode}
             className="toaster group"
             toastOptions={{
                 classNames: {
                     toast:
-                        "group toast group-[.toaster]:bg-[#0A0D18] group-[.toaster]:text-white group-[.toaster]:border-white/10 group-[.toaster]:shadow-lg",
-                    description: "group-[.toast]:text-slate-400",
+                        "group toast group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
+                    description: "group-[.toast]:text-muted-foreground",
                     actionButton:
                         "group-[.toast]:bg-cyan-500 group-[.toast]:text-[#030408] group-[.toast]:font-black",
                     cancelButton:
-                        "group-[.toast]:bg-white/5 group-[.toast]:text-slate-400",
+                        "group-[.toast]:bg-secondary group-[.toast]:text-secondary-foreground",
                 },
             }}
             {...props}

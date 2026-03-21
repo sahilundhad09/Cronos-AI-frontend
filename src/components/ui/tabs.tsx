@@ -12,7 +12,14 @@ const TabsList = React.forwardRef<
     <TabsPrimitive.List
         ref={ref}
         className={cn(
-            "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+            // Reset radix defaults
+            "inline-flex items-center justify-start",
+            // Layout: horizontal scroll on small screens, no wrap
+            "w-full overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
+            // No background — let the parent provide the border-b context
+            "bg-transparent p-0 gap-0",
+            // Height
+            "h-11",
             className
         )}
         {...props}
@@ -27,7 +34,29 @@ const TabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
         ref={ref}
         className={cn(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+            // Base layout
+            "relative inline-flex items-center justify-center gap-1.5 flex-shrink-0",
+            // Sizing & spacing
+            "h-10 sm:h-11 px-0 mr-4 sm:mr-6 last:mr-0",
+            // Typography
+            "text-[9px] sm:text-[10px] font-black uppercase tracking-widest whitespace-nowrap",
+            // Colors — inactive
+            "text-slate-500 bg-transparent",
+            // Colors — active
+            "data-[state=active]:text-white data-[state=active]:bg-transparent",
+            // Hover
+            "hover:text-slate-300 transition-colors duration-150",
+            // Animated underline via after pseudo-element
+            "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px]",
+            "after:rounded-t-full after:bg-cyan-400",
+            "after:scale-x-0 data-[state=active]:after:scale-x-100",
+            "after:transition-transform after:duration-200 after:ease-out",
+            // No border radius on the trigger itself
+            "rounded-none",
+            // Focus ring
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40 focus-visible:ring-offset-0",
+            // Disabled
+            "disabled:pointer-events-none disabled:opacity-30",
             className
         )}
         {...props}
@@ -42,7 +71,12 @@ const TabsContent = React.forwardRef<
     <TabsPrimitive.Content
         ref={ref}
         className={cn(
-            "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            // Always hide inactive content panels, regardless of consumer display classes
+            "data-[state=inactive]:hidden",
+            // Remove default mt-2 override — consumers control spacing
+            "mt-0",
+            // Focus ring
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40 focus-visible:ring-offset-0",
             className
         )}
         {...props}
