@@ -60,7 +60,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
             <div className="flex items-center justify-center h-full px-4">
                 <div className="flex flex-col items-center gap-4 opacity-50">
                     <div className="h-10 w-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-                    <p className="text-[9px] text-center font-black text-slate-500 uppercase tracking-[0.2em]">Synchronizing Board State...</p>
+                    <p className="text-[9px] text-center font-black text-white uppercase tracking-[0.2em]">Synchronizing Board State...</p>
                 </div>
             </div>
         );
@@ -68,10 +68,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
 
     if (!isLoading && statuses.length === 0) {
         return (
-            <div className="py-16 sm:py-20 px-4 text-center bg-white/[0.01] border border-dashed border-white/5 rounded-3xl h-full flex flex-col items-center justify-center">
-                <LayoutDashboard className="h-10 w-10 text-slate-700 mx-auto mb-4" />
-                <h3 className="text-lg font-heading font-black text-slate-500 uppercase italic tracking-widest">Signal Lost</h3>
-                <p className="text-[10px] max-w-lg text-slate-600 font-bold uppercase tracking-widest mt-2">No task statuses found for this orchestration. Parameters may be corrupted.</p>
+            <div className="py-16 sm:py-20 px-4 text-center bg-white/[0.01] border border-dashed border-white/10 rounded-3xl h-full flex flex-col items-center justify-center">
+                <LayoutDashboard className="h-10 w-10 text-white/40 mx-auto mb-4" />
+                <h3 className="text-lg font-heading font-black text-white italic tracking-widest uppercase">Signal Lost</h3>
+                <p className="text-[10px] max-w-lg text-white/40 font-bold uppercase tracking-widest mt-2">No task statuses found for this orchestration. Parameters may be corrupted.</p>
             </div>
         );
     }

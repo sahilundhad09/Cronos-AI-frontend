@@ -147,14 +147,14 @@ const DashboardStatCard = ({
                     <div className="space-y-0.5">
                         {isLoading
                             ? <div className="h-7 w-20 bg-muted animate-pulse rounded-lg" />
-                            : <p className="text-2xl sm:text-3xl font-black text-foreground tracking-tighter tabular-nums">{value}</p>
+                            : <p className="text-3xl sm:text-4xl font-black text-foreground tracking-tighter tabular-nums">{value}</p>
                         }
-                        <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.18em]">{label}</p>
+                        <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.18em]">{label}</p>
                     </div>
 
                     <div className="mt-3 flex items-center gap-1.5">
                         <span className={`inline-block w-1.5 h-1.5 rounded-full ${isLoading ? 'bg-muted' : `${a.dot} animate-pulse`}`} />
-                        <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest truncate">
+                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest truncate">
                             {isLoading ? 'Syncing...' : trend}
                         </span>
                     </div>
@@ -221,12 +221,12 @@ const QuickAction = ({ icon: Icon, label, onClick, accent }: {
     const a = accentMap[accent] || accentMap.primary;
     return (
         <button onClick={onClick}
-            className={`flex flex-col items-center gap-1.5 p-2.5 sm:p-3 rounded-xl bg-card border border-border ${a.border} ${a.bg} transition-all duration-200 group cursor-pointer w-full`}
+            className={`flex flex-col items-center gap-2.5 p-4 sm:p-5 rounded-2xl bg-card border border-border ${a.border} ${a.bg} transition-all duration-300 group cursor-pointer w-full shadow-lg shadow-black/5 hover:shadow-primary/5`}
         >
-            <div className={`p-2 rounded-lg border ${a.icon} group-hover:scale-105 transition-transform duration-200`}>
-                <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <div className={`p-3 rounded-xl border ${a.icon} group-hover:scale-110 transition-transform duration-300`}>
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <span className={`text-[7px] font-black text-muted-foreground/70 uppercase tracking-wider group-hover:text-foreground transition-colors text-center leading-tight`}>
+            <span className={`text-xs sm:text-sm font-bold text-muted-foreground/80 uppercase tracking-widest group-hover:text-foreground transition-colors text-center leading-tight`}>
                 {label}
             </span>
         </button>
@@ -242,7 +242,7 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
         low:    'border-emerald-500/30 text-emerald-400 bg-emerald-500/10',
     };
     return (
-        <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${map[priority] || map.medium}`}>
+        <span className={`px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${map[priority] || map.medium}`}>
             {priority}
         </span>
     );
@@ -270,11 +270,11 @@ const DeadlineItem = ({ task, onClick }: { task: any; onClick: () => void }) => 
             <div className="flex items-center gap-2.5 min-w-0">
                 <div className={`flex-shrink-0 p-1.5 rounded-lg ${cfg.ibg}`}>{cfg.icon}</div>
                 <div className="min-w-0">
-                    <p className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">{task.title}</p>
-                    <p className="text-[8px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">{task.project?.name || 'Project'}</p>
+                    <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">{task.title}</p>
+                    <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">{task.project?.name || 'Project'}</p>
                 </div>
             </div>
-            <span className={`flex-shrink-0 ml-2 px-1.5 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${cfg.badge}`}>
+            <span className={`flex-shrink-0 ml-2 px-1.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest ${cfg.badge}`}>
                 {cfg.label}
             </span>
         </button>
@@ -387,7 +387,7 @@ const DashboardPage = () => {
     }
 
     return (
-        <div className="h-full overflow-y-auto custom-scrollbar">
+        <div className="h-full overflow-y-auto custom-scrollbar bg-[#08090d]">
             <div className="px-4 sm:px-6 lg:px-8 xl:px-10 py-5 sm:py-6 max-w-7xl mx-auto">
 
                 {/* ── Header ───────────────────────────────────────────────── */}
@@ -425,13 +425,10 @@ const DashboardPage = () => {
 
                 {/* ── Quick Actions ─────────────────────────────────────────── */}
                 <motion.div variants={stagger} initial="hidden" animate="visible"
-                    className="grid grid-cols-4 lg:grid-cols-8 gap-2 mb-5 sm:mb-6"
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
                 >
-                    {quickActions.slice(0, 4).map((a, i) => (
+                    {quickActions.map((a, i) => (
                         <motion.div key={i} variants={slideUp}><QuickAction {...a} /></motion.div>
-                    ))}
-                    {quickActions.slice(4).map((a, i) => (
-                        <motion.div key={i + 4} variants={slideUp} className="hidden lg:block"><QuickAction {...a} /></motion.div>
                     ))}
                 </motion.div>
 
@@ -478,20 +475,20 @@ const DashboardPage = () => {
                                                         <div className="bg-muted border border-border p-2 rounded-xl group-hover:border-primary/20 transition-colors">
                                                             <Layers className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                                                         </div>
-                                                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[8px] font-black uppercase tracking-widest border border-primary/20">
+                                                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20">
                                                             {project.status || 'Active'}
                                                         </span>
                                                     </div>
                                                     <div className="mb-3">
-                                                        <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors truncate">
+                                                        <h3 className="text-base font-black text-foreground group-hover:text-primary transition-colors truncate">
                                                             {project.name}
                                                         </h3>
-                                                        <p className="text-[10px] text-muted-foreground font-medium mt-0.5 line-clamp-1">
+                                                        <p className="text-[12px] text-muted-foreground font-medium mt-0.5 line-clamp-1">
                                                             {project.description || 'No description provided'}
                                                         </p>
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">
+                                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
                                                             <span>Progress</span>
                                                             <span className="text-muted-foreground">{project.progress || 0}%</span>
                                                         </div>
@@ -552,12 +549,12 @@ const DashboardPage = () => {
                                                             <Bot className="h-4 w-4" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-emerald-400 transition-colors truncate">{task.title}</h4>
-                                                            <p className="text-[8px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">{task.project?.name || 'Unknown project'}</p>
+                                                            <h4 className="text-sm sm:text-base font-bold text-foreground group-hover:text-emerald-400 transition-colors truncate">{task.title}</h4>
+                                                            <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">{task.project?.name || 'Unknown project'}</p>
                                                         </div>
                                                         <div className="flex items-center gap-1.5 flex-shrink-0">
                                                             {task.due_date && (
-                                                                <span className={`hidden sm:inline text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${
+                                                                <span className={`hidden sm:inline text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${
                                                                     isPast(new Date(task.due_date))   ? 'text-red-400 border-red-500/20 bg-red-500/10'
                                                                     : isToday(new Date(task.due_date)) ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
                                                                     : 'text-muted-foreground border-border'
@@ -601,20 +598,20 @@ const DashboardPage = () => {
                                     <CompletionRing percentage={userPerformance?.completionRate || 0} />
                                     <div className="flex-1 min-w-0 space-y-2.5">
                                         <div>
-                                            <p className="text-xl font-black text-foreground tabular-nums leading-none">
+                                            <p className="text-2xl font-black text-foreground tabular-nums leading-none">
                                                 {userPerformance?.tasksCompleted || 0}
-                                                <span className="text-muted-foreground/60 text-xs font-bold">/{userPerformance?.tasksAssigned || 0}</span>
+                                                <span className="text-muted-foreground/60 text-sm font-bold">/{userPerformance?.tasksAssigned || 0}</span>
                                             </p>
-                                            <p className="text-[8px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">Tasks Done</p>
+                                            <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">Tasks Done</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
                                             <div className="bg-muted/60 rounded-lg p-2 border border-border">
-                                                <p className="text-sm font-black text-foreground leading-none">{userPerformance?.onTimeDelivery || 0}%</p>
-                                                <p className="text-[7px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-0.5">On-Time</p>
+                                                <p className="text-base font-black text-foreground leading-none">{userPerformance?.onTimeDelivery || 0}%</p>
+                                                <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-0.5">On-Time</p>
                                             </div>
                                             <div className="bg-muted/60 rounded-lg p-2 border border-border">
-                                                <p className="text-sm font-black text-foreground leading-none">{userPerformance?.averageCompletionTime || 0}d</p>
-                                                <p className="text-[7px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-0.5">Avg Time</p>
+                                                <p className="text-base font-black text-foreground leading-none">{userPerformance?.averageCompletionTime || 0}d</p>
+                                                <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-0.5">Avg Time</p>
                                             </div>
                                         </div>
                                     </div>
@@ -720,11 +717,11 @@ const DashboardPage = () => {
                                         </CardHeader>
                                         <CardContent className="p-4">
                                             <ReactMarkdown components={{
-                                                p:      ({ children }) => <p className="mb-2 last:mb-0 text-xs text-muted-foreground leading-relaxed">{children}</p>,
+                                                p:      ({ children }) => <p className="mb-2 last:mb-0 text-sm text-muted-foreground leading-relaxed">{children}</p>,
                                                 strong: ({ children }) => <strong className="text-primary font-black">{children}</strong>,
                                                 ul:     ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                                                li:     ({ children }) => <li className="text-[11px] text-muted-foreground">{children}</li>,
-                                                h2:     ({ children }) => <h2 className="text-xs font-black text-foreground mb-1.5 uppercase tracking-wide">{children}</h2>,
+                                                li:     ({ children }) => <li className="text-[12px] text-muted-foreground">{children}</li>,
+                                                h2:     ({ children }) => <h2 className="text-sm font-black text-foreground mb-1.5 uppercase tracking-wide">{children}</h2>,
                                             }}>
                                                 {analysisResult}
                                             </ReactMarkdown>
@@ -737,8 +734,8 @@ const DashboardPage = () => {
                         {/* Activity Feed */}
                         <div>
                             <div className="flex items-center gap-1.5 mb-3">
-                                <ActivityIcon className="h-3 w-3 text-emerald-400" />
-                                <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Live Activity</h3>
+                                <ActivityIcon className="h-4 w-4 text-emerald-400" />
+                                <h3 className="text-[12px] font-black text-foreground uppercase tracking-[0.2em]">Live Activity</h3>
                             </div>
                             <div className="relative border-l border-border ml-1.5 pl-4 flex flex-col gap-3">
                                 {analyticsLoading
@@ -747,13 +744,13 @@ const DashboardPage = () => {
                                     ? analytics.recentActivity.map((activity: any) => (
                                         <div key={activity.id || Math.random()} className="relative">
                                             <div className="absolute -left-[1.32rem] top-1.5 w-2 h-2 rounded-full bg-primary/60 border-2 border-card" />
-                                            <p className="text-[11px] text-foreground/80 font-medium leading-snug">
+                                            <p className="text-base text-foreground font-medium leading-snug">
                                                 <span className="text-primary font-bold">
                                                     @{activity.actor?.name?.split(' ')[0] || 'System'}
                                                 </span>{' '}
                                                 {activity.description || activity.action?.replace(/_/g, ' ')}
                                             </p>
-                                            <p className="text-[8px] text-muted-foreground/40 font-bold uppercase tracking-widest mt-0.5">
+                                            <p className="text-[11px] text-foreground/70 font-bold uppercase tracking-widest mt-0.5">
                                                 {formatDistanceToNow(new Date(activity.created_at || activity.timestamp))} ago
                                             </p>
                                         </div>

@@ -81,13 +81,13 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
             <div className="max-w-7xl mx-auto px-6 py-8">
                 <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-6">
                     {/* Tabs Navigation */}
-                    <div className="border-b border-white/10">
-                        <TabsList className="bg-transparent h-auto p-0 gap-6">
+                    <div className="border-b border-white/10 overflow-x-auto custom-scrollbar">
+                        <TabsList className="bg-transparent h-auto p-0 gap-6 min-w-max">
                             {visibleTabs.map((tab) => (
                                 <TabsTrigger
                                     key={tab.id}
                                     value={tab.id}
-                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-xs tracking-widest transition-all gap-2"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] sm:text-xs tracking-widest transition-all gap-2"
                                 >
                                     {tab.icon}
                                     {tab.label}

@@ -64,11 +64,11 @@ const ProjectsPage = () => {
         return (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-80px)] p-6 text-center">
                 <div className="bg-white/[0.03] p-8 rounded-2xl border border-white/[0.06] mb-6 max-w-sm">
-                    <Briefcase className="h-10 w-10 text-slate-700 mb-4 mx-auto" />
+                    <Briefcase className="h-10 w-10 text-muted-foreground/60 mb-4 mx-auto" />
                     <h2 className="text-xl font-heading font-black text-white italic uppercase tracking-tight">
                         Sector <span className="text-cyan-400">Locked</span>
                     </h2>
-                    <p className="text-slate-600 font-bold uppercase text-[9px] tracking-widest mt-3 leading-relaxed">
+                    <p className="text-muted-foreground/60 font-bold uppercase text-[9px] tracking-widest mt-3 leading-relaxed">
                         Navigate to a workspace to access project orchestrations.
                     </p>
                 </div>
@@ -86,9 +86,9 @@ const ProjectsPage = () => {
                         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-black tracking-tighter uppercase italic text-white">
                             Project <span className="text-cyan-400">Command</span>
                         </h1>
-                        <p className="text-slate-600 font-bold uppercase text-[9px] tracking-[0.25em]">
+                        <p className="text-muted-foreground font-bold uppercase text-[9px] tracking-[0.25em]">
                             Sector: {activeWorkspace.name}
-                            <span className="mx-2 text-slate-800">//</span>
+                            <span className="mx-2 text-muted-foreground/40">//</span>
                             <span className={isLoading ? 'text-amber-500/70' : 'text-emerald-500/70'}>
                                 {isLoading ? 'Scanning...' : 'Ready'}
                             </span>
@@ -128,7 +128,7 @@ const ProjectsPage = () => {
 
                 {/* ── Search bar ── */}
                 <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-700 pointer-events-none" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60 pointer-events-none" />
                     <input
                         type="text"
                         placeholder="Search missions..."
@@ -139,7 +139,7 @@ const ProjectsPage = () => {
                             bg-white/[0.03] border border-white/[0.07]
                             hover:border-white/[0.12] focus:border-cyan-500/40
                             rounded-xl outline-none
-                            text-[11px] font-bold text-white placeholder:text-slate-700
+                            text-[11px] font-bold text-white placeholder:text-muted-foreground/40
                             transition-colors
                         "
                     />
@@ -206,9 +206,9 @@ const ProjectsPage = () => {
                             exit={{ opacity: 0 }}
                             className="py-20 text-center bg-white/[0.01] border border-dashed border-white/[0.06] rounded-2xl"
                         >
-                            <Layers className="h-9 w-9 text-slate-800 mx-auto mb-3" />
-                            <h3 className="text-sm font-heading font-black text-slate-600 uppercase italic tracking-widest">Static Silence</h3>
-                            <p className="text-[9px] text-slate-700 font-bold uppercase tracking-widest mt-1.5 max-w-xs mx-auto">
+                            <Layers className="h-9 w-9 text-muted-foreground/20 mx-auto mb-3" />
+                            <h3 className="text-sm font-heading font-black text-muted-foreground/60 uppercase italic tracking-widest">Static Silence</h3>
+                            <p className="text-[9px] text-muted-foreground/40 font-bold uppercase tracking-widest mt-1.5 max-w-xs mx-auto">
                                 {searchQuery
                                     ? `No missions matching "${searchQuery}" found in this sector.`
                                     : 'No projects found in this sector.'
@@ -253,7 +253,7 @@ const ProjectCard = ({
                     </div>
                     <div className="min-w-0 space-y-0.5">
                         <h3 className="text-sm font-black text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight truncate">{project.name}</h3>
-                        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-tight line-clamp-1 max-w-md">{project.description || 'No objective defined'}</p>
+                        <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-tight line-clamp-1 max-w-md">{project.description || 'No objective defined'}</p>
                     </div>
                 </div>
 
@@ -261,7 +261,7 @@ const ProjectCard = ({
                 <div className="flex items-center gap-4 sm:gap-8 flex-shrink-0 pl-14 sm:pl-0">
                     <div className="hidden lg:block w-36">
                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-[8px] font-black uppercase text-slate-700 tracking-widest">Sync</span>
+                            <span className="text-[8px] font-black uppercase text-muted-foreground/60 tracking-widest">Sync</span>
                             <span className="text-[9px] font-black text-cyan-400 tabular-nums">{project.progress || 0}%</span>
                         </div>
                         <div className="h-[3px] w-full bg-white/[0.05] rounded-full overflow-hidden">
@@ -273,11 +273,11 @@ const ProjectCard = ({
                         <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${
                             project.status === 'active'
                                 ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                                : 'bg-slate-500/10 text-slate-500 border border-slate-500/20'
+                                : 'bg-white/10 text-white/40 border border-white/20'
                         }`}>
                             {project.status}
                         </span>
-                        <ArrowUpRight className="h-3.5 w-3.5 text-slate-700 group-hover:text-cyan-400 transition-colors" />
+                        <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:text-cyan-400 transition-colors" />
                     </div>
                 </div>
             </motion.div>
@@ -294,9 +294,9 @@ const ProjectCard = ({
                 <CardContent className="p-5 space-y-5 flex-1 flex flex-col">
 
                     {/* Card top */}
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between mt-3">
                         <div className="p-2.5 rounded-xl bg-white/[0.04] group-hover:bg-cyan-500/10 transition-all duration-300">
-                            <Briefcase className="h-5 w-5 text-slate-500 group-hover:text-cyan-400 transition-colors" />
+                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-cyan-400 transition-colors" />
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
@@ -322,7 +322,7 @@ const ProjectCard = ({
                         <h3 className="text-base sm:text-lg font-heading font-black text-white group-hover:text-cyan-400 transition-colors tracking-tight uppercase italic leading-tight">
                             {project.name}
                         </h3>
-                        <p className="text-[10px] text-slate-600 font-bold uppercase tracking-tight leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight leading-relaxed line-clamp-2 min-h-[2.5rem]">
                             {project.description || 'No primary objective defined for this orchestration.'}
                         </p>
                     </div>
@@ -330,7 +330,7 @@ const ProjectCard = ({
                     {/* Progress */}
                     <div className="space-y-2 pt-2 mt-auto">
                         <div className="flex justify-between text-[8px] font-black uppercase tracking-widest">
-                            <span className="text-slate-700">Protocol Sync</span>
+                            <span className="text-muted-foreground/60">Protocol Sync</span>
                             <span className="text-cyan-400 tabular-nums">{project.progress || 0}%</span>
                         </div>
                         <div className="h-[3px] w-full bg-white/[0.05] rounded-full overflow-hidden">
@@ -345,7 +345,7 @@ const ProjectCard = ({
 
                     {/* Footer */}
                     <div className="pt-4 border-t border-white/[0.05] flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-slate-700">
+                        <div className="flex items-center gap-1.5 text-muted-foreground/60">
                             <Clock className="h-3 w-3" />
                             <span className="text-[8px] font-black uppercase tracking-widest">Modified: 2h ago</span>
                         </div>
@@ -353,13 +353,13 @@ const ProjectCard = ({
                             <span className={`px-1.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${
                                 project.status === 'active'
                                     ? 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/20'
-                                    : 'bg-slate-500/10 text-slate-500 border border-slate-500/20'
+                                    : 'bg-white/10 text-white/40 border border-white/20'
                             }`}>
                                 {project.status}
                             </span>
                             <div className="flex -space-x-1.5">
                                 {[1, 2].map(i => (
-                                    <div key={i} className="h-5 w-5 rounded-md bg-slate-800 border border-[#030408] flex items-center justify-center text-[7px] font-black text-slate-600">
+                                    <div key={i} className="h-5 w-5 rounded-md bg-white/10 border border-[#030408] flex items-center justify-center text-[7px] font-black text-white/40">
                                         M
                                     </div>
                                 ))}

@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 100%;
+}
+
 @layer base {
   :root {
     --background: 222 47% 4%;
@@ -15,7 +19,7 @@
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted-foreground: 0 0% 100%; /* Pure White instead of silver */
     --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84% 60%;
@@ -43,7 +47,7 @@
     --secondary: 210 20% 93%;
     --secondary-foreground: 222 47% 11%;
     --muted: 210 20% 93%;
-    --muted-foreground: 215 18% 40%;
+    --muted-foreground: 0 0% 0%; /* Pure Black instead of silver */
     --accent: 210 20% 93%;
     --accent-foreground: 222 47% 11%;
     --destructive: 0 72% 50%;
@@ -173,4 +177,28 @@
 .light .border-white\/\[0\.06\],
 .light .border-white\/\[0\.08\] {
   border-color: hsl(var(--border)) !important;
+}
+
+/* 
+  GLOBAL SILVER-TO-CONTRAST BRIDGE
+  Forces common "silver-ish" Tailwind utility classes to follow 
+  the high-contrast white (dark) / black (light) preference.
+*/
+.text-slate-400, .text-slate-500, .text-slate-600,
+.text-gray-400, .text-gray-500, .text-gray-600,
+.text-zinc-400, .text-zinc-500, .text-zinc-600,
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.border-slate-400, .border-slate-500, .border-slate-600,
+.border-gray-400, .border-gray-500, .border-gray-600,
+.border-zinc-400, .border-zinc-500, .border-zinc-600 {
+  border-color: hsl(var(--muted-foreground) / 0.2) !important;
+}
+
+.bg-slate-400\/10, .bg-slate-500\/10, .bg-slate-600\/10,
+.bg-gray-400\/10, .bg-gray-500\/10, .bg-gray-600\/10,
+.bg-zinc-400\/10, .bg-zinc-500\/10, .bg-zinc-600\/10 {
+  background-color: hsl(var(--muted-foreground) / 0.1) !important;
 }

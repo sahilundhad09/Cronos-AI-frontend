@@ -12,7 +12,8 @@ import {
     Shield,
     CheckCircle2,
     History,
-    ChevronDown
+    ChevronDown,
+    ChevronRight
 } from 'lucide-react';
 import { useProjectStore } from '@/store/useProjectStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -104,7 +105,7 @@ const ProjectDetailsPage = () => {
             <div className="flex items-center justify-center h-full bg-background">
                 <div className="flex flex-col items-center gap-4">
                     <div className="h-12 w-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Synchronizing neural link...</p>
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Synchronizing neural link...</p>
                 </div>
             </div>
         );
@@ -113,13 +114,13 @@ const ProjectDetailsPage = () => {
     const isLead = project.your_role === 'lead' || activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin';
 
     const tabs = [
-        { value: 'kanban',       label: 'Board',          icon: LayoutDashboard, iconClass: 'text-slate-400' },
+        { value: 'kanban',       label: 'Board',          icon: LayoutDashboard, iconClass: 'text-white/40' },
         { value: 'orchestrator', label: 'AI Orchestrator', icon: Brain,           iconClass: 'text-cyan-400'  },
-        { value: 'team',         label: 'Specialists',     icon: Users,           iconClass: 'text-slate-400' },
+        { value: 'team',         label: 'Specialists',     icon: Users,           iconClass: 'text-white/40' },
         { value: 'activity',     label: 'Stream',          icon: Activity,        iconClass: 'text-emerald-400' },
     ];
 
-    const currentTab = [...tabs, { value: 'settings', label: 'Parameters', icon: Settings, iconClass: 'text-slate-400' }]
+    const currentTab = [...tabs, { value: 'settings', label: 'Parameters', icon: Settings, iconClass: 'text-white/40' }]
         .find(t => t.value === activeTab) ?? tabs[0];
     const CurrentIcon = currentTab.icon;
 
@@ -128,13 +129,13 @@ const ProjectDetailsPage = () => {
 
             {/* ── Header ── */}
             <header className="border-b border-white/[0.06] bg-[#030408]/80 backdrop-blur-xl flex-shrink-0">
-                <div className="px-4 sm:px-6 lg:px-8 pt-3 pb-4">
+                <div className="px-3 sm:px-6 lg:px-8 pt-3 pb-4">
 
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate('/projects')}
-                        className="text-slate-600 hover:text-slate-300 -ml-2 gap-1.5 font-bold uppercase text-[9px] tracking-widest mb-3 h-7 px-2"
+                        className="text-white/40 hover:text-white -ml-2 gap-1.5 font-bold uppercase text-[9px] tracking-widest mb-3 h-7 px-2"
                     >
                         <ChevronLeft className="h-3 w-3" /> Back to Fleet
                     </Button>
@@ -150,7 +151,7 @@ const ProjectDetailsPage = () => {
                                 <h1 className="text-xl sm:text-2xl lg:text-[1.75rem] font-heading font-black tracking-tighter uppercase italic text-white truncate leading-none">
                                     {project.name}
                                 </h1>
-                                <p className="text-slate-600 font-bold uppercase text-[9px] tracking-widest leading-relaxed line-clamp-1 max-w-xl">
+                                <p className="text-white/40 font-bold uppercase text-[9px] tracking-widest leading-relaxed line-clamp-1 max-w-xl">
                                     {project.description || 'No primary objective defined for this orchestration.'}
                                 </p>
                             </div>
@@ -181,7 +182,7 @@ const ProjectDetailsPage = () => {
                                     onClick={() => navigate(`/projects/${projectId}/settings`)}
                                     variant="outline"
                                     size="sm"
-                                    className="h-8 px-3 bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.06] text-slate-400 hover:text-white font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
+                                    className="h-8 px-3 bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.06] text-white/60 hover:text-white font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
                                 >
                                     <Settings className="h-3.5 w-3.5" />
                                     <span className="hidden sm:inline">Settings</span>
@@ -226,9 +227,9 @@ const ProjectDetailsPage = () => {
                                         className="
                                             relative flex-shrink-0 mr-6 last:mr-0
                                             bg-transparent border-0 rounded-none h-11 px-0
-                                            text-slate-600 data-[state=active]:text-white
+                                            text-white/40 data-[state=active]:text-white
                                             font-black uppercase text-[9px] tracking-widest
-                                            transition-colors gap-1.5 hover:text-slate-400
+                                            transition-colors gap-1.5 hover:text-white/60
                                             after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px]
                                             after:bg-cyan-400 after:rounded-t-full after:scale-x-0
                                             data-[state=active]:after:scale-x-100 after:transition-transform after:duration-200
@@ -244,9 +245,9 @@ const ProjectDetailsPage = () => {
                                         className="
                                             relative flex-shrink-0 ml-auto
                                             bg-transparent border-0 rounded-none h-11 px-0
-                                            text-slate-600 data-[state=active]:text-white
+                                            text-white/40 data-[state=active]:text-white
                                             font-black uppercase text-[9px] tracking-widest
-                                            transition-colors gap-1.5 hover:text-slate-400
+                                            transition-colors gap-1.5 hover:text-white/60
                                             after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px]
                                             after:bg-cyan-400 after:rounded-t-full after:scale-x-0
                                             data-[state=active]:after:scale-x-100 after:transition-transform after:duration-200
@@ -268,7 +269,7 @@ const ProjectDetailsPage = () => {
                             >
                                 <CurrentIcon className={`h-3.5 w-3.5 flex-shrink-0 ${currentTab.iconClass}`} />
                                 <span className="text-white font-black uppercase text-[10px] tracking-widest flex-1 text-left">{currentTab.label}</span>
-                                <ChevronDown className={`h-3.5 w-3.5 text-slate-600 transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+                                <ChevronDown className={`h-3.5 w-3.5 text-white/40 transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : ''}`} />
                             </button>
                         </div>
 
@@ -282,10 +283,10 @@ const ProjectDetailsPage = () => {
                                         className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${
                                             activeTab === value
                                                 ? 'border-l-cyan-400 bg-cyan-500/[0.06] text-white'
-                                                : 'border-l-transparent text-slate-500 hover:text-slate-300 hover:bg-white/[0.025]'
+                                                : 'border-l-transparent text-white/40 hover:text-white hover:bg-white/[0.025]'
                                         }`}
                                     >
-                                        <Icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === value ? iconClass : 'text-slate-700'}`} />
+                                        <Icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === value ? iconClass : 'text-white/20'}`} />
                                         <span className="font-black uppercase text-[10px] tracking-widest">{label}</span>
                                         {activeTab === value && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />}
                                     </button>
@@ -296,10 +297,10 @@ const ProjectDetailsPage = () => {
                                         className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${
                                             activeTab === 'settings'
                                                 ? 'border-l-cyan-400 bg-cyan-500/[0.06] text-white'
-                                                : 'border-l-transparent text-slate-500 hover:text-slate-300 hover:bg-white/[0.025]'
+                                                : 'border-l-transparent text-white/40 hover:text-white hover:bg-white/[0.025]'
                                         }`}
                                     >
-                                        <Settings className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === 'settings' ? 'text-cyan-400' : 'text-slate-700'}`} />
+                                        <Settings className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === 'settings' ? 'text-cyan-400' : 'text-white/20'}`} />
                                         <span className="font-black uppercase text-[10px] tracking-widest">Parameters</span>
                                         {activeTab === 'settings' && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />}
                                     </button>
@@ -319,41 +320,42 @@ const ProjectDetailsPage = () => {
 
                             {/* Orchestrator */}
                             <TabsContent value="orchestrator" className="m-0 flex-1 flex flex-col min-h-0">
-                                <div className="w-full max-w-5xl mx-auto flex-1 min-h-0">
+                                <div className="w-full max-w-5xl mx-auto flex-1 min-h-0 mt-4">
                                     <AIOrchestrator projectId={projectId!} isActive={activeTab === 'orchestrator'} />
                                 </div>
                             </TabsContent>
 
                             {/* Team */}
-                            <TabsContent value="team" className="m-0 flex-1 flex flex-col gap-6 pr-1">
-
+                            <TabsContent value="team" className="m-0 flex-1 flex flex-col gap-8">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                     <div>
                                         <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">Active Personnel</h3>
-                                        <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest mt-0.5">Specialists currently assigned to this mission sector</p>
+                                        <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-0.5">Specialists currently assigned to this mission sector</p>
                                     </div>
                                     {isLead && <ProjectInviteDialog projectId={projectId!} />}
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                                     {projectMembers.map((member) => (
-                                        <Card key={member.id} className="bg-white/[0.025] border-white/[0.06] hover:border-cyan-500/25 hover:bg-white/[0.04] transition-all duration-300 group overflow-hidden">
-                                            <CardContent className="p-4 flex items-center gap-3">
-                                                <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-br from-cyan-500/15 to-blue-600/15 border border-white/[0.06] flex items-center justify-center text-cyan-400 font-black text-sm overflow-hidden">
+                                        <Card key={member.id} className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-xl backdrop-blur-md transition-all duration-300 hover:border-cyan-500/40 hover:bg-white/[0.05] group">
+                                            <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                                            <CardContent className="p-4 flex items-center gap-4 relative">
+                                                <div className="h-12 w-12 flex-shrink-0 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-cyan-400 font-black text-lg overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
                                                     {member.user.avatar_url ? (
                                                         <img src={member.user.avatar_url} alt={member.user.name} className="h-full w-full object-cover" />
                                                     ) : (
                                                         <span>{member.user.name.charAt(0)}</span>
                                                     )}
+                                                    <div className="absolute inset-0 bg-cyan-400/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="text-xs font-bold text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight truncate">{member.user.name}</h4>
-                                                    <div className="flex items-center gap-1.5 mt-0.5">
-                                                        <Shield className="h-2.5 w-2.5 text-cyan-500/60 flex-shrink-0" />
-                                                        <span className="text-[8px] text-slate-600 font-black uppercase tracking-widest truncate">{member.project_role}</span>
+                                                    <h4 className="text-[13px] font-black text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight truncate">{member.user.name}</h4>
+                                                    <div className="flex items-center gap-1.5 mt-1">
+                                                        <Shield className="h-3 w-3 text-cyan-500 flex-shrink-0" />
+                                                        <span className="text-[9px] text-white/60 font-black uppercase tracking-widest truncate">{member.project_role}</span>
                                                     </div>
                                                 </div>
-                                                <Badge variant="outline" className="border-white/[0.06] text-[8px] font-black tracking-widest uppercase flex-shrink-0 text-slate-600">
+                                                <Badge variant="outline" className="border-white/[0.1] bg-white/[0.02] text-[9px] font-black tracking-widest uppercase flex-shrink-0 text-white/40 group-hover:text-cyan-400 transition-colors">
                                                     {member.workspace_role}
                                                 </Badge>
                                             </CardContent>
@@ -365,30 +367,30 @@ const ProjectDetailsPage = () => {
                                     <div className="space-y-4">
                                         <div>
                                             <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">Pending Authorizations</h3>
-                                            <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest mt-0.5">Awaiting sector entry confirmation from specialists</p>
+                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-0.5">Awaiting sector entry confirmation from specialists</p>
                                         </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                                             {projectInvitations.filter(i => i.status === 'pending').map((invite) => (
-                                                <Card key={invite.id} className="bg-white/[0.02] border border-dashed border-amber-500/20 relative overflow-hidden">
+                                                <Card key={invite.id} className="bg-white/[0.02] border border-dashed border-amber-500/30 relative overflow-hidden group/invite shadow-lg">
                                                     <div className="absolute top-2.5 right-2.5">
-                                                        <Clock className="h-3 w-3 text-amber-500 animate-pulse" />
+                                                        <Clock className="h-4 w-4 text-amber-500 animate-[pulse_2s_infinite]" />
                                                     </div>
-                                                    <CardContent className="p-4 space-y-3">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="h-9 w-9 flex-shrink-0 rounded-lg bg-white/[0.04] flex items-center justify-center text-slate-500">
-                                                                <Users size={15} />
+                                                    <CardContent className="p-4 space-y-4">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="h-11 w-11 flex-shrink-0 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-white/20 group-hover/invite:text-amber-500 transition-colors">
+                                                                <Users size={18} />
                                                             </div>
                                                             <div className="min-w-0">
-                                                                <h4 className="text-[11px] font-bold text-white uppercase truncate">{invite.invitee?.user?.name || 'Unknown User'}</h4>
-                                                                <p className="text-[8px] text-slate-600 font-bold uppercase truncate">{invite.invitee?.user?.email}</p>
+                                                                <h4 className="text-[12px] font-black text-white uppercase truncate tracking-tight">{invite.invitee?.user?.name || 'Unknown User'}</h4>
+                                                                <p className="text-[9px] text-white/40 font-bold uppercase truncate mt-0.5 tracking-widest">{invite.invitee?.user?.email}</p>
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+                                                        <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
                                                             <div className="flex items-center gap-1.5">
-                                                                <Shield className="h-2.5 w-2.5 text-cyan-500/60" />
-                                                                <span className="text-[8px] text-slate-600 font-black uppercase">{invite.role}</span>
+                                                                <Shield className="h-3 w-3 text-cyan-400" />
+                                                                <span className="text-[9px] text-white/60 font-black uppercase tracking-widest">{invite.role}</span>
                                                             </div>
-                                                            <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-[8px] uppercase font-black">pending</Badge>
+                                                            <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20 text-[9px] uppercase font-black tracking-tighter">pending</Badge>
                                                         </div>
                                                     </CardContent>
                                                 </Card>
@@ -404,7 +406,7 @@ const ProjectDetailsPage = () => {
                                         </div>
                                         <div className="space-y-1.5">
                                             <h3 className="text-lg sm:text-xl font-heading font-black text-white uppercase italic tracking-tight">Mission Authorization Detected</h3>
-                                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest max-w-sm mx-auto">
+                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest max-w-sm mx-auto">
                                                 You have been invited to join this mission sector as a specialist. Confirm authorization to proceed.
                                             </p>
                                         </div>
@@ -431,7 +433,7 @@ const ProjectDetailsPage = () => {
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">Mission Stream</h3>
-                                            <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest mt-0.5">Real-time chronicle of neural status transitions</p>
+                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-0.5">Real-time chronicle of neural status transitions</p>
                                         </div>
                                         <History size={18} className="text-emerald-500/40 flex-shrink-0" />
                                     </div>
@@ -441,35 +443,35 @@ const ProjectDetailsPage = () => {
                                             (projectActivities || []).map((activity: any) => (
                                                 <div
                                                     key={activity.id}
-                                                    className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] border-l-2 border-l-cyan-500/25 hover:border-l-cyan-400/50 hover:bg-white/[0.035] transition-all"
+                                                    className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] border-l-4 border-l-cyan-500/40 hover:border-l-cyan-400 hover:bg-white/[0.05] transition-all shadow-lg"
                                                 >
-                                                    <div className="h-7 w-7 rounded-lg bg-slate-800/80 border border-white/[0.06] flex items-center justify-center relative flex-shrink-0 mt-0.5">
+                                                    <div className="h-9 w-9 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center relative flex-shrink-0">
                                                         {activity.actor?.avatar_url ? (
-                                                            <img src={activity.actor.avatar_url} alt={activity.actor.name} className="h-full w-full object-cover rounded-lg" />
+                                                            <img src={activity.actor.avatar_url} alt={activity.actor.name} className="h-full w-full object-cover rounded-xl" />
                                                         ) : (
-                                                            <span className="text-[9px] font-black text-cyan-400">{activity.actor?.name?.charAt(0)}</span>
+                                                            <span className="text-[11px] font-black text-cyan-400">{activity.actor?.name?.charAt(0)}</span>
                                                         )}
-                                                        <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 bg-[#030408] rounded-full flex items-center justify-center">
-                                                            <span className="h-1.5 w-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                                                        <span className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-[#030408] rounded-full flex items-center justify-center">
+                                                            <span className="h-2 w-2 bg-emerald-400 rounded-full shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
                                                         </span>
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-start justify-between gap-3">
-                                                            <p className="text-[11px] text-white/80 font-medium leading-snug">
-                                                                <span className="text-cyan-400 font-bold">{activity.actor?.name}</span>
-                                                                {' '}moved{' '}
-                                                                <span className="italic text-white/90">"{activity.meta?.task_title}"</span>
+                                                            <p className="text-[12px] text-white font-medium leading-snug">
+                                                                <span className="text-cyan-400 font-black uppercase tracking-tighter">{activity.actor?.name}</span>
+                                                                {' '}transitioned{' '}
+                                                                <span className="text-white/90 font-bold">"{activity.meta?.task_title}"</span>
                                                             </p>
-                                                            <span className="text-[8px] font-black text-slate-700 uppercase flex-shrink-0 tabular-nums mt-0.5">
+                                                            <span className="text-[9px] font-black text-white/20 uppercase flex-shrink-0 tabular-nums font-mono">
                                                                 {format(new Date(activity.created_at), 'HH:mm')}
                                                             </span>
                                                         </div>
-                                                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                                                            <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md bg-white/[0.04] text-slate-600 line-through">
+                                                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-white/[0.04] text-white/40 border border-white/5 line-through">
                                                                 {activity.meta?.old_status}
                                                             </span>
-                                                            <span className="text-slate-700 text-xs">→</span>
-                                                            <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                                                            <ChevronRight className="h-3 w-3 text-white/10" />
+                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-cyan-500/15 text-cyan-400 border border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
                                                                 {activity.meta?.new_status}
                                                             </span>
                                                         </div>
@@ -477,11 +479,11 @@ const ProjectDetailsPage = () => {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="py-16 text-center bg-white/[0.01] border border-dashed border-white/[0.06] rounded-2xl flex flex-col items-center justify-center gap-3">
-                                                <Activity className="h-8 w-8 text-emerald-500/15" />
-                                                <div>
-                                                    <h3 className="text-sm font-heading font-black text-slate-600 uppercase italic tracking-widest">Neural Silence</h3>
-                                                    <p className="text-[9px] text-slate-700 font-bold uppercase tracking-widest mt-1">No activity detected in this sector yet.</p>
+                                            <div className="py-20 text-center bg-white/[0.02] border border-dashed border-white/[0.1] rounded-3xl flex flex-col items-center justify-center gap-4">
+                                                <Activity className="h-10 w-10 text-emerald-500/20" />
+                                                <div className="space-y-1">
+                                                    <h3 className="text-base font-heading font-black text-white/40 uppercase italic tracking-[0.2em]">Neural Silence</h3>
+                                                    <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">No activity detected in this sector yet.</p>
                                                 </div>
                                             </div>
                                         )}
@@ -491,11 +493,11 @@ const ProjectDetailsPage = () => {
 
                             {/* Settings */}
                             <TabsContent value="settings" className="m-0 flex-1 min-h-0">
-                                <div className="py-16 text-center bg-white/[0.01] border border-dashed border-white/[0.06] rounded-2xl h-full flex flex-col items-center justify-center gap-3">
-                                    <Settings className="h-9 w-9 text-slate-800" />
-                                    <div>
-                                        <h3 className="text-sm font-heading font-black text-slate-600 uppercase italic tracking-widest">Mission Parameters</h3>
-                                        <p className="text-[9px] text-slate-700 font-bold uppercase tracking-widest mt-1">Configuring sector variables and access overrides...</p>
+                                <div className="py-20 text-center bg-white/[0.02] border border-dashed border-white/[0.1] rounded-3xl h-full flex flex-col items-center justify-center gap-4">
+                                    <Settings className="h-12 w-12 text-white/10" />
+                                    <div className="space-y-1">
+                                        <h3 className="text-base font-heading font-black text-white/40 uppercase italic tracking-[0.2em]">Mission Parameters</h3>
+                                        <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Configuring sector variables and access overrides...</p>
                                     </div>
                                 </div>
                             </TabsContent>

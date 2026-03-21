@@ -241,12 +241,12 @@ export const ProjectSettingsPage: React.FC = () => {
                                 Project Color
                             </Label>
                             <div className="flex items-center gap-4">
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
                                     {colorPresets.map((color) => (
                                         <button
                                             key={color}
                                             onClick={() => handleInputChange('color', color)}
-                                            className={`w-10 h-10 rounded-lg border-2 transition-all ${formData.color === color
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-2 transition-all ${formData.color === color
                                                 ? 'border-white scale-110'
                                                 : 'border-white/20 hover:border-white/40'
                                                 }`}
@@ -259,7 +259,7 @@ export const ProjectSettingsPage: React.FC = () => {
                                     type="color"
                                     value={formData.color}
                                     onChange={(e) => handleInputChange('color', e.target.value)}
-                                    className="w-20 h-10 bg-slate-800/50 border-white/10"
+                                    className="w-16 h-8 sm:w-20 sm:h-10 bg-slate-800/50 border-white/10"
                                 />
                             </div>
                         </div>

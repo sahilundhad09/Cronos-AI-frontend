@@ -82,7 +82,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
 
                                 {/* Top row: priority badge + complete + menu */}
                                 <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-2 min-w-0">
+                                    <div className="flex items-center gap-2 min-w-0 mt-3">
                                         <Badge
                                             variant={priorityColors[task.priority] || 'outline'}
                                             className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0 h-4 flex-shrink-0"
@@ -98,7 +98,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                                 className={`h-5 w-5 rounded-md flex items-center justify-center transition-all flex-shrink-0 ${
                                                     isAssignee
                                                         ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 opacity-40 hover:opacity-100 cursor-pointer'
-                                                        : 'bg-slate-800/50 border border-slate-700/50 text-slate-600 cursor-not-allowed opacity-20'
+                                                        : 'bg-white/5 border border-white/10 text-white/20 cursor-not-allowed opacity-20'
                                                 }`}
                                             >
                                                 <CheckCircle2 size={11} strokeWidth={3} />
@@ -108,7 +108,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
 
                                     <button
                                         onClick={(e) => e.stopPropagation()}
-                                        className="text-slate-700 hover:text-slate-400 transition-colors flex-shrink-0 p-0.5 rounded"
+                                        className="text-white/60 hover:text-white transition-colors flex-shrink-0 p-0.5 rounded"
                                     >
                                         <MoreHorizontal className="h-3.5 w-3.5" />
                                     </button>
@@ -120,7 +120,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                         {task.title}
                                     </h4>
                                     {task.description && (
-                                        <p className="text-[10px] text-slate-600 font-bold uppercase tracking-tight line-clamp-2 leading-relaxed">
+                                        <p className="text-[10px] text-white/85 font-bold uppercase tracking-tight line-clamp-2 leading-relaxed">
                                             {task.description}
                                         </p>
                                     )}
@@ -132,14 +132,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                     {/* Left meta */}
                                     <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
                                         {task.due_date && (
-                                            <div className="flex items-center gap-1 text-slate-600">
+                                            <div className="flex items-center gap-1 text-white/80">
                                                 <Clock className="h-2.5 w-2.5 flex-shrink-0" />
                                                 <span className="text-[8px] font-black uppercase tracking-widest whitespace-nowrap">
                                                     {format(new Date(task.due_date), 'MMM d')}
                                                 </span>
                                             </div>
                                         )}
-                                        <div className="flex items-center gap-2 text-slate-700">
+                                        <div className="flex items-center gap-2 text-white/60">
                                             <div className="flex items-center gap-1">
                                                 <MessageSquare className="h-2.5 w-2.5" />
                                                 <span className="text-[8px] font-black tracking-widest">2</span>
@@ -161,7 +161,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                                 {task.assignees.slice(0, 3).map((a: any, i: number) => (
                                                     <div
                                                         key={i}
-                                                        className="h-5 w-5 rounded-md bg-slate-800 border border-[#0A0D18] flex items-center justify-center text-[7px] font-black text-slate-500 overflow-hidden"
+                                                        className="h-5 w-5 rounded-md bg-white/20 border border-[#0A0D18] flex items-center justify-center text-[7px] font-black text-white/60 overflow-hidden"
                                                         title={a.user?.name || a.name}
                                                     >
                                                         {(a.user?.avatar_url || a.avatar_url) ? (
@@ -176,17 +176,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                                     </div>
                                                 ))}
                                                 {task.assignees.length > 3 && (
-                                                    <div className="h-5 w-5 rounded-md bg-slate-700 border border-[#0A0D18] flex items-center justify-center text-[7px] font-black text-slate-400">
+                                                    <div className="h-5 w-5 rounded-md bg-white/20 border border-[#0A0D18] flex items-center justify-center text-[7px] font-black text-white/60">
                                                         +{task.assignees.length - 3}
                                                     </div>
                                                 )}
                                             </>
                                         ) : (
                                             <div className="flex items-center gap-1.5 group/assign">
-                                                <span className="text-[7px] font-black text-slate-700 uppercase tracking-widest opacity-0 group-hover/assign:opacity-100 transition-opacity">
+                                                <span className="text-[7px] font-black text-white/60 uppercase tracking-widest opacity-0 group-hover/assign:opacity-100 transition-opacity">
                                                     Assign
                                                 </span>
-                                                <div className="h-5 w-5 rounded-md border border-dashed border-white/[0.08] flex items-center justify-center text-slate-700 group-hover:border-cyan-500/40 group-hover:text-cyan-500 transition-colors">
+                                                <div className="h-5 w-5 rounded-md border border-dashed border-white/[0.2] flex items-center justify-center text-white/60 group-hover:border-cyan-500/40 group-hover:text-cyan-500 transition-colors">
                                                     <UserPlus className="h-2.5 w-2.5" />
                                                 </div>
                                             </div>

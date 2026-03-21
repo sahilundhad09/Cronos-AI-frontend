@@ -80,7 +80,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                         <h2 className="text-lg sm:text-xl font-heading font-black text-white uppercase italic tracking-tighter">
                             Neural <span className="text-cyan-400">Llama Orchestrator</span>
                         </h2>
-                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
+                        <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest leading-relaxed">
                             Provide mission parameters for automated milestone decomposition
                         </p>
                     </div>
@@ -89,13 +89,13 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                 {/* Input card */}
                 <div className="relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-2xl blur opacity-20 group-focus-within:opacity-60 transition-opacity" />
-                    <div className="relative bg-[#0A0D18] border border-white/[0.06] rounded-2xl p-4 space-y-4">
+                    <div className="relative bg-[#08090d] border border-white/[0.08] rounded-2xl p-4 space-y-4">
 
                         <Textarea
                             value={prompt}
                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setPrompt(e.target.value)}
                             placeholder="e.g. Build a secure client portal with file sharing, real-time collaboration, and multi-factor authentication..."
-                            className="bg-transparent border-none focus-visible:ring-0 text-white placeholder:text-slate-700 resize-none min-h-[80px] sm:min-h-[100px] font-bold text-sm leading-relaxed p-0"
+                            className="bg-transparent border-none focus-visible:ring-0 text-white placeholder:text-muted-foreground/20 resize-none min-h-[80px] sm:min-h-[100px] font-bold text-sm leading-relaxed p-0"
                         />
 
                         {/* Controls row — stacks on mobile */}
@@ -106,7 +106,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
 
                                 {/* Task count slider */}
                                 <div className="flex items-center gap-3 w-full xs:w-auto xs:max-w-xs flex-1">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] whitespace-nowrap flex-shrink-0">Tasks:</span>
+                                    <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.15em] whitespace-nowrap flex-shrink-0">Tasks:</span>
                                     <div className="flex-1">
                                         <input
                                             type="range"
@@ -114,7 +114,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                             max="15"
                                             value={taskCount}
                                             onChange={(e) => setTaskCount(parseInt(e.target.value))}
-                                            className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-slate-800 accent-cyan-500"
+                                            className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-white/5 accent-cyan-500"
                                             aria-label="Generated task count"
                                             title="Generated task count"
                                         />
@@ -124,9 +124,9 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
 
                                 {/* Engine meta — hidden on mobile */}
                                 <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
-                                    <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.2em]">Groq / Llama 3.3 70B</span>
-                                    <span className="text-slate-800">·</span>
-                                    <span className="text-[8px] font-black text-slate-700 uppercase tracking-[0.2em]">Latency: Optimized</span>
+                                    <span className="text-[8px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Groq / Llama 3.3 70B</span>
+                                    <span className="text-white/10">·</span>
+                                    <span className="text-[8px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Latency: Optimized</span>
                                 </div>
                             </div>
 
@@ -157,7 +157,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                             <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">
                                 Generated <span className="text-cyan-400">Milestones</span>
                             </h3>
-                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                            <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
                                 {selectedIndices.length} of {currentGen.generated_tasks.length} selected
                             </p>
                         </div>
@@ -168,7 +168,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                 variant="ghost"
                                 onClick={() => setSelectedIndices(currentGen.generated_tasks.map((_, i) => i))}
                                 disabled={selectedIndices.length === currentGen.generated_tasks.length}
-                                className="flex-shrink-0 text-slate-500 hover:text-white uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
+                                className="flex-shrink-0 text-muted-foreground/40 hover:text-white uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
                             >
                                 All
                             </Button>
@@ -176,7 +176,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                 variant="ghost"
                                 onClick={() => setSelectedIndices([])}
                                 disabled={selectedIndices.length === 0}
-                                className="flex-shrink-0 text-slate-500 hover:text-white uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
+                                className="flex-shrink-0 text-muted-foreground/40 hover:text-white uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
                             >
                                 None
                             </Button>
@@ -228,24 +228,24 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                                 {task.title}
                                             </h4>
 
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight line-clamp-2 leading-relaxed">
+                                            <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-tight line-clamp-2 leading-relaxed">
                                                 {task.description}
                                             </p>
 
                                             {/* Meta pills — wrap on small screens */}
                                             <div className="flex items-center flex-wrap gap-2 gap-y-1.5 pt-1">
                                                 <div className="flex items-center gap-1.5">
-                                                    <Flag className="h-3 w-3 text-slate-700 flex-shrink-0" />
+                                                    <Flag className="h-3 w-3 text-muted-foreground/20 flex-shrink-0" />
                                                     <Badge
                                                         variant="outline"
-                                                        className="text-[8px] border-white/10 text-slate-500 h-4 px-1.5 uppercase font-black tracking-widest"
+                                                        className="text-[8px] border-white/10 text-muted-foreground/60 h-4 px-1.5 uppercase font-black tracking-widest"
                                                     >
                                                         {task.priority || 'medium'}
                                                     </Badge>
                                                 </div>
 
                                                 {task.estimated_hours && (
-                                                    <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-slate-600">
+                                                    <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
                                                         <Calendar className="h-3 w-3 flex-shrink-0" />
                                                         <span>{task.estimated_hours}h</span>
                                                     </div>
@@ -263,7 +263,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                         </div>
 
                                         <ChevronRight className={`h-4 w-4 flex-shrink-0 mt-1 transition-colors ${
-                                            isSelected ? 'text-emerald-500' : 'text-slate-800 group-hover:text-cyan-500'
+                                            isSelected ? 'text-emerald-500' : 'text-white/10 group-hover:text-cyan-500'
                                         }`} />
                                     </CardContent>
                                 </Card>
