@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-    X,
     Calendar,
     Flag,
     User,
@@ -19,7 +18,8 @@ import {
     Trash2,
     Send,
     Upload,
-    Download
+    Download,
+    Zap
 } from 'lucide-react';
 import { useTaskStore, Task } from '@/store/useTaskStore';
 import { format } from 'date-fns';
@@ -171,59 +171,65 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl max-h-[90vh] bg-[#0A0D18] border-white/10 text-white p-0 overflow-hidden">
+            <DialogContent className="sm:max-w-4xl w-[calc(100%-1rem)] max-h-[95vh] bg-card border-2 border-border/80 hover:border-primary/70 transition-colors text-foreground p-0 overflow-hidden shadow-[0_0_50px_-12px_rgba(var(--primary),0.3)] rounded-2xl sm:rounded-3xl">
                 {/* Header */}
-                <DialogHeader className="px-6 py-4 border-b border-white/10">
-                    <div className="flex items-start justify-between">
-                        <div className="flex-1 pr-4">
-                            {isEditing ? (
-                                <Input
-                                    value={editedTask.title || ''}
-                                    onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-                                    className="text-xl font-bold bg-white/5 border-white/10"
-                                />
-                            ) : (
-                                <DialogTitle className="text-2xl font-bold text-white">{task.title}</DialogTitle>
-                            )}
+                <DialogHeader className="px-4 sm:px-8 py-5 sm:py-7 border-b border-border bg-secondary/10">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0 flex items-start gap-3">
+                            {/* Favicon-style Icon */}
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
+                                <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary animate-pulse" />
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                                {isEditing ? (
+                                    <Input
+                                        value={editedTask.title || ''}
+                                        onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
+                                        className="text-lg sm:text-2xl font-black bg-secondary/30 border-border rounded-xl"
+                                    />
+                                ) : (
+                                    <DialogTitle className="text-xl sm:text-2xl font-black text-foreground italic uppercase tracking-tight truncate leading-tight mt-1 sm:mt-2">
+                                        {task.title}
+                                    </DialogTitle>
+                                )}
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 self-end sm:self-center">
                             {isEditing ? (
                                 <>
-                                    <Button onClick={handleSave} size="sm" className="bg-emerald-500 hover:bg-emerald-400">
-                                        <CheckCircle2 className="h-4 w-4 mr-2" /> Save
+                                    <Button onClick={handleSave} size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-widest text-[10px] h-9 px-5 rounded-xl shadow-lg shadow-emerald-500/20">
+                                        <CheckCircle2 className="h-4 w-4 mr-2" /> Save Changes
                                     </Button>
-                                    <Button onClick={() => setIsEditing(false)} size="sm" variant="ghost">
+                                    <Button onClick={() => setIsEditing(false)} size="sm" variant="ghost" className="text-[10px] font-black uppercase tracking-widest h-9 px-4 rounded-xl">
                                         Cancel
                                     </Button>
                                 </>
                             ) : (
                                 <>
-                                    <Button onClick={() => setIsEditing(true)} size="sm" variant="ghost">
+                                    <Button onClick={() => setIsEditing(true)} size="sm" variant="ghost" className="h-10 w-10 p-0 hover:bg-primary/10 hover:text-primary rounded-xl transition-all border border-transparent hover:border-primary/20">
                                         <Edit2 className="h-4 w-4" />
                                     </Button>
-                                    <Button onClick={handleDelete} size="sm" variant="ghost" className="text-red-400 hover:text-red-300">
+                                    <Button onClick={handleDelete} size="sm" variant="ghost" className="h-10 w-10 p-0 text-destructive/60 hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all border border-transparent hover:border-destructive/20">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </>
                             )}
-                            <Button onClick={onClose} size="sm" variant="ghost">
-                                <X className="h-4 w-4" />
-                            </Button>
                         </div>
                     </div>
                 </DialogHeader>
 
-                <ScrollArea className="h-[calc(90vh-100px)]">
-                    <div className="p-6 space-y-6">
-                        {/* Task Info */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Priority</label>
+                <ScrollArea className="h-[calc(95vh-140px)] sm:h-[calc(90vh-120px)]">
+                    <div className="p-4 sm:p-10 space-y-8 sm:space-y-10">
+                        {/* Task Info Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em]">Mission Priority</label>
                                 {isEditing ? (
                                     <select
                                         value={editedTask.priority || 'medium'}
                                         onChange={(e) => setEditedTask({ ...editedTask, priority: e.target.value as 'low' | 'medium' | 'high' | 'urgent' })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
+                                        className="w-full bg-secondary/30 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold"
                                     >
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
@@ -231,85 +237,94 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                         <option value="urgent">Urgent</option>
                                     </select>
                                 ) : (
-                                    <Badge className={getPriorityColor(task.priority)}>
-                                        <Flag className="h-3 w-3 mr-1" />
-                                        {task.priority}
-                                    </Badge>
+                                    <div className="flex">
+                                        <Badge className={`${getPriorityColor(task.priority)} shadow-md font-black uppercase tracking-widest text-[9px] px-3 py-1 border rounded-lg`}>
+                                            <Flag className="h-3 w-3 mr-2" />
+                                            {task.priority}
+                                        </Badge>
+                                    </div>
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Due Date</label>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em]">Deadline Pin</label>
                                 {isEditing ? (
                                     <Input
                                         type="date"
                                         value={editedTask.due_date ? format(new Date(editedTask.due_date), 'yyyy-MM-dd') : ''}
                                         onChange={(e) => setEditedTask({ ...editedTask, due_date: e.target.value })}
-                                        className="bg-white/5 border-white/10"
+                                        className="bg-secondary/30 border-border rounded-xl h-11 px-4 font-bold"
                                     />
                                 ) : (
-                                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                                        <Calendar className="h-4 w-4" />
-                                        {task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No due date'}
+                                    <div className="flex items-center gap-3 text-sm font-black text-foreground/70 bg-secondary/20 w-fit px-4 py-2 rounded-xl border border-border/40 shadow-sm transition-all hover:bg-secondary/30">
+                                        <Calendar className="h-4 w-4 text-primary" />
+                                        {task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No Horizon Set'}
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        <Separator className="bg-white/10" />
+                        <Separator className="bg-border/30" />
 
                         {/* Description */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Description</label>
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em]">Mission Briefing</label>
                             {isEditing ? (
                                 <Textarea
                                     value={editedTask.description || ''}
                                     onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
-                                    className="min-h-[120px] bg-white/5 border-white/10 resize-none"
-                                    placeholder="Add a description..."
+                                    className="min-h-[160px] bg-secondary/30 border-border rounded-2xl resize-none p-5 text-sm leading-relaxed font-medium focus:ring-2 focus:ring-primary/20 transition-all"
+                                    placeholder="Define the mission parameters..."
                                 />
                             ) : (
-                                <p className="text-sm text-slate-300 leading-relaxed">
-                                    {task.description || 'No description provided'}
-                                </p>
+                                <div className="bg-secondary/10 rounded-2xl p-5 border border-border/30">
+                                    <p className="text-sm sm:text-base text-foreground/80 leading-relaxed font-semibold">
+                                        {task.description || 'No briefing parameters provided for this segment.'}
+                                    </p>
+                                </div>
                             )}
                         </div>
 
-                        <Separator className="bg-white/10" />
+                        <Separator className="bg-border/30" />
 
                         {/* Assignees */}
-                        <div className="space-y-3">
+                        <div className="space-y-5">
                             <div className="flex items-center justify-between">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                    <User className="h-4 w-4" />
-                                    Assignees
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em] flex items-center gap-2">
+                                    <User className="h-4 w-4 text-primary" />
+                                    Active Specialists
                                 </label>
                             </div>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-3">
                                 {task.assignees && task.assignees.length > 0 ? (
                                     task.assignees.map((assignee: any) => (
-                                        <div key={assignee.id} className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2 border border-white/10">
-                                            <Avatar className="h-6 w-6">
-                                                <AvatarFallback className="bg-cyan-500/20 text-cyan-400 text-xs">
+                                        <div key={assignee.id} className="flex items-center gap-3 bg-secondary/30 rounded-2xl px-4 py-2.5 border border-border/60 hover:border-primary/40 transition-all shadow-sm group/specialist cursor-default">
+                                            <Avatar className="h-8 w-8 border border-border/50 ring-2 ring-primary/5">
+                                                <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-black">
                                                     {assignee.user?.name?.charAt(0) || 'U'}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <span className="text-sm text-slate-300">{assignee.user?.name || 'Unknown'}</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/90 leading-tight">
+                                                    {assignee.user?.name || 'Unknown Specialist'}
+                                                </span>
+                                                <span className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-tighter">Verified Operative</span>
+                                            </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-slate-500">No assignees</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 italic py-2">No specialist locked on target</p>
                                 )}
                             </div>
                         </div>
 
-                        <Separator className="bg-white/10" />
+                        <Separator className="bg-border/30" />
 
                         {/* Comments */}
-                        <div className="space-y-3">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                <MessageSquare className="h-4 w-4" />
-                                Comments ({comments.length})
+                        <div className="space-y-6 sm:space-y-8">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em] flex items-center gap-2">
+                                < MessageSquare className="h-4 w-4 text-primary" />
+                                Secure Comms Log ({comments.length})
                             </label>
 
                             <CommentSummarizer
@@ -317,84 +332,106 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                 comments={comments}
                             />
 
-                            <div className="space-y-3">
+                            <div className="space-y-5">
                                 {comments.map((comment) => (
-                                    <div key={comment.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                                        <div className="flex items-start gap-3">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback className="bg-cyan-500/20 text-cyan-400 text-xs">
+                                    <div key={comment.id} className="bg-secondary/20 rounded-2xl p-5 sm:p-6 border border-border/40 hover:border-primary/20 transition-all shadow-sm">
+                                        <div className="flex items-start gap-4 sm:gap-5">
+                                            <Avatar className="h-10 w-10 border border-border/50 shrink-0">
+                                                <AvatarFallback className="bg-primary/10 text-primary text-xs font-black">
                                                     {comment.user?.name?.charAt(0) || 'U'}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-sm font-bold text-white">{comment.user?.name}</span>
-                                                    <span className="text-xs text-slate-500">
-                                                        {format(new Date(comment.created_at), 'MMM dd, yyyy HH:mm')}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+                                                    <span className="text-xs font-black uppercase tracking-tight text-foreground">
+                                                        {comment.user?.name}
+                                                    </span>
+                                                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">
+                                                        {format(new Date(comment.created_at), 'MMM dd, HH:mm')}
                                                     </span>
                                                 </div>
-                                                <p className="text-sm text-slate-300">{comment.message}</p>
+                                                <p className="text-sm text-foreground/80 font-semibold leading-relaxed break-words">
+                                                    {comment.message}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-4 mt-8">
                                 <Textarea
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder="Add a comment..."
-                                    className="flex-1 bg-white/5 border-white/10 resize-none min-h-[80px]"
+                                    placeholder="Enter secure message..."
+                                    className="flex-1 bg-secondary/30 border-border rounded-2xl resize-none min-h-[100px] sm:min-h-[120px] p-5 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-semibold outline-none"
                                 />
-                                <Button onClick={handleAddComment} disabled={!newComment.trim()} className="bg-cyan-500 hover:bg-cyan-400">
-                                    <Send className="h-4 w-4" />
+                                <Button 
+                                    onClick={handleAddComment} 
+                                    disabled={!newComment.trim()} 
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 sm:w-16 sm:h-auto rounded-2xl flex items-center justify-center transition-all active:scale-95 group/send"
+                                >
+                                    <Send className="h-6 w-6 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                 </Button>
                             </div>
                         </div>
 
-                        <Separator className="bg-white/10" />
+                        <Separator className="bg-border/30" />
 
                         {/* Attachments */}
-                        <div className="space-y-3">
+                        <div className="space-y-5">
                             <div className="flex items-center justify-between">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                    <Paperclip className="h-4 w-4" />
-                                    Attachments ({attachments.length})
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.25em] flex items-center gap-2">
+                                    <Paperclip className="h-4 w-4 text-primary" />
+                                    Mission Assets ({attachments.length})
                                 </label>
                                 <label className="cursor-pointer">
                                     <input type="file" className="hidden" onChange={handleFileUpload} />
-                                    <Button size="sm" className="bg-cyan-500 hover:bg-cyan-400" asChild>
+                                    <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 text-[9px] font-black uppercase tracking-widest h-9 px-6 rounded-xl transition-all" asChild>
                                         <span>
-                                            <Upload className="h-4 w-4 mr-2" /> Upload
+                                            <Upload className="h-3.5 w-3.5 mr-2" /> Upload Asset
                                         </span>
                                     </Button>
                                 </label>
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {attachments.map((attachment) => (
-                                    <div key={attachment.id} className="flex items-center justify-between bg-white/5 rounded-lg p-3 border border-white/10">
-                                        <div className="flex items-center gap-3">
-                                            <Paperclip className="h-4 w-4 text-slate-400" />
-                                            <div>
-                                                <p className="text-sm font-medium text-white">{attachment.file_name}</p>
-                                                <p className="text-xs text-slate-500">{formatFileSize(attachment.file_size)}</p>
+                                    <div key={attachment.id} className="flex items-center justify-between bg-secondary/20 rounded-2xl p-4 border border-border/40 hover:border-primary/30 transition-all shadow-sm group/att">
+                                        <div className="flex items-center gap-4 min-w-0">
+                                            <div className="p-2.5 bg-primary/10 rounded-xl group-hover/att:bg-primary/20 transition-colors">
+                                                <Paperclip className="h-4 w-4 text-primary" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[11px] font-black text-foreground truncate uppercase tracking-tight">{attachment.file_name}</p>
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">{formatFileSize(attachment.file_size)}</p>
                                             </div>
                                         </div>
                                         <Button
                                             size="sm"
                                             variant="ghost"
+                                            className="h-10 w-10 p-0 text-muted-foreground hover:text-primary transition-all hover:bg-primary/10 rounded-xl"
                                             onClick={() => window.open(attachment.file_url, '_blank')}
                                         >
-                                            <Download className="h-4 w-4" />
+                                            <Download className="h-5 w-5" />
                                         </Button>
                                     </div>
                                 ))}
                                 {attachments.length === 0 && (
-                                    <p className="text-sm text-slate-500">No attachments</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 italic py-4 text-center w-full border border-dashed border-border/40 rounded-2xl">No asset uplinks detected in this sector</p>
                                 )}
                             </div>
+                        </div>
+
+                        {/* Footer Close Button */}
+                        <div className="flex justify-center sm:justify-end pt-8">
+                            <Button 
+                                onClick={onClose} 
+                                variant="outline" 
+                                className="border-border/60 hover:bg-secondary/50 text-[10px] font-black uppercase tracking-[0.3em] h-12 px-10 rounded-2xl shadow-md transition-all active:scale-95 group/close w-full sm:w-auto"
+                            >
+                                <span className="group-hover:opacity-70 transition-opacity">Abort Link Persistence</span>
+                            </Button>
                         </div>
                     </div>
                 </ScrollArea>

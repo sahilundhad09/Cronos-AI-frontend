@@ -23,6 +23,20 @@ api.interceptors.request.use(
     }
 );
 
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
 // Add a response interceptor to handle token expiration
 api.interceptors.response.use(
     (response) => response,
@@ -31,7 +45,21 @@ api.interceptors.response.use(
 
         // If the error is 401 and not a retry, try to refresh the token
         if (error.response?.status === 401 && !originalRequest._retry) {
+            if (isRefreshing) {
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                })
+                    .then((token) => {
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                        return api(originalRequest);
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    });
+            }
+
             originalRequest._retry = true;
+            isRefreshing = true;
 
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
@@ -39,25 +67,30 @@ api.interceptors.response.use(
                     throw new Error('No refresh token available');
                 }
 
-                const response = await axios.post(`${API_URL}/auth/refresh`, {
+                const response = await axios.post(`${API_URL}/auth/refresh-token`, {
                     refreshToken,
                 });
 
                 const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
                 localStorage.setItem('accessToken', accessToken);
-                localStorage.setItem('refreshToken', newRefreshToken);
+                if (newRefreshToken) {
+                    localStorage.setItem('refreshToken', newRefreshToken);
+                }
 
-                // Update store if needed (though localStorage update might be enough for next reload, 
-                // for the retry to work we need headers)
+                processQueue(null, accessToken);
+                
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
+                processQueue(refreshError, null);
                 // If refresh fails, log out the user cleanly
                 const { useAuthStore } = await import('@/store/useAuthStore');
                 useAuthStore.getState().logout();
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
+            } finally {
+                isRefreshing = false;
             }
         }
 

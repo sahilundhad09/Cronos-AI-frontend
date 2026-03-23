@@ -115,8 +115,8 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+            <div className="flex items-center justify-center py-16">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -124,89 +124,89 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h2 className="text-lg font-heading font-black text-white uppercase tracking-tight">
+                    <h2 className="text-xl font-heading font-black text-foreground uppercase tracking-tight italic">
                         Project Labels
                     </h2>
-                    <p className="text-sm text-slate-400 mt-1">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-black mt-1.5">
                         Create and manage labels to organize your tasks
                     </p>
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black">
+                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest px-8 shadow-lg shadow-primary/20">
                             <Plus className="h-4 w-4 mr-2" />
                             New Label
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-slate-900 border-white/10">
+                    <DialogContent className="bg-card border-border shadow-2xl">
                         <DialogHeader>
-                            <DialogTitle className="text-white font-heading font-black uppercase">
+                            <DialogTitle className="text-xl font-heading font-black uppercase tracking-tight italic text-foreground">
                                 Create New Label
                             </DialogTitle>
-                            <DialogDescription className="text-slate-400">
-                                Add a new label to categorize your tasks.
+                            <DialogDescription className="text-muted-foreground text-xs font-semibold leading-relaxed">
+                                Add a new label to categorize your tasks in the neural network.
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="space-y-4 py-4">
+                        <div className="space-y-6 py-4">
                             <div>
-                                <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
+                                <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
                                     Label Name *
                                 </Label>
                                 <Input
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="e.g., Bug, Feature, Documentation"
-                                    className="bg-slate-800/50 border-white/10 text-white"
+                                    className="bg-secondary/30 border-border text-foreground h-11"
                                     maxLength={30}
                                 />
                             </div>
                             <div>
-                                <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
-                                    Color
+                                <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
+                                    Identifier Color
                                 </Label>
-                                <div className="flex items-center gap-2">
-                                    <div className="flex flex-wrap gap-2">
-                                        {colorPresets.map((color) => (
-                                            <button
-                                                key={color}
-                                                onClick={() => setFormData({ ...formData, color })}
-                                                className={`w-8 h-8 rounded-lg border-2 transition-all ${formData.color === color
-                                                    ? 'border-white scale-110'
-                                                    : 'border-white/20 hover:border-white/40'
-                                                    }`}
-                                                style={{ backgroundColor: color }}
-                                                title={color}
-                                            />
-                                        ))}
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex flex-wrap gap-2">
+                                            {colorPresets.map((color) => (
+                                                <button
+                                                    key={color}
+                                                    onClick={() => setFormData({ ...formData, color })}
+                                                    className={`w-8 h-8 rounded-lg border-2 transition-all ${formData.color === color
+                                                        ? 'border-primary ring-2 ring-primary/20 scale-110'
+                                                        : 'border-border hover:border-border/60'
+                                                        }`}
+                                                    style={{ backgroundColor: color }}
+                                                    title={color}
+                                                />
+                                            ))}
+                                        </div>
+                                        <Input
+                                            type="color"
+                                            value={formData.color}
+                                            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                                            className="w-16 h-8 bg-secondary/30 border-border"
+                                        />
                                     </div>
-                                    <Input
-                                        type="color"
-                                        value={formData.color}
-                                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                        className="w-16 h-8 bg-slate-800/50 border-white/10"
-                                    />
-                                </div>
                             </div>
                         </div>
-                        <DialogFooter>
+                        <DialogFooter className="pt-6">
                             <Button
                                 variant="ghost"
                                 onClick={closeDialog}
-                                className="text-slate-400 hover:text-white"
+                                className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleCreate}
                                 disabled={isSaving || !formData.name.trim()}
-                                className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest h-11 px-8 shadow-lg shadow-primary/20"
                             >
                                 {isSaving ? (
                                     <>
                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Creating...
+                                        Syncing...
                                     </>
                                 ) : (
                                     'Create Label'
@@ -219,44 +219,44 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
 
             {/* Search */}
             {projectLabels.length > 0 && (
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <div className="relative group/search mb-6">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 group-focus-within/search:text-primary transition-colors" />
                     <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search labels..."
-                        className="pl-10 bg-slate-800/50 border-white/10 text-white"
+                        placeholder="Filter labels by name..."
+                        className="pl-11 bg-secondary/30 border-border text-foreground h-12 focus:border-primary/50 transition-all font-semibold italic text-sm"
                     />
                 </div>
             )}
 
             {/* Labels List */}
-            <div className="bg-slate-900/50 border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-card/50 border border-border rounded-xl shadow-sm overflow-hidden">
                 {filteredLabels.length === 0 ? (
-                    <div className="p-12 text-center">
-                        <p className="text-slate-500 text-sm">
-                            {searchQuery ? 'No labels found matching your search.' : 'No labels yet. Create your first label to get started.'}
+                    <div className="p-16 text-center">
+                        <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.1em] italic">
+                            {searchQuery ? 'Zero matches found in terminal.' : 'No active labels detected in this sector.'}
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-white/5">
+                    <div className="divide-y divide-border">
                         {filteredLabels.map((label) => (
                             <div
                                 key={label.id}
-                                className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group"
+                                className="p-5 flex items-center justify-between hover:bg-primary/[0.02] transition-colors group"
                             >
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-4">
                                     <div
-                                        className="w-4 h-4 rounded"
+                                        className="w-3.5 h-3.5 rounded-full shadow-sm ring-1 ring-border"
                                         style={{ backgroundColor: label.color }}
                                     />
-                                    <span className="text-white font-medium">{label.name}</span>
+                                    <span className="text-foreground font-black uppercase text-[13px] tracking-tight">{label.name}</span>
                                     <Badge
                                         variant="outline"
-                                        className="text-[10px] border-white/10 text-slate-500"
+                                        className="text-[9px] border-border text-muted-foreground font-black uppercase tracking-widest h-4.5 px-2 bg-secondary/30"
                                         style={{
-                                            backgroundColor: `${label.color}15`,
-                                            borderColor: `${label.color}30`,
+                                            backgroundColor: `${label.color}10`,
+                                            borderColor: `${label.color}20`,
                                             color: label.color
                                         }}
                                     >
@@ -278,42 +278,42 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="text-slate-400 hover:text-white"
+                                                className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest"
                                             >
-                                                Edit
+                                                Edit Tag
                                             </Button>
                                         </DialogTrigger>
-                                        <DialogContent className="bg-slate-900 border-white/10">
+                                        <DialogContent className="bg-card border-border shadow-2xl">
                                             <DialogHeader>
-                                                <DialogTitle className="text-white font-heading font-black uppercase">
-                                                    Edit Label
+                                                <DialogTitle className="text-xl font-heading font-black uppercase tracking-tight italic text-foreground">
+                                                    Refine Label
                                                 </DialogTitle>
                                             </DialogHeader>
-                                            <div className="space-y-4 py-4">
+                                            <div className="space-y-6 py-4">
                                                 <div>
-                                                    <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
+                                                    <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
                                                         Label Name *
                                                     </Label>
                                                     <Input
                                                         value={formData.name}
                                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                        className="bg-slate-800/50 border-white/10 text-white"
+                                                        className="bg-secondary/30 border-border text-foreground h-11"
                                                         maxLength={30}
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
-                                                        Color
+                                                    <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
+                                                        Identifier Color
                                                     </Label>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-4">
                                                         <div className="flex flex-wrap gap-2">
                                                             {colorPresets.map((color) => (
                                                                 <button
                                                                     key={color}
                                                                     onClick={() => setFormData({ ...formData, color })}
                                                                     className={`w-8 h-8 rounded-lg border-2 transition-all ${formData.color === color
-                                                                        ? 'border-white scale-110'
-                                                                        : 'border-white/20 hover:border-white/40'
+                                                                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
+                                                                        : 'border-border hover:border-primary/40'
                                                                         }`}
                                                                     style={{ backgroundColor: color }}
                                                                 />
@@ -323,31 +323,31 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
                                                             type="color"
                                                             value={formData.color}
                                                             onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                                            className="w-16 h-8 bg-slate-800/50 border-white/10"
+                                                            className="w-16 h-10 bg-secondary/30 border-border p-1 cursor-pointer"
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
-                                            <DialogFooter>
+                                            <DialogFooter className="pt-6">
                                                 <Button
                                                     variant="ghost"
                                                     onClick={closeDialog}
-                                                    className="text-slate-400 hover:text-white"
+                                                    className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest"
                                                 >
                                                     Cancel
                                                 </Button>
                                                 <Button
                                                     onClick={handleUpdate}
                                                     disabled={isSaving || !formData.name.trim()}
-                                                    className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black"
+                                                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest h-11 px-8 shadow-lg shadow-primary/20"
                                                 >
                                                     {isSaving ? (
                                                         <>
                                                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                            Saving...
+                                                            Syncing...
                                                         </>
                                                     ) : (
-                                                        'Save Changes'
+                                                        'Update Tag'
                                                     )}
                                                 </Button>
                                             </DialogFooter>
@@ -357,7 +357,7 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => handleDelete(label.id)}
-                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                        className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-all rounded-lg"
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>

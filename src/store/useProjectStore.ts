@@ -31,6 +31,7 @@ interface ProjectState {
     fetchProjectInvitations: (projectId: string) => Promise<void>;
     acceptProjectInvitation: (projectId: string, invitationId: string) => Promise<void>;
     fetchProjectActivities: (projectId: string) => Promise<void>;
+    updateProject: (projectId: string, data: Partial<Project>) => Promise<void>;
 }
 
 export const useProjectStore = create<ProjectState>((set) => ({
@@ -160,6 +161,25 @@ export const useProjectStore = create<ProjectState>((set) => ({
             set({ projectActivities: response.data.data });
         } catch (error: any) {
             console.error('Failed to fetch project activity', error);
+        }
+    },
+
+    updateProject: async (projectId: string, data: Partial<Project>) => {
+        try {
+            const response = await api.put(`/projects/${projectId}`, data);
+            const updatedProject = response.data.data;
+            set((state) => ({
+                projects: state.projects.map(p => p.id === projectId ? updatedProject : p),
+                activeProject: state.activeProject?.id === projectId ? updatedProject : state.activeProject
+            }));
+            toast.success('Project Updated', {
+                description: 'Mission parameters have been recalibrated.',
+            });
+        } catch (error: any) {
+            console.error('Failed to update project', error);
+            toast.error('Update Failed', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
         }
     }
 }));

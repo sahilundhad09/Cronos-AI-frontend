@@ -98,8 +98,8 @@ export const WorkspaceSettingsPage: React.FC = () => {
 
     if (isLoading && !formData.name) {
         return (
-            <div className="flex h-screen items-center justify-center bg-slate-950">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+            <div className="flex h-screen items-center justify-center bg-background">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -115,51 +115,51 @@ export const WorkspaceSettingsPage: React.FC = () => {
         >
             {/* General Tab */}
             <TabsContent value="general" className="space-y-6 m-0">
-                <div className="bg-slate-900/50 border border-white/10 rounded-xl p-6">
-                    <h2 className="text-lg font-heading font-black text-white uppercase tracking-tight mb-6">
+                <div className="bg-card border border-border rounded-xl p-4 sm:p-8 shadow-sm">
+                    <h2 className="text-lg sm:text-xl font-heading font-black text-foreground uppercase tracking-tight italic mb-6 sm:mb-8">
                         Workspace Information
                     </h2>
 
                     <form onSubmit={handleSaveGeneral} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <Label className="text-xs uppercase tracking-widest font-black text-slate-400">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-2.5">
+                                <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground">
                                     Workspace Name *
                                 </Label>
                                 <Input
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="Enter workspace name"
-                                    className="bg-slate-800/50 border-white/10 text-white"
+                                    className="bg-secondary/30 border-border text-foreground h-11 px-4 focus:border-primary/50 transition-colors"
                                     required
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-xs uppercase tracking-widest font-black text-slate-400">
+                            <div className="space-y-2.5">
+                                <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground">
                                     Logo URL
                                 </Label>
                                 <Input
                                     value={formData.logo_url}
                                     onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
                                     placeholder="https://example.com/logo.png"
-                                    className="bg-slate-800/50 border-white/10 text-white"
+                                    className="bg-secondary/30 border-border text-foreground h-11 px-4 focus:border-primary/50 transition-colors"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-xs uppercase tracking-widest font-black text-slate-400">
+                        <div className="space-y-2.5">
+                            <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground">
                                 Description
                             </Label>
                             <Textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Brief description of this workspace"
-                                className="bg-slate-800/50 border-white/10 text-white min-h-[100px]"
+                                className="bg-secondary/30 border-border text-foreground min-h-[120px] p-4 focus:border-primary/50 transition-colors resize-none"
                             />
                         </div>
 
-                        <div className="pt-4 flex justify-end gap-3">
+                        <div className="pt-6 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4">
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -176,7 +176,7 @@ export const WorkspaceSettingsPage: React.FC = () => {
                                         });
                                     }
                                 }}
-                                className="text-slate-400 hover:text-white"
+                                className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest w-full sm:w-auto"
                                 disabled={isSaving}
                             >
                                 Reset Changes
@@ -184,17 +184,17 @@ export const WorkspaceSettingsPage: React.FC = () => {
                             <Button
                                 type="submit"
                                 disabled={isSaving}
-                                className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black px-8"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground font-black px-6 sm:px-10 h-11 uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20 w-full sm:w-auto"
                             >
                                 {isSaving ? (
                                     <>
                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Saving...
+                                        Syncing...
                                     </>
                                 ) : (
                                     <>
                                         <Save className="h-4 w-4 mr-2" />
-                                        Save Changes
+                                        Save Parameters
                                     </>
                                 )}
                             </Button>
@@ -205,7 +205,7 @@ export const WorkspaceSettingsPage: React.FC = () => {
 
             {/* Members Tab */}
             <TabsContent value="members" className="space-y-6 m-0">
-                <div className="bg-slate-900/50 border border-white/10 rounded-xl p-6">
+                <div className="bg-card border border-border rounded-xl p-4 sm:p-8 shadow-sm">
                     <WorkspaceMemberManagement workspaceId={workspaceId!} />
                 </div>
             </TabsContent>
@@ -217,34 +217,34 @@ export const WorkspaceSettingsPage: React.FC = () => {
 
             {/* Advanced Tab */}
             <TabsContent value="advanced" className="space-y-6 m-0">
-                <div className="bg-slate-900/50 border border-red-500/20 rounded-xl p-6">
-                    <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg mb-6">
-                        <ShieldAlert className="h-5 w-5 text-red-400 mt-0.5" />
+                <div className="bg-card border border-destructive/20 rounded-xl p-4 sm:p-8">
+                    <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:p-5 bg-destructive/5 border border-destructive/10 rounded-xl mb-8">
+                        <ShieldAlert className="h-6 w-6 text-destructive mt-0.5 shrink-0" />
                         <div>
-                            <h3 className="text-red-400 font-black uppercase text-xs tracking-widest mb-1">
-                                Danger Zone
+                            <h3 className="text-destructive font-black uppercase text-[10px] tracking-[0.2em] mb-1.5">
+                                Restricted Access Sector
                             </h3>
-                            <p className="text-slate-400 text-sm font-medium">
-                                These actions are permanent and cannot be undone. Be extremely careful.
+                            <p className="text-muted-foreground text-xs font-semibold leading-relaxed">
+                                These actions are permanent and cannot be undone. Terminal deletion will erase all project history and associated neural links.
                             </p>
                         </div>
                     </div>
 
-                    <div className="space-y-6 divide-y divide-white/5">
-                        <div className="flex items-center justify-between pt-0 pb-6">
+                    <div className="space-y-8 divide-y divide-border">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-0 pb-4">
                             <div className="max-w-md">
-                                <h4 className="text-white font-bold text-sm">Delete Workspace</h4>
-                                <p className="text-slate-500 text-xs mt-1">
-                                    Permanently delete this workspace and all associated projects, tasks, and data. All neural links will be severed.
+                                <h4 className="text-foreground font-black uppercase text-sm italic tracking-tight mb-2">Workspace Decommission</h4>
+                                <p className="text-muted-foreground text-xs leading-relaxed font-semibold">
+                                    Permanently delete this workspace and all associated projects, tasks, and data. This action is irreversible.
                                 </p>
                             </div>
                             <Button
                                 variant="destructive"
                                 onClick={handleDeleteWorkspace}
-                                className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-black px-6 border border-red-500/20 hover:border-red-500 transition-all"
+                                className="bg-destructive/10 hover:bg-destructive text-destructive hover:text-destructive-foreground font-black px-6 sm:px-8 h-12 uppercase text-[10px] tracking-widest border border-destructive/20 hover:border-destructive transition-all shadow-lg hover:shadow-destructive/20 w-full sm:w-auto"
                             >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Workspace
+                                Terminate Workspace
                             </Button>
                         </div>
                     </div>

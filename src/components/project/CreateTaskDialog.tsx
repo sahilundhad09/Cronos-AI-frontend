@@ -21,19 +21,31 @@ import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 interface CreateTaskDialogProps {
     projectId: string;
     trigger?: React.ReactNode;
+    isOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    initialStatusId?: string;
 }
 
-const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger }) => {
+const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ 
+    projectId, 
+    trigger, 
+    isOpen: controlledOpen, 
+    onOpenChange: setControlledOpen,
+    initialStatusId 
+}) => {
     const queryClient = useQueryClient();
     const { activeWorkspace } = useWorkspaceStore();
     const { createTask, isLoading, statuses, fetchProjectStatuses } = useTaskStore();
     const { detailTask } = useAIStore();
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+    const setIsOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
+
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
-    const [statusId, setStatusId] = useState('');
+    const [statusId, setStatusId] = useState(initialStatusId || '');
     const [isDetailing, setIsDetailing] = useState(false);
 
     const handleAIDetail = async () => {
@@ -57,9 +69,9 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
 
     useEffect(() => {
         if (statuses.length > 0 && !statusId) {
-            setStatusId(statuses[0].id);
+            setStatusId(initialStatusId || statuses[0].id);
         }
-    }, [statuses, statusId]);
+    }, [statuses, statusId, initialStatusId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -90,42 +102,42 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black h-10 rounded-xl px-6 uppercase tracking-widest text-[10px] shadow-lg shadow-cyan-500/20">
+                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black h-10 rounded-xl px-6 uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
                         <Plus className="mr-2 h-4 w-4" /> New Task
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="bg-[#0A0D18] border-white/5 text-white rounded-3xl">
+            <DialogContent className="bg-card border-border text-foreground rounded-3xl">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-heading font-black italic uppercase tracking-tighter">
-                        New <span className="text-cyan-400">Milestone</span>
+                        New <span className="text-primary">Milestone</span>
                     </DialogTitle>
-                    <DialogDescription className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
+                    <DialogDescription className="text-muted-foreground font-bold uppercase text-[10px] tracking-widest">
                         Initialize a manual orchestration link
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-6 py-8">
                         <div className="space-y-2">
-                            <Label htmlFor="t-title" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Task Title</Label>
+                            <Label htmlFor="t-title" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Task Title</Label>
                             <Input
                                 id="t-title"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="bg-white/5 border-white/10 rounded-xl h-12 focus:border-cyan-500/50 transition-all font-bold"
+                                className="bg-secondary/30 border-border rounded-xl h-12 focus:border-primary/50 transition-all font-bold"
                                 placeholder="e.g. Implement Neural Interlink"
                                 required
                             />
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="t-desc" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Description</Label>
+                                <Label htmlFor="t-desc" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Description</Label>
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     onClick={handleAIDetail}
                                     disabled={isDetailing || !title.trim()}
-                                    className="h-6 px-2 rounded-lg text-[9px] font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 gap-2"
+                                    className="h-6 px-2 rounded-lg text-[9px] font-black uppercase tracking-widest text-primary hover:text-primary/80 hover:bg-primary/10 gap-2"
                                 >
                                     {isDetailing ? (
                                         <Loader2 className="h-3 w-3 animate-spin" />
@@ -139,37 +151,37 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                                 id="t-desc"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="bg-white/5 border-white/10 rounded-xl min-h-[100px] focus:border-cyan-500/50 transition-all font-bold"
+                                className="bg-secondary/30 border-border rounded-xl min-h-[100px] focus:border-primary/50 transition-all font-bold"
                                 placeholder="Define the task parameters..."
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Priority</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Priority</Label>
                                 <select
                                     value={priority}
                                     onChange={(e) => setPriority(e.target.value as any)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl h-12 px-4 focus:border-cyan-500/50 transition-all font-bold text-sm appearance-none cursor-pointer"
+                                    className="w-full bg-secondary/30 border border-border rounded-xl h-12 px-4 focus:border-primary/50 transition-all font-bold text-sm appearance-none cursor-pointer"
                                 >
-                                    <option value="low" className="bg-[#0A0D18]">LOW</option>
-                                    <option value="medium" className="bg-[#0A0D18]">MEDIUM</option>
-                                    <option value="high" className="bg-[#0A0D18]">HIGH</option>
-                                    <option value="urgent" className="bg-[#0A0D18]">URGENT</option>
+                                    <option value="low" className="bg-card">LOW</option>
+                                    <option value="medium" className="bg-card">MEDIUM</option>
+                                    <option value="high" className="bg-card">HIGH</option>
+                                    <option value="urgent" className="bg-card">URGENT</option>
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Initial Column</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Initial Column</Label>
                                 <select
                                     value={statusId}
                                     onChange={(e) => setStatusId(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl h-12 px-4 focus:border-cyan-500/50 transition-all font-bold text-sm appearance-none cursor-pointer"
+                                    className="w-full bg-secondary/30 border border-border rounded-xl h-12 px-4 focus:border-primary/50 transition-all font-bold text-sm appearance-none cursor-pointer"
                                     disabled={statuses.length === 0}
                                 >
                                     {statuses.length === 0 ? (
                                         <option value="">SCANNING...</option>
                                     ) : (
                                         statuses.map(s => (
-                                            <option key={s.id} value={s.id} className="bg-[#0A0D18]">{s.name.toUpperCase()}</option>
+                                            <option key={s.id} value={s.id} className="bg-card">{s.name.toUpperCase()}</option>
                                         ))
                                     )}
                                 </select>
@@ -180,7 +192,7 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                         <Button
                             type="submit"
                             disabled={isLoading || !statusId}
-                            className="w-full bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black h-12 rounded-xl uppercase tracking-widest text-[11px] shadow-lg shadow-cyan-500/20 gap-3"
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black h-12 rounded-xl uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 gap-3"
                         >
                             {isLoading ? (
                                 <>

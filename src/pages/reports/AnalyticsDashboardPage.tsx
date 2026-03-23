@@ -63,8 +63,8 @@ const STATUS_COLORS = ['#06b6d4', '#8b5cf6', '#22c55e'];
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload) return null;
     return (
-        <div className="bg-[#0A0D18] border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+        <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-2xl backdrop-blur-md">
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">{label}</p>
             {payload.map((entry: any, i: number) => (
                 <p key={i} className="text-sm font-bold" style={{ color: entry.color }}>
                     {entry.name}: {entry.value}
@@ -149,10 +149,10 @@ const AnalyticsDashboardPage = () => {
                             <BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 text-emerald-400" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-heading font-black tracking-tighter uppercase italic text-white">
-                                Analytics <span className="text-emerald-400">Hub</span>
+                            <h1 className="text-3xl font-heading font-black tracking-tighter uppercase italic text-foreground">
+                                Analytics <span className="text-primary">Hub</span>
                             </h1>
-                            <p className="text-slate-500 font-bold uppercase text-[9px] tracking-[0.2em] mt-0.5">
+                            <p className="text-muted-foreground font-semibold uppercase text-[9px] tracking-[0.2em] mt-0.5">
                                 Performance Intelligence • Real-Time Metrics
                             </p>
                         </div>
@@ -226,7 +226,7 @@ const AnalyticsDashboardPage = () => {
                 ) : (
                     <>
                         {/* Workspace Overview Cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                             <StatCard
                                 icon={FolderOpen}
                                 label="Total Projects"
@@ -240,6 +240,13 @@ const AnalyticsDashboardPage = () => {
                                 value={ws?.totalTasks ?? 0}
                                 sub={`${ws?.completedTasks ?? 0} completed`}
                                 color="emerald"
+                            />
+                            <StatCard
+                                icon={AlertTriangle}
+                                label="Pending Tasks"
+                                value={(ws?.statusBreakdown.todo ?? 0) + (ws?.statusBreakdown.inProgress ?? 0)}
+                                sub="Awaiting action"
+                                color="amber"
                             />
                             <StatCard
                                 icon={TrendingUp}
@@ -260,13 +267,20 @@ const AnalyticsDashboardPage = () => {
 
                         {/* User Performance Cards */}
                         {up && (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                 <StatCard
                                     icon={Zap}
                                     label="My Tasks"
                                     value={up.tasksAssigned}
                                     sub={`${up.tasksCompleted} completed`}
                                     color="cyan"
+                                />
+                                <StatCard
+                                    icon={Clock}
+                                    label="My Pending"
+                                    value={up.pendingTasks?.length ?? 0}
+                                    sub="To be finished"
+                                    color="amber"
                                 />
                                 <StatCard
                                     icon={CheckCircle2}
@@ -277,11 +291,11 @@ const AnalyticsDashboardPage = () => {
                                     trend={up.completionRate >= 50 ? 'up' : 'down'}
                                 />
                                 <StatCard
-                                    icon={Clock}
+                                    icon={TrendingUp}
                                     label="Avg Time"
                                     value={`${up.averageCompletionTime}d`}
                                     sub="Per task"
-                                    color="amber"
+                                    color="purple"
                                 />
                                 <StatCard
                                     icon={AlertTriangle}
@@ -297,14 +311,14 @@ const AnalyticsDashboardPage = () => {
                         {/* Charts Row */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Burndown Chart */}
-                            <Card className="bg-[#0A0D18] border-white/5 overflow-hidden">
+                            <Card className="bg-card border-border overflow-hidden">
                                 <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center justify-between mb-6 pt-4">
                                         <div>
-                                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Burndown Chart</h3>
-                                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Last 30 days • {selectedProject?.name}</p>
+                                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest">Burndown Chart</h3>
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Last 30 days • {selectedProject?.name}</p>
                                         </div>
-                                        <Activity className="h-5 w-5 text-cyan-500/50" />
+                                        <Activity className="h-5 w-5 text-primary/40" />
                                     </div>
                                     {burndownChartData.length > 0 ? (
                                         <ResponsiveContainer width="100%" height={240}>
@@ -360,14 +374,14 @@ const AnalyticsDashboardPage = () => {
                             </Card>
 
                             {/* Status Distribution Pie Chart */}
-                            <Card className="bg-[#0A0D18] border-white/5 overflow-hidden">
+                            <Card className="bg-card border-border overflow-hidden">
                                 <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center justify-between mb-6 pt-4">
                                         <div>
-                                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Status Distribution</h3>
-                                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Across all workspace tasks</p>
+                                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest">Status Distribution</h3>
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Across all workspace tasks</p>
                                         </div>
-                                        <PieChart className="h-5 w-5 text-purple-500/50" />
+                                        <PieChart className="h-5 w-5 text-primary/40" />
                                     </div>
                                     {statusPieData.length > 0 ? (
                                         <ResponsiveContainer width="100%" height={240}>
@@ -406,14 +420,14 @@ const AnalyticsDashboardPage = () => {
                         {/* Priority & Workload Row */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Priority Distribution */}
-                            <Card className="bg-[#0A0D18] border-white/5 overflow-hidden">
+                            <Card className="bg-card border-border overflow-hidden">
                                 <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center justify-between mb-6 pt-4">
                                         <div>
-                                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Priority Breakdown</h3>
-                                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">{selectedProject?.name}</p>
+                                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest">Priority Breakdown</h3>
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-1">{selectedProject?.name}</p>
                                         </div>
-                                        <AlertTriangle className="h-5 w-5 text-amber-500/50" />
+                                        <AlertTriangle className="h-5 w-5 text-primary/40" />
                                     </div>
                                     {priorityBarData.length > 0 ? (
                                         <ResponsiveContainer width="100%" height={240}>
@@ -448,14 +462,14 @@ const AnalyticsDashboardPage = () => {
                             </Card>
 
                             {/* Team Workload */}
-                            <Card className="bg-[#0A0D18] border-white/5 overflow-hidden">
+                            <Card className="bg-card border-border overflow-hidden">
                                 <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center justify-between mb-6 pt-4">
                                         <div>
-                                            <h3 className="text-sm font-black text-white uppercase tracking-widest">Team Workload</h3>
-                                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Assignee distribution • {selectedProject?.name}</p>
+                                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest">Team Workload</h3>
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Assignee distribution • {selectedProject?.name}</p>
                                         </div>
-                                        <Users className="h-5 w-5 text-cyan-500/50" />
+                                        <Users className="h-5 w-5 text-primary/40" />
                                     </div>
                                     {pa && pa.assigneeWorkload.length > 0 ? (
                                         <div className="space-y-3 max-h-[240px] overflow-y-auto custom-scrollbar pr-2">
@@ -592,9 +606,9 @@ const StatCard = ({
     };
 
     return (
-        <Card className="bg-[#0A0D18] border-white/5 hover:border-white/10 transition-all overflow-hidden group">
+        <Card className="bg-card border-border hover:border-primary/20 transition-all overflow-hidden group">
             <CardContent className="p-5">
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-3 pt-4">
                     <div className={`p-2 rounded-xl bg-gradient-to-br border ${colorMap[color]} group-hover:scale-110 transition-transform`}>
                         <Icon className="h-4 w-4" />
                     </div>
@@ -604,10 +618,10 @@ const StatCard = ({
                         </div>
                     )}
                 </div>
-                <p className="text-2xl font-black text-white tracking-tight mb-1">{value}</p>
+                <p className="text-2xl font-black text-foreground tracking-tight mb-1">{value}</p>
                 <div className="flex items-center justify-between">
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</p>
-                    <p className="text-[8px] font-bold text-slate-600 uppercase tracking-wider">{sub}</p>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">{label}</p>
+                    <p className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-wider">{sub}</p>
                 </div>
             </CardContent>
         </Card>

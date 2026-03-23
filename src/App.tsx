@@ -21,6 +21,7 @@ import AIChatPage from './pages/ai/AIChatPage';
 import AnalyticsDashboardPage from './pages/reports/AnalyticsDashboardPage';
 import { useThemeStore } from './store/useThemeStore';
 import ThemeSelectorPage from './pages/ThemeSelectorPage';
+import GrowthPage from './pages/GrowthPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -149,6 +150,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <AnalyticsDashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/growth"
+                        element={
+                            <ProtectedRoute>
+                                <GrowthPage />
                             </ProtectedRoute>
                         }
                     />

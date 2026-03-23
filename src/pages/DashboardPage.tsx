@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Zap, Target, TrendingUp, Plus, ArrowUpRight, Bot, Layers,
     Activity as ActivityIcon, AlertCircle, Loader2, CheckCircle2,
     Clock, AlertTriangle, Calendar, Brain, BarChart3, Users,
-    MessageSquare, Rocket, Flame, ChevronRight, X
+    MessageSquare, Rocket, Flame, ChevronRight, X, Sparkles,
+    CircleDot, Shield, Command
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -14,183 +15,195 @@ import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import api from '@/services/api';
 import { formatDistanceToNow, format, isPast, isToday, isTomorrow } from 'date-fns';
 import { CreateProjectDialog } from '@/components/project/CreateProjectDialog';
+import { CreateTaskDialog } from '@/components/project/CreateTaskDialog';
 import ProjectPulse from '@/components/project/ProjectPulse';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import { toast } from 'sonner';
 
-/*
-  Color token reference (from globals.css):
-  ─────────────────────────────────────────
-  bg-background        → --background  (page bg, dark: hsl(222 47% 4%))
-  bg-card              → --card        (card bg, dark: hsl(222 47% 6%))
-  text-foreground      → --foreground  (primary text)
-  text-muted-foreground→ --muted-foreground
-  border-border        → --border      (replaces border-white/5, border-white/[0.06])
-  bg-muted             → --muted       (replaces bg-white/[0.03..0.05])
-  bg-accent            → --accent
-  text-primary         → --primary     (cyan brand color)
-  border-primary/20    → cyan accent border
-  ring-primary         → focus ring
-
-  All hardcoded #hex backgrounds are mapped in the CSS bridge, but we
-  use semantic tokens directly here so the component is theme-aware.
-*/
-
-// ─── Variants ─────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANIMATION VARIANTS
+───────────────────────────────────────────────────────────────────────────── */
 const stagger = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } }
+    visible: { opacity: 1, transition: { staggerChildren: 0.055 } },
 };
-const slideUp = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as any } }
+const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as any } },
+};
+const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.4 } },
 };
 
-// ─── Accent config — maps to Tailwind color scale ────────────────────────────
-// primary = cyan (from --primary token)
-// We keep named Tailwind colors for non-primary accents (emerald, amber, indigo, etc.)
-// since those don't have CSS variable equivalents in the theme.
-const accentMap: Record<string, { icon: string; border: string; bg: string; text: string; dot: string; hover: string }> = {
+/* ─────────────────────────────────────────────────────────────────────────────
+   ACCENT MAP
+───────────────────────────────────────────────────────────────────────────── */
+const accentMap: Record<string, {
+    icon: string; border: string; bg: string; text: string;
+    dot: string; badge: string; glow: string;
+}> = {
     primary: {
-        icon: 'bg-primary/10 text-primary border-primary/20',
-        border: 'hover:border-primary/30',
-        bg: 'hover:bg-primary/[0.04]',
+        icon: 'bg-primary/10 text-primary border-primary/40',
+        border: 'hover:border-primary/60',
+        bg: 'hover:bg-primary/5',
         text: 'text-primary',
         dot: 'bg-primary',
-        hover: 'group-hover:text-primary group-hover:bg-primary/10',
+        badge: 'bg-primary/15 text-primary border-primary/40',
+        glow: 'rgba(var(--primary), 0.25)',
     },
     emerald: {
-        icon: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-        border: 'hover:border-emerald-500/30',
-        bg: 'hover:bg-emerald-500/[0.04]',
+        icon: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/40',
+        border: 'hover:border-emerald-500/50',
+        bg: 'hover:bg-emerald-500/5',
         text: 'text-emerald-400',
         dot: 'bg-emerald-500',
-        hover: 'group-hover:text-emerald-400 group-hover:bg-emerald-500/10',
+        badge: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40',
+        glow: 'rgba(52,211,153,0.2)',
     },
     amber: {
-        icon: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-        border: 'hover:border-amber-500/30',
-        bg: 'hover:bg-amber-500/[0.04]',
+        icon: 'bg-amber-500/10 text-amber-400 border-amber-500/40',
+        border: 'hover:border-amber-500/50',
+        bg: 'hover:bg-amber-500/5',
         text: 'text-amber-400',
         dot: 'bg-amber-500',
-        hover: 'group-hover:text-amber-400 group-hover:bg-amber-500/10',
+        badge: 'bg-amber-500/15 text-amber-400 border-amber-500/40',
+        glow: 'rgba(245,158,11,0.2)',
     },
     indigo: {
-        icon: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-        border: 'hover:border-indigo-500/30',
-        bg: 'hover:bg-indigo-500/[0.04]',
+        icon: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/40',
+        border: 'hover:border-indigo-500/50',
+        bg: 'hover:bg-indigo-500/5',
         text: 'text-indigo-400',
         dot: 'bg-indigo-500',
-        hover: 'group-hover:text-indigo-400 group-hover:bg-indigo-500/10',
+        badge: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/40',
+        glow: 'rgba(99,102,241,0.2)',
     },
     purple: {
-        icon: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-        border: 'hover:border-purple-500/30',
-        bg: 'hover:bg-purple-500/[0.04]',
+        icon: 'bg-purple-500/10 text-purple-400 border-purple-500/40',
+        border: 'hover:border-purple-500/50',
+        bg: 'hover:bg-purple-500/5',
         text: 'text-purple-400',
         dot: 'bg-purple-500',
-        hover: 'group-hover:text-purple-400 group-hover:bg-purple-500/10',
+        badge: 'bg-purple-500/15 text-purple-400 border-purple-500/40',
+        glow: 'rgba(168,85,247,0.2)',
     },
     sky: {
-        icon: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
-        border: 'hover:border-sky-500/30',
-        bg: 'hover:bg-sky-500/[0.04]',
+        icon: 'bg-sky-500/10 text-sky-400 border-sky-500/40',
+        border: 'hover:border-sky-500/50',
+        bg: 'hover:bg-sky-500/5',
         text: 'text-sky-400',
         dot: 'bg-sky-500',
-        hover: 'group-hover:text-sky-400 group-hover:bg-sky-500/10',
+        badge: 'bg-sky-500/15 text-sky-400 border-sky-500/40',
+        glow: 'rgba(14,165,233,0.2)',
     },
     teal: {
-        icon: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
-        border: 'hover:border-teal-500/30',
-        bg: 'hover:bg-teal-500/[0.04]',
+        icon: 'bg-teal-500/10 text-teal-400 border-teal-500/40',
+        border: 'hover:border-teal-500/50',
+        bg: 'hover:bg-teal-500/5',
         text: 'text-teal-400',
         dot: 'bg-teal-500',
-        hover: 'group-hover:text-teal-400 group-hover:bg-teal-500/10',
+        badge: 'bg-teal-500/15 text-teal-400 border-teal-500/40',
+        glow: 'rgba(20,184,166,0.2)',
     },
     rose: {
-        icon: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-        border: 'hover:border-rose-500/30',
-        bg: 'hover:bg-rose-500/[0.04]',
+        icon: 'bg-rose-500/10 text-rose-400 border-rose-500/40',
+        border: 'hover:border-rose-500/50',
+        bg: 'hover:bg-rose-500/5',
         text: 'text-rose-400',
         dot: 'bg-rose-500',
-        hover: 'group-hover:text-rose-400 group-hover:bg-rose-500/10',
+        badge: 'bg-rose-500/15 text-rose-400 border-rose-500/40',
+        glow: 'rgba(244,63,94,0.2)',
     },
 };
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-const DashboardStatCard = ({
-    label, value, trend, icon, accent, isLoading, onClick
+/* ─────────────────────────────────────────────────────────────────────────────
+   STAT CARD
+───────────────────────────────────────────────────────────────────────────── */
+const StatCard = ({
+    label, value, icon, accent, isLoading, onClick, delta,
 }: {
-    label: string; value: string; trend: string; icon: React.ReactNode;
-    accent: string; isLoading?: boolean; onClick?: () => void;
+    label: string; value: string; icon: React.ReactNode;
+    accent: string; isLoading?: boolean; onClick?: () => void; delta?: string;
 }) => {
     const a = accentMap[accent] || accentMap.primary;
     return (
-        <motion.div variants={slideUp} className="h-full">
-            <Card
+        <motion.div variants={fadeUp} className="h-full">
+            <motion.div
                 onClick={onClick}
-                className={`relative h-full bg-card border-border overflow-hidden group transition-all duration-300 hover:border-border/60 hover:-translate-y-0.5 ${onClick ? 'cursor-pointer' : ''}`}
+                whileHover={onClick ? { y: -3, scale: 1.015 } : {}}
+                className={`relative h-full bg-card border border-border rounded-2xl overflow-hidden group transition-all duration-300 ${onClick ? 'cursor-pointer' : ''} ${a.border} ${a.bg}`}
+                onMouseMove={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+                    e.currentTarget.style.setProperty('--my', `${e.clientY - rect.top}px`);
+                }}
             >
-                {/* subtle hover glow — uses muted to stay theme-safe */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-muted/60 to-transparent pointer-events-none" />
+                {/* Radial spotlight */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{ background: `radial-gradient(280px circle at var(--mx,50%) var(--my,50%), ${a.glow}, transparent 70%)` }} />
 
-                <CardContent className="p-4 sm:p-5">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className={`p-2 sm:p-2.5 rounded-xl border ${a.icon} group-hover:scale-110 transition-all duration-300`}>
-                            {icon}
-                        </div>
-                        <div className={`p-1.5 rounded-lg bg-muted/60 text-muted-foreground/50 ${a.hover} transition-all`}>
-                            <ArrowUpRight className="h-3.5 w-3.5" />
-                        </div>
+                {/* Top accent bar */}
+                <div className={`absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${a.dot}`}
+                    style={{ background: `linear-gradient(90deg, transparent, ${a.glow}, transparent)` }} />
+
+                <CardContent className="p-4 sm:p-5 flex items-start gap-4 relative z-10">
+                    <div className={`p-2.5 rounded-xl border ${a.icon} flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-sm`}>
+                        {icon}
                     </div>
-
-                    <div className="space-y-0.5">
+                    <div className="min-w-0 flex-1">
                         {isLoading
-                            ? <div className="h-7 w-20 bg-muted animate-pulse rounded-lg" />
-                            : <p className="text-3xl sm:text-4xl font-black text-foreground tracking-tighter tabular-nums">{value}</p>
+                            ? <div className="h-7 w-16 bg-muted animate-pulse rounded-lg" />
+                            : (
+                                <div className="flex items-end gap-1.5">
+                                    <p className={`text-2xl sm:text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none transition-colors group-hover:${a.text.replace('text-', 'text-')}`}>
+                                        {value}
+                                    </p>
+                                    {delta && (
+                                        <span className="text-[10px] font-black text-emerald-400 mb-0.5 bg-emerald-500/10 px-1 py-0.5 rounded">
+                                            {delta}
+                                        </span>
+                                    )}
+                                </div>
+                            )
                         }
-                        <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.18em]">{label}</p>
+                        <p className="text-[9px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mt-1">{label}</p>
                     </div>
-
-                    <div className="mt-3 flex items-center gap-1.5">
-                        <span className={`inline-block w-1.5 h-1.5 rounded-full ${isLoading ? 'bg-muted' : `${a.dot} animate-pulse`}`} />
-                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest truncate">
-                            {isLoading ? 'Syncing...' : trend}
-                        </span>
-                    </div>
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1 ${isLoading ? 'bg-muted' : a.dot} animate-pulse`} />
                 </CardContent>
-            </Card>
+            </motion.div>
         </motion.div>
     );
 };
 
-// ─── Skeletons ────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   SKELETONS
+───────────────────────────────────────────────────────────────────────────── */
 const ProjectCardSkeleton = () => (
-    <Card className="bg-card border-border animate-pulse">
-        <CardContent className="p-4 space-y-3">
+    <div className="bg-card border border-border rounded-2xl p-5 space-y-4 animate-pulse">
+        <div className="flex justify-between items-start">
+            <div className="h-9 w-9 bg-muted rounded-xl" />
+            <div className="h-5 w-16 bg-muted rounded-full" />
+        </div>
+        <div className="space-y-2">
+            <div className="h-4 w-3/4 bg-muted rounded-lg" />
+            <div className="h-3 w-full bg-muted/60 rounded-lg" />
+        </div>
+        <div className="space-y-1.5">
             <div className="flex justify-between">
-                <div className="h-8 w-8 bg-muted rounded-xl" />
-                <div className="h-5 w-14 bg-muted rounded-full" />
+                <div className="h-2.5 w-12 bg-muted/60 rounded" />
+                <div className="h-2.5 w-8 bg-muted/60 rounded" />
             </div>
-            <div className="space-y-2">
-                <div className="h-4 w-3/4 bg-muted rounded" />
-                <div className="h-3 w-full bg-muted/60 rounded" />
-            </div>
-            <div className="h-1 w-full bg-muted rounded-full" />
-        </CardContent>
-    </Card>
-);
-
-const ActivitySkeleton = () => (
-    <div className="space-y-1 relative">
-        <div className="absolute -left-[1.35rem] top-1 w-2 h-2 rounded-full bg-muted" />
-        <div className="h-3 w-44 bg-muted rounded animate-pulse" />
-        <div className="h-2 w-20 bg-muted/60 rounded animate-pulse" />
+            <div className="h-1.5 w-full bg-muted rounded-full" />
+        </div>
     </div>
 );
 
-// ─── Completion Ring ──────────────────────────────────────────────────────────
-const CompletionRing = ({ percentage, size = 72, strokeWidth = 5 }: {
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMPLETION RING
+───────────────────────────────────────────────────────────────────────────── */
+const CompletionRing = ({ percentage, size = 80, strokeWidth = 6 }: {
     percentage: number; size?: number; strokeWidth?: number;
 }) => {
     const r = (size - strokeWidth) / 2;
@@ -201,39 +214,52 @@ const CompletionRing = ({ percentage, size = 72, strokeWidth = 5 }: {
         <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
             <svg className="-rotate-90" width={size} height={size}>
                 <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor" strokeOpacity="0.06" strokeWidth={strokeWidth} />
-                <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"
-                    strokeDasharray={circ} strokeDashoffset={offset}
+                <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={strokeWidth}
+                    strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset}
                     className="transition-all duration-1000 ease-out"
-                    style={{ filter: `drop-shadow(0 0 6px ${color}55)` }}
+                    style={{ filter: `drop-shadow(0 0 8px ${color}88)` }}
                 />
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-black text-foreground">{percentage}%</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-base font-black text-foreground leading-none">{percentage}%</span>
+                <span className="text-[7px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">Done</span>
             </div>
         </div>
     );
 };
 
-// ─── Quick Action ─────────────────────────────────────────────────────────────
-const QuickAction = ({ icon: Icon, label, onClick, accent }: {
-    icon: any; label: string; onClick: () => void; accent: string;
-}) => {
+/* ─────────────────────────────────────────────────────────────────────────────
+   QUICK ACTION
+───────────────────────────────────────────────────────────────────────────── */
+const QuickAction = React.forwardRef<HTMLButtonElement, {
+    icon: any; label: string; sub?: string; onClick: () => void; accent: string;
+}>(({ icon: Icon, label, sub = 'Execute', onClick, accent }, ref) => {
     const a = accentMap[accent] || accentMap.primary;
     return (
-        <button onClick={onClick}
-            className={`flex flex-col items-center gap-2.5 p-4 sm:p-5 rounded-2xl bg-card border border-border ${a.border} ${a.bg} transition-all duration-300 group cursor-pointer w-full shadow-lg shadow-black/5 hover:shadow-primary/5`}
+        <motion.button
+            ref={ref}
+            onClick={onClick}
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            className={`relative flex flex-col items-start gap-2.5 p-3.5 rounded-2xl bg-card border border-border ${a.border} ${a.bg} transition-all duration-300 group cursor-pointer overflow-hidden w-full text-left`}
         >
-            <div className={`p-3 rounded-xl border ${a.icon} group-hover:scale-110 transition-transform duration-300`}>
-                <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{ background: `radial-gradient(200px circle at 30% 50%, ${a.glow || 'transparent'}, transparent 70%)` }} />
+            <div className={`p-2 rounded-xl border ${a.icon} transition-all duration-300 group-hover:scale-110 relative z-10`}>
+                <Icon className="h-3.5 w-3.5" />
             </div>
-            <span className={`text-xs sm:text-sm font-bold text-muted-foreground/80 uppercase tracking-widest group-hover:text-foreground transition-colors text-center leading-tight`}>
-                {label}
-            </span>
-        </button>
+            <div className="relative z-10">
+                <p className="text-[10px] font-black text-foreground uppercase tracking-widest leading-none">{label}</p>
+                <p className={`text-[8px] font-bold ${a.text} uppercase tracking-wider mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity`}>{sub}</p>
+            </div>
+        </motion.button>
     );
-};
+});
+QuickAction.displayName = 'QuickAction';
 
-// ─── Priority Badge ───────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   PRIORITY BADGE
+───────────────────────────────────────────────────────────────────────────── */
 const PriorityBadge = ({ priority }: { priority: string }) => {
     const map: Record<string, string> = {
         urgent: 'border-red-500/30 text-red-400 bg-red-500/10',
@@ -242,76 +268,166 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
         low:    'border-emerald-500/30 text-emerald-400 bg-emerald-500/10',
     };
     return (
-        <span className={`px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${map[priority] || map.medium}`}>
+        <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border ${map[priority] || map.medium}`}>
             {priority}
         </span>
     );
 };
 
-// ─── Deadline Item ────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   DEADLINE ITEM
+───────────────────────────────────────────────────────────────────────────── */
 const DeadlineItem = ({ task, onClick }: { task: any; onClick: () => void }) => {
     const dueDate = new Date(task.due_date);
-    const overdue = isPast(dueDate) && !task.completed_at;
-    const dueToday = isToday(dueDate);
+    const overdue   = isPast(dueDate) && !task.completed_at;
+    const dueToday  = isToday(dueDate);
     const dueTomorrow = isTomorrow(dueDate);
 
     const cfg = overdue
-        ? { border: 'border-red-500/20',    bg: 'bg-red-500/[0.03]',    text: 'text-red-400',    badge: 'bg-red-500/10 text-red-400',    label: 'Overdue',   icon: <AlertTriangle className="h-3 w-3" />, ibg: 'bg-red-500/10 text-red-400' }
+        ? { cls: 'border-red-500/20 bg-red-500/[0.03]', text: 'text-red-400', badge: 'bg-red-500/10 text-red-400 border-red-500/20', label: 'Overdue', icon: <AlertTriangle className="h-3 w-3" /> }
         : dueToday
-        ? { border: 'border-amber-500/20',  bg: 'bg-amber-500/[0.03]',  text: 'text-amber-400',  badge: 'bg-amber-500/10 text-amber-400',  label: 'Today',     icon: <Flame className="h-3 w-3" />,         ibg: 'bg-amber-500/10 text-amber-400' }
+        ? { cls: 'border-amber-500/20 bg-amber-500/[0.03]', text: 'text-amber-400', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20', label: 'Today', icon: <Flame className="h-3 w-3" /> }
         : dueTomorrow
-        ? { border: 'border-orange-500/20', bg: 'bg-orange-500/[0.03]', text: 'text-orange-400', badge: 'bg-orange-500/10 text-orange-400', label: 'Tomorrow',  icon: <Clock className="h-3 w-3" />,         ibg: 'bg-orange-500/10 text-orange-400' }
-        : { border: 'border-border',        bg: '',                      text: 'text-muted-foreground', badge: 'bg-muted text-muted-foreground', label: format(dueDate, 'MMM d'), icon: <Calendar className="h-3 w-3" />, ibg: 'bg-muted text-muted-foreground' };
+        ? { cls: 'border-orange-500/20 bg-orange-500/[0.03]', text: 'text-orange-400', badge: 'bg-orange-500/10 text-orange-400 border-orange-500/20', label: 'Tomorrow', icon: <Clock className="h-3 w-3" /> }
+        : { cls: 'border-border/60', text: 'text-muted-foreground', badge: 'bg-muted text-muted-foreground border-border/60', label: format(dueDate, 'MMM d'), icon: <Calendar className="h-3 w-3" /> };
 
     return (
-        <button onClick={onClick}
-            className={`w-full flex items-center justify-between p-2.5 rounded-xl border ${cfg.border} ${cfg.bg} hover:bg-accent/50 transition-all cursor-pointer group text-left`}
+        <motion.button
+            onClick={onClick}
+            whileHover={{ x: 3 }}
+            className={`w-full flex items-center justify-between gap-2 p-3 rounded-xl border ${cfg.cls} hover:bg-accent/30 transition-all duration-200 cursor-pointer group text-left`}
         >
             <div className="flex items-center gap-2.5 min-w-0">
-                <div className={`flex-shrink-0 p-1.5 rounded-lg ${cfg.ibg}`}>{cfg.icon}</div>
+                <span className={`flex-shrink-0 ${cfg.text} transition-transform group-hover:scale-110`}>{cfg.icon}</span>
                 <div className="min-w-0">
-                    <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">{task.title}</p>
-                    <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">{task.project?.name || 'Project'}</p>
+                    <p className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">{task.title}</p>
+                    <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest">{task.project?.name || 'Project'}</p>
                 </div>
             </div>
-            <span className={`flex-shrink-0 ml-2 px-1.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest ${cfg.badge}`}>
+            <span className={`flex-shrink-0 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg border ${cfg.badge}`}>
                 {cfg.label}
             </span>
-        </button>
+        </motion.button>
     );
 };
 
-// ─── Section Label ────────────────────────────────────────────────────────────
-const SectionLabel = ({ icon, title, accent, action, actionLabel, badge }: {
+/* ─────────────────────────────────────────────────────────────────────────────
+   SECTION HEADER
+───────────────────────────────────────────────────────────────────────────── */
+const SectionHeader = ({ icon, title, accent, action, actionLabel, badge }: {
     icon: React.ReactNode; title: React.ReactNode; accent: string;
     action?: () => void; actionLabel?: string; badge?: React.ReactNode;
 }) => {
     const a = accentMap[accent] || accentMap.primary;
     return (
-        <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-black text-foreground uppercase tracking-widest flex items-center gap-2">
+        <div className="flex items-center justify-between mb-4">
+            <h2 className="flex items-center gap-2 text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
                 <span className={a.text}>{icon}</span>
-                {title}
+                <span>{title}</span>
                 {badge}
             </h2>
             {action && (
                 <button onClick={action}
-                    className="flex items-center gap-0.5 text-[9px] font-black text-muted-foreground hover:text-primary uppercase tracking-widest transition-colors"
+                    className="flex items-center gap-0.5 text-[9px] font-black text-muted-foreground/50 hover:text-primary uppercase tracking-widest transition-colors"
                 >
-                    {actionLabel}<ChevronRight className="h-3 w-3" />
+                    {actionLabel}
+                    <ChevronRight className="h-3 w-3" />
                 </button>
             )}
         </div>
     );
 };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━ DASHBOARD PAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/* ─────────────────────────────────────────────────────────────────────────────
+   PROJECT CARD
+───────────────────────────────────────────────────────────────────────────── */
+const ProjectCard = ({ project, idx, onClick }: { project: any; idx: number; onClick: () => void }) => {
+    const statusColors: Record<string, string> = {
+        active:    'bg-primary/10 text-primary border-primary/25',
+        completed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        paused:    'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        archived:  'bg-muted text-muted-foreground border-border/60',
+    };
+    const statusKey = (project.status || 'active').toLowerCase();
+    const statusClass = statusColors[statusKey] || statusColors.active;
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+            <motion.div
+                onClick={onClick}
+                whileHover={{ y: -5 }}
+                className="relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300 hover:border-primary/30 hover:shadow-[0_8px_32px_-8px_rgba(var(--primary),0.15)]"
+                onMouseMove={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+                    e.currentTarget.style.setProperty('--my', `${e.clientY - rect.top}px`);
+                }}
+            >
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{ background: 'radial-gradient(320px circle at var(--mx,50%) var(--my,50%), rgba(var(--primary),0.05), transparent 70%)' }} />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <CardContent className="p-5 relative z-10">
+                    <div className="flex justify-between items-start mb-4 pt-4">
+                        <div className="h-9 w-9 rounded-xl bg-muted border border-border flex items-center justify-center group-hover:border-primary/20 group-hover:bg-primary/5 transition-all">
+                            <Layers className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:rotate-6 transition-all" />
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${statusClass}`}>
+                            {project.status || 'Active'}
+                        </span>
+                    </div>
+
+                    <div className="mb-4">
+                        <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors truncate tracking-tight leading-tight mb-1">
+                            {project.name}
+                        </h3>
+                        <p className="text-[11px] text-muted-foreground/70 font-medium line-clamp-1">
+                            {project.description || 'No description provided'}
+                        </p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest">Progress</span>
+                            <span className="text-[10px] font-black text-muted-foreground tabular-nums">{project.progress || 0}%</span>
+                        </div>
+                        <div className="h-1 w-full bg-muted/60 rounded-full overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${project.progress || 0}%` }}
+                                transition={{ duration: 1.2, delay: 0.2 + idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                                className="h-full rounded-full bg-gradient-to-r from-primary to-teal-400"
+                                style={{ boxShadow: '0 0 12px hsl(var(--primary) / 0.5)' }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-end mt-3">
+                        <span className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest group-hover:text-primary/60 transition-colors flex items-center gap-0.5">
+                            View <ArrowUpRight className="h-2.5 w-2.5" />
+                        </span>
+                    </div>
+                </CardContent>
+            </motion.div>
+        </motion.div>
+    );
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DASHBOARD PAGE
+═══════════════════════════════════════════════════════════════════════════════ */
 const DashboardPage = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
     const { activeWorkspace } = useWorkspaceStore();
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+    const [taskPage, setTaskPage] = useState(0);
+    const TASKS_PER_PAGE = 6;
 
     const { data: userPerformance } = useQuery({
         queryKey: ['user-performance', user?.id],
@@ -354,32 +470,36 @@ const DashboardPage = () => {
 
     const overdueCount = upcomingDeadlines.filter((t: any) => isPast(new Date(t.due_date))).length;
 
+    const firstName = user?.name?.split(' ')[0] || 'Commander';
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
     const quickActions = [
-        { icon: Plus,          label: 'New Project', onClick: () => {},                    accent: 'primary' },
-        { icon: Brain,         label: 'AI Chat',     onClick: () => navigate('/ai-chat'),   accent: 'purple'  },
-        { icon: BarChart3,     label: 'Analytics',   onClick: () => navigate('/analytics'), accent: 'emerald' },
-        { icon: Users,         label: 'Team',        onClick: () => navigate('/team'),      accent: 'amber'   },
-        { icon: Target,        label: 'Projects',    onClick: () => navigate('/projects'),  accent: 'sky'     },
-        { icon: MessageSquare, label: 'Messages',    onClick: () => navigate('/ai-chat'),   accent: 'teal'    },
-        { icon: Rocket,        label: 'Deploy',      onClick: () => {},                    accent: 'indigo'  },
-        { icon: Zap,           label: 'Quick Task',  onClick: () => {},                    accent: 'rose'    },
+        { icon: Plus,          label: 'New Project', sub: 'Create',   onClick: () => {},                    accent: 'primary' },
+        { icon: Brain,         label: 'AI Chat',     sub: 'Converse', onClick: () => navigate('/ai-chat'),   accent: 'purple'  },
+        { icon: BarChart3,     label: 'Analytics',   sub: 'Explore',  onClick: () => navigate('/analytics'), accent: 'emerald' },
+        { icon: Users,         label: 'Team',        sub: 'Manage',   onClick: () => navigate('/team'),      accent: 'amber'   },
+        { icon: Target,        label: 'Projects',    sub: 'Browse',   onClick: () => navigate('/projects'),  accent: 'sky'     },
+        { icon: MessageSquare, label: 'Messages',    sub: 'Inbox',    onClick: () => navigate('/ai-chat'),   accent: 'teal'    },
+        { icon: Rocket,        label: 'Deploy',      sub: 'Launch',   onClick: () => toast.info('Deployment engine initializing. Feature available soon.'), accent: 'indigo' },
+        { icon: Zap,           label: 'Quick Task',  sub: 'Add',      onClick: () => {},                    accent: 'rose'    },
     ];
 
-    // ── Empty state ───────────────────────────────────────────────────────────
+    /* ── Empty state ── */
     if (!activeWorkspace && !analyticsLoading) {
         return (
-            <div className="flex items-center justify-center h-full p-6">
+            <div className="flex items-center justify-center h-full p-6 bg-background">
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                    className="bg-card p-8 rounded-3xl border border-border max-w-xs w-full text-center"
+                    className="bg-card p-10 rounded-3xl border border-border max-w-sm w-full text-center"
                 >
-                    <div className="h-12 w-12 rounded-2xl bg-muted border border-border flex items-center justify-center mx-auto mb-4">
+                    <div className="h-14 w-14 rounded-2xl bg-muted border border-border flex items-center justify-center mx-auto mb-5">
                         <AlertCircle className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <h2 className="text-lg font-black text-foreground uppercase tracking-tight mb-1.5">
+                    <h2 className="text-lg font-black text-foreground uppercase tracking-tight mb-2">
                         No Active <span className="text-primary">Workspace</span>
                     </h2>
-                    <p className="text-muted-foreground font-medium text-xs leading-relaxed">
-                        Select or create a workspace to start monitoring your operations.
+                    <p className="text-muted-foreground text-xs leading-relaxed font-medium">
+                        Select or create a workspace to begin monitoring your operations.
                     </p>
                 </motion.div>
             </div>
@@ -387,129 +507,117 @@ const DashboardPage = () => {
     }
 
     return (
-        <div className="h-full overflow-y-auto custom-scrollbar bg-[#08090d]">
-            <div className="px-4 sm:px-6 lg:px-8 xl:px-10 py-5 sm:py-6 max-w-7xl mx-auto">
+        <div className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-background">
+            <div className="px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
 
-                {/* ── Header ───────────────────────────────────────────────── */}
-                <motion.div variants={stagger} initial="hidden" animate="visible"
-                    className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 sm:mb-6"
+                {/* ── HEADER ────────────────────────────────────────────────── */}
+                <motion.header
+                    variants={stagger} initial="hidden" animate="visible"
+                    className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10"
                 >
-                    <motion.div variants={slideUp} className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.22em]">
-                                {analyticsLoading ? 'Synchronizing...' : 'System Online'}
+                    <motion.div variants={fadeUp}>
+                        {/* Status pill */}
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">
+                                    {analyticsLoading ? 'Syncing…' : 'All Systems Online'}
+                                </span>
+                            </div>
+                            <span className="hidden sm:block text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest">
+                                {activeWorkspace?.name}
                             </span>
                         </div>
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter uppercase text-foreground leading-none">
-                            Neural <span className="text-primary">Overview</span>
+
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-foreground leading-none">
+                            {greeting},{' '}
+                            <span className="text-primary">{firstName}</span>
+                            <span className="text-muted-foreground/30">.</span>
                         </h1>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.18em]">
-                            Welcome back, {user?.name?.split(' ')[0]} · {activeWorkspace?.name}
+                        <p className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em] mt-1.5">
+                            {format(new Date(), 'EEEE, MMMM d · yyyy')}
                         </p>
                     </motion.div>
 
-                    <motion.div variants={slideUp} className="flex items-center gap-2 flex-shrink-0">
+                    <motion.div variants={fadeUp} className="flex items-center gap-2 flex-shrink-0">
                         <Button variant="outline" onClick={() => navigate('/analytics')}
-                            className="hidden sm:flex border-border bg-card hover:bg-accent text-foreground font-bold h-9 rounded-xl px-4 uppercase tracking-widest text-[9px] gap-1.5 transition-all"
+                            className="hidden sm:flex h-9 border-border/60 bg-card hover:bg-accent text-foreground font-black rounded-xl px-4 text-[9px] uppercase tracking-widest gap-1.5"
                         >
-                            <BarChart3 className="h-3.5 w-3.5" />Analytics
+                            <BarChart3 className="h-3.5 w-3.5" /> Analytics
                         </Button>
                         <CreateProjectDialog trigger={
-                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black h-9 rounded-xl px-4 uppercase tracking-widest text-[9px] shadow-lg shadow-primary/20 gap-1.5 transition-all">
-                                <Plus className="h-3.5 w-3.5" />New Project
+                            <Button className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl px-4 text-[9px] uppercase tracking-widest shadow-lg shadow-primary/20 gap-1.5">
+                                <Plus className="h-3.5 w-3.5" /> New Project
                             </Button>
                         } />
                     </motion.div>
-                </motion.div>
+                </motion.header>
 
-                {/* ── Quick Actions ─────────────────────────────────────────── */}
+                {/* ── STATS ROW ─────────────────────────────────────────────── */}
                 <motion.div variants={stagger} initial="hidden" animate="visible"
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10"
                 >
-                    {quickActions.map((a, i) => (
-                        <motion.div key={i} variants={slideUp}><QuickAction {...a} /></motion.div>
-                    ))}
+                    <StatCard label="Active Projects" value={analytics?.projectCount?.toString() || '0'}                icon={<Layers className="h-4 w-4" />}       accent="primary"  isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
+                    <StatCard label="In Progress"     value={analytics?.statusBreakdown?.inProgress?.toString() || '0'} icon={<Zap className="h-4 w-4" />}          accent="teal"     isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
+                    <StatCard label="Completed"       value={analytics?.statusBreakdown?.done?.toString() || '0'}       icon={<CheckCircle2 className="h-4 w-4" />}  accent="emerald"  isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
+                    <StatCard label="Productivity"    value={`${analytics?.completionRate || 0}%`}                      icon={<TrendingUp className="h-4 w-4" />}    accent="indigo"   isLoading={analyticsLoading} onClick={() => navigate('/analytics')} />
                 </motion.div>
 
-                {/* ── Stats ────────────────────────────────────────────────── */}
-                <motion.div variants={stagger} initial="hidden" animate="visible"
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6 sm:mb-8"
-                >
-                    <DashboardStatCard label="Active Projects" value={analytics?.projectCount?.toString() || '0'}                trend="Synced from cloud"   icon={<Layers className="h-4 w-4" />}       accent="primary" isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
-                    <DashboardStatCard label="In Progress"     value={analytics?.statusBreakdown?.inProgress?.toString() || '0'} trend={`${analytics?.statusBreakdown?.todo || 0} in backlog`} icon={<Zap className="h-4 w-4" />} accent="teal" isLoading={analyticsLoading} />
-                    <DashboardStatCard label="Completed"       value={analytics?.statusBreakdown?.done?.toString() || '0'}       trend="Objectives achieved" icon={<CheckCircle2 className="h-4 w-4" />}  accent="emerald" isLoading={analyticsLoading} />
-                    <DashboardStatCard label="Productivity"    value={`${analytics?.completionRate || 0}%`}                      trend="Completion rate"     icon={<TrendingUp className="h-4 w-4" />}    accent="indigo"  isLoading={analyticsLoading} />
-                </motion.div>
+                {/* ── QUICK ACTIONS ─────────────────────────────────────────── */}
+                <motion.section variants={stagger} initial="hidden" animate="visible" className="mb-8 sm:mb-10">
+                    <SectionHeader
+                        icon={<Command className="h-3.5 w-3.5" />}
+                        title="Command Center"
+                        accent="primary"
+                    />
+                    <motion.div variants={fadeUp}
+                        className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-2.5 sm:gap-3"
+                    >
+                        {quickActions.map((a, i) => {
+                            const btn = <QuickAction {...a} />;
+                            if (a.label === 'New Project') return <CreateProjectDialog key={i} trigger={btn} />;
+                            if (a.label === 'Quick Task') {
+                                const pid = projectsData?.[0]?.id;
+                                return pid
+                                    ? <CreateTaskDialog key={i} projectId={pid} trigger={btn} />
+                                    : <div key={i} onClick={() => toast.error('No active projects found.')}>{btn}</div>;
+                            }
+                            return <div key={i}>{btn}</div>;
+                        })}
+                    </motion.div>
+                </motion.section>
 
-                {/* ── Main Grid ────────────────────────────────────────────── */}
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 sm:gap-6 items-start">
+                {/* ── MAIN GRID ─────────────────────────────────────────────── */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8 items-start">
 
-                    {/* ── Left (2/3) ───────────────────────────────────────── */}
-                    <div className="xl:col-span-2 flex flex-col gap-6">
+                    {/* ── LEFT COL (2/3) ─────────────────────────────────────── */}
+                    <div className="xl:col-span-2 flex flex-col gap-8">
 
                         {/* Active Projects */}
                         <section>
-                            <SectionLabel
+                            <SectionHeader
                                 icon={<Target className="h-3.5 w-3.5" />}
-                                title={<>Active <span className="text-muted-foreground font-semibold normal-case tracking-normal">Projects</span></>}
+                                title="Active Projects"
                                 accent="primary"
                                 action={() => navigate('/projects')}
                                 actionLabel="View all"
                             />
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {projectsLoading
                                     ? [1, 2, 3, 4].map(i => <ProjectCardSkeleton key={i} />)
                                     : projectsData && projectsData.length > 0
-                                    ? projectsData.map((project: any, idx: number) => (
-                                        <motion.div key={project.id}
-                                            initial={{ opacity: 0, y: 14 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.07, duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-                                        >
-                                            <Card onClick={() => navigate(`/projects/${project.id}`)}
-                                                className="bg-card border-border hover:border-primary/25 transition-all duration-300 group cursor-pointer hover:-translate-y-0.5 pt-4"
-                                            >
-                                                <CardContent className="p-4">
-                                                    <div className="flex justify-between items-start mb-3">
-                                                        <div className="bg-muted border border-border p-2 rounded-xl group-hover:border-primary/20 transition-colors">
-                                                            <Layers className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                                                        </div>
-                                                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20">
-                                                            {project.status || 'Active'}
-                                                        </span>
-                                                    </div>
-                                                    <div className="mb-3">
-                                                        <h3 className="text-base font-black text-foreground group-hover:text-primary transition-colors truncate">
-                                                            {project.name}
-                                                        </h3>
-                                                        <p className="text-[12px] text-muted-foreground font-medium mt-0.5 line-clamp-1">
-                                                            {project.description || 'No description provided'}
-                                                        </p>
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-                                                            <span>Progress</span>
-                                                            <span className="text-muted-foreground">{project.progress || 0}%</span>
-                                                        </div>
-                                                        <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                                                            <motion.div
-                                                                initial={{ width: 0 }}
-                                                                animate={{ width: `${project.progress || 0}%` }}
-                                                                transition={{ duration: 1.1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                                                                className="h-full rounded-full bg-gradient-to-r from-primary to-teal-400"
-                                                                style={{ boxShadow: '0 0 8px hsl(var(--primary) / 0.35)' }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        </motion.div>
+                                    ? projectsData.map((p: any, idx: number) => (
+                                        <ProjectCard key={p.id} project={p} idx={idx} onClick={() => navigate(`/projects/${p.id}`)} />
                                     ))
                                     : (
-                                        <div className="col-span-full py-10 text-center bg-muted/30 border border-dashed border-border rounded-2xl">
-                                            <Layers className="h-7 w-7 text-muted-foreground/30 mx-auto mb-2" />
-                                            <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest">No projects initialized</p>
+                                        <div className="col-span-full flex flex-col items-center justify-center py-14 bg-muted/20 border border-dashed border-border/60 rounded-2xl gap-3">
+                                            <Layers className="h-8 w-8 text-muted-foreground/20" />
+                                            <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">No projects initialized</p>
+                                            <CreateProjectDialog trigger={
+                                                <Button size="sm" className="h-8 bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-black rounded-xl px-3 text-[9px] uppercase tracking-widest border border-primary/20 gap-1.5 transition-all">
+                                                    <Plus className="h-3 w-3" /> Create First Project
+                                                </Button>
+                                            } />
                                         </div>
                                     )
                                 }
@@ -518,9 +626,9 @@ const DashboardPage = () => {
 
                         {/* Assigned Tasks */}
                         <section>
-                            <SectionLabel
+                            <SectionHeader
                                 icon={<Zap className="h-3.5 w-3.5" />}
-                                title={<>Assigned <span className="text-muted-foreground font-semibold normal-case tracking-normal">Tasks</span></>}
+                                title="Assigned Tasks"
                                 accent="emerald"
                                 action={() => navigate('/projects')}
                                 actionLabel="All tasks"
@@ -532,86 +640,199 @@ const DashboardPage = () => {
                                         : undefined
                                 }
                             />
-                            <div className="flex flex-col gap-2">
-                                {userPerformance?.pendingTasks && userPerformance.pendingTasks.length > 0
-                                    ? userPerformance.pendingTasks.map((task: any, idx: number) => (
-                                        <motion.div key={task.id}
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: idx * 0.04, duration: 0.32 }}
-                                        >
-                                            <Card onClick={() => navigate(`/projects/${task.project_id}`)}
-                                                className="bg-card border-border hover:border-emerald-500/25 transition-all duration-200 group cursor-pointer hover:bg-accent/40"
-                                            >
-                                                <CardContent className="p-3 sm:p-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0 group-hover:bg-emerald-500 group-hover:text-card group-hover:border-emerald-500 transition-all duration-200">
-                                                            <Bot className="h-4 w-4" />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h4 className="text-sm sm:text-base font-bold text-foreground group-hover:text-emerald-400 transition-colors truncate">{task.title}</h4>
-                                                            <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">{task.project?.name || 'Unknown project'}</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                                                            {task.due_date && (
-                                                                <span className={`hidden sm:inline text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${
-                                                                    isPast(new Date(task.due_date))   ? 'text-red-400 border-red-500/20 bg-red-500/10'
-                                                                    : isToday(new Date(task.due_date)) ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
-                                                                    : 'text-muted-foreground border-border'
-                                                                }`}>
-                                                                    {isPast(new Date(task.due_date)) ? 'Overdue'
-                                                                        : isToday(new Date(task.due_date)) ? 'Today'
-                                                                        : format(new Date(task.due_date), 'MMM d')}
-                                                                </span>
-                                                            )}
-                                                            <PriorityBadge priority={task.priority || 'medium'} />
-                                                            <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-emerald-400 transition-colors" />
-                                                        </div>
+                            <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                                <div className="divide-y divide-border/40 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                    {userPerformance?.pendingTasks && userPerformance.pendingTasks.length > 0
+                                        ? userPerformance.pendingTasks
+                                            .slice(taskPage * TASKS_PER_PAGE, (taskPage + 1) * TASKS_PER_PAGE)
+                                            .map((task: any, idx: number) => (
+                                                <motion.div key={task.id}
+                                                    initial={{ opacity: 0, x: -8 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: idx * 0.04 }}
+                                                    onClick={() => navigate(`/projects/${task.project_id}`)}
+                                                    className="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 hover:bg-accent/40 cursor-pointer group transition-all duration-200"
+                                                >
+                                                    <div className="h-9 w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500 transition-all">
+                                                        <Bot className="h-4 w-4" />
                                                     </div>
-                                                </CardContent>
-                                            </Card>
-                                        </motion.div>
-                                    ))
-                                    : (
-                                        <div className="py-10 text-center bg-muted/30 border border-dashed border-border rounded-2xl">
-                                            <CheckCircle2 className="h-6 w-6 text-emerald-500/20 mx-auto mb-2" />
-                                            <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest">All clear — no pending tasks</p>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-sm font-bold text-foreground group-hover:text-emerald-400 transition-colors truncate">{task.title}</h4>
+                                                        <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">{task.project?.name || 'Unknown project'}</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                                                        {task.due_date && (
+                                                            <span className={`hidden sm:inline text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg border ${
+                                                                isPast(new Date(task.due_date))    ? 'text-red-400 border-red-500/20 bg-red-500/10'
+                                                                : isToday(new Date(task.due_date)) ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
+                                                                : 'text-muted-foreground/50 border-border/60'
+                                                            }`}>
+                                                                {isPast(new Date(task.due_date)) ? 'Overdue'
+                                                                    : isToday(new Date(task.due_date)) ? 'Today'
+                                                                    : format(new Date(task.due_date), 'MMM d')}
+                                                            </span>
+                                                        )}
+                                                        <PriorityBadge priority={task.priority || 'medium'} />
+                                                        <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-emerald-400 transition-colors" />
+                                                    </div>
+                                                </motion.div>
+                                            ))
+                                        : (
+                                            <div className="py-12 text-center">
+                                                <CheckCircle2 className="h-7 w-7 text-emerald-500/20 mx-auto mb-2" />
+                                                <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">All clear — no pending tasks</p>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                                {/* Pagination */}
+                                {userPerformance?.pendingTasks?.length > TASKS_PER_PAGE && (
+                                    <div className="flex items-center justify-between px-4 py-3 border-t border-border/40 bg-muted/20">
+                                        <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest">
+                                            {taskPage * TASKS_PER_PAGE + 1}–{Math.min((taskPage + 1) * TASKS_PER_PAGE, userPerformance.pendingTasks.length)} of {userPerformance.pendingTasks.length}
+                                        </span>
+                                        <div className="flex items-center gap-1">
+                                            <button onClick={() => setTaskPage(p => Math.max(0, p - 1))} disabled={taskPage === 0}
+                                                className="h-6 w-6 flex items-center justify-center rounded-lg border border-border text-muted-foreground/50 hover:text-foreground hover:border-primary/30 disabled:opacity-25 disabled:cursor-not-allowed transition-all text-sm"
+                                            >‹</button>
+                                            {Array.from({ length: Math.ceil(userPerformance.pendingTasks.length / TASKS_PER_PAGE) }).map((_, i) => (
+                                                <button key={i} onClick={() => setTaskPage(i)}
+                                                    className={`h-6 w-6 flex items-center justify-center rounded-lg text-[9px] font-black transition-all ${
+                                                        taskPage === i
+                                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                                            : 'text-muted-foreground/40 hover:text-foreground border border-transparent hover:border-border/60'
+                                                    }`}
+                                                >{i + 1}</button>
+                                            ))}
+                                            <button onClick={() => setTaskPage(p => Math.min(Math.ceil(userPerformance.pendingTasks.length / TASKS_PER_PAGE) - 1, p + 1))}
+                                                disabled={taskPage >= Math.ceil(userPerformance.pendingTasks.length / TASKS_PER_PAGE) - 1}
+                                                className="h-6 w-6 flex items-center justify-center rounded-lg border border-border text-muted-foreground/50 hover:text-foreground hover:border-primary/30 disabled:opacity-25 disabled:cursor-not-allowed transition-all text-sm"
+                                            >›</button>
                                         </div>
-                                    )
-                                }
+                                    </div>
+                                )}
                             </div>
                         </section>
+
+                        {/* Bottom row: Neural Assistant + Live Activity */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                            {/* Neural Assistant */}
+                            <motion.div
+                                whileHover={{ scale: 1.01 }}
+                                className="relative bg-card border border-primary/25 rounded-2xl overflow-hidden"
+                                style={{ boxShadow: '0 0 30px -12px rgba(var(--primary), 0.2)' }}
+                            >
+                                <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full blur-3xl bg-primary/10 animate-pulse pointer-events-none" />
+                                <div className="absolute -bottom-8 -left-8 w-20 h-20 rounded-full blur-3xl bg-teal-500/[0.06] pointer-events-none" />
+                                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
+                                <CardHeader className="pt-4 pb-2 px-5">
+                                    <CardTitle className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                                        <div className="h-6 w-6 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                                            <Bot className="h-3 w-3 text-primary" />
+                                        </div>
+                                        Neural Assistant
+                                        <span className="ml-auto text-[7px] font-black text-primary/50 uppercase tracking-widest flex items-center gap-0.5">
+                                            <Sparkles className="h-2.5 w-2.5" /> AI
+                                        </span>
+                                    </CardTitle>
+                                </CardHeader>
+
+                                <CardContent className="px-5 pb-5 flex flex-col gap-3 relative z-10">
+                                    <div className="p-3 rounded-xl bg-muted/50 border border-border">
+                                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                            {userPerformance?.pendingTasks?.length > 0
+                                                ? `You have ${userPerformance.pendingTasks.length} pending task${userPerformance.pendingTasks.length !== 1 ? 's' : ''}.${overdueCount > 0 ? ` ⚠️ ${overdueCount} overdue.` : ' Prioritize wisely.'}`
+                                                : 'All systems nominal. Initialize a new project or invite your team to begin.'}
+                                        </p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button onClick={handleAnalyzeWorkspace} disabled={isAnalyzing}
+                                            className="flex-1 bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary font-black h-8 rounded-xl text-[9px] uppercase tracking-widest border border-primary/20 gap-1.5 transition-all"
+                                        >
+                                            {isAnalyzing
+                                                ? <><Loader2 className="h-3 w-3 animate-spin" />Analyzing</>
+                                                : <><Brain className="h-3 w-3" />Analyze</>}
+                                        </Button>
+                                        <Button onClick={() => navigate('/ai-chat')} variant="outline"
+                                            className="border-border/60 bg-transparent text-foreground font-black h-8 rounded-xl text-[9px] uppercase tracking-widest hover:border-primary/30 hover:bg-accent gap-1.5 transition-all"
+                                        >
+                                            <MessageSquare className="h-3 w-3" />Chat
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </motion.div>
+
+                            {/* Live Activity */}
+                            <div>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <CircleDot className="h-3.5 w-3.5 text-emerald-400" />
+                                    <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Live Activity</h3>
+                                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                </div>
+                                <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                                    <div className="max-h-[280px] overflow-y-auto custom-scrollbar p-4">
+                                        <div className="relative border-l border-border/40 ml-2 pl-4 flex flex-col gap-4">
+                                            {analyticsLoading
+                                                ? Array.from({ length: 3 }).map((_, i) => (
+                                                    <div key={i} className="relative space-y-1.5">
+                                                        <div className="absolute -left-[1.35rem] top-1.5 w-2 h-2 rounded-full bg-muted" />
+                                                        <div className="h-3 w-40 bg-muted rounded animate-pulse" />
+                                                        <div className="h-2 w-20 bg-muted/60 rounded animate-pulse" />
+                                                    </div>
+                                                ))
+                                                : analytics?.recentActivity && analytics.recentActivity.length > 0
+                                                ? analytics.recentActivity.map((act: any) => (
+                                                    <div key={act.id || Math.random()} className="relative">
+                                                        <div className="absolute -left-[1.32rem] top-1.5 w-2 h-2 rounded-full bg-primary/60 border-2 border-card" />
+                                                        <p className="text-xs text-foreground font-medium leading-snug">
+                                                            <span className="text-primary font-bold">@{act.actor?.name?.split(' ')[0] || 'System'}</span>{' '}
+                                                            {act.description || act.action?.replace(/_/g, ' ')}
+                                                        </p>
+                                                        <p className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-widest mt-0.5">
+                                                            {formatDistanceToNow(new Date(act.created_at || act.timestamp))} ago
+                                                        </p>
+                                                    </div>
+                                                ))
+                                                : <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No recent activity</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* ── Right (1/3) ─ xl:self-start prevents height stretch ── */}
-                    <div className="flex flex-col gap-4 xl:self-start">
+                    {/* ── RIGHT COL (1/3) ────────────────────────────────────── */}
+                    <div className="flex flex-col gap-6 xl:self-start">
 
                         {/* Personal Stats */}
-                        <Card className="bg-card border-border">
-                            <CardHeader className="pt-4 pb-2 px-4">
-                                <CardTitle className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                        <Card className="bg-card border-border/60">
+                            <CardHeader className="pt-4 pb-2 px-5">
+                                <CardTitle className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
                                     <TrendingUp className="h-3 w-3 text-primary" />Personal Stats
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="px-4 pb-4">
+                            <CardContent className="px-5 pb-5">
                                 <div className="flex items-center gap-4">
                                     <CompletionRing percentage={userPerformance?.completionRate || 0} />
-                                    <div className="flex-1 min-w-0 space-y-2.5">
+                                    <div className="flex-1 min-w-0 space-y-3">
                                         <div>
                                             <p className="text-2xl font-black text-foreground tabular-nums leading-none">
                                                 {userPerformance?.tasksCompleted || 0}
-                                                <span className="text-muted-foreground/60 text-sm font-bold">/{userPerformance?.tasksAssigned || 0}</span>
+                                                <span className="text-muted-foreground/40 text-sm font-bold">/{userPerformance?.tasksAssigned || 0}</span>
                                             </p>
-                                            <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">Tasks Done</p>
+                                            <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">Tasks Completed</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
-                                            <div className="bg-muted/60 rounded-lg p-2 border border-border">
-                                                <p className="text-base font-black text-foreground leading-none">{userPerformance?.onTimeDelivery || 0}%</p>
-                                                <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-0.5">On-Time</p>
+                                            <div className="bg-muted/50 rounded-xl p-2.5 border border-border/60">
+                                                <p className="text-lg font-black text-foreground leading-none">{userPerformance?.onTimeDelivery || 0}%</p>
+                                                <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">On-Time</p>
                                             </div>
-                                            <div className="bg-muted/60 rounded-lg p-2 border border-border">
-                                                <p className="text-base font-black text-foreground leading-none">{userPerformance?.averageCompletionTime || 0}d</p>
-                                                <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-0.5">Avg Time</p>
+                                            <div className="bg-muted/50 rounded-xl p-2.5 border border-border/60">
+                                                <p className="text-lg font-black text-foreground leading-none">{userPerformance?.averageCompletionTime || 0}d</p>
+                                                <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">Avg Time</p>
                                             </div>
                                         </div>
                                     </div>
@@ -620,11 +841,11 @@ const DashboardPage = () => {
                         </Card>
 
                         {/* Deadlines */}
-                        <Card className="bg-card border-border">
-                            <CardHeader className="pt-4 pb-2 px-4">
+                        <Card className="bg-card border-border/60">
+                            <CardHeader className="pt-4 pb-2 px-5">
                                 <div className="flex items-center justify-between">
-                                    <CardTitle className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
-                                        <Calendar className="h-3 w-3 text-amber-400" />Deadlines
+                                    <CardTitle className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                                        <Calendar className="h-3 w-3 text-amber-400" />Upcoming Deadlines
                                     </CardTitle>
                                     {overdueCount > 0 && (
                                         <span className="text-[8px] font-black bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/20">
@@ -633,58 +854,18 @@ const DashboardPage = () => {
                                     )}
                                 </div>
                             </CardHeader>
-                            <CardContent className="px-4 pb-4 flex flex-col gap-1.5">
+                            <CardContent className="px-5 pb-5 flex flex-col gap-2">
                                 {upcomingDeadlines.length > 0
                                     ? upcomingDeadlines.map((task: any) => (
                                         <DeadlineItem key={task.id} task={task} onClick={() => navigate(`/projects/${task.project_id}`)} />
                                     ))
                                     : (
-                                        <div className="py-5 text-center">
-                                            <Clock className="h-4 w-4 text-muted-foreground/20 mx-auto mb-1.5" />
-                                            <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">No upcoming deadlines</p>
+                                        <div className="py-8 text-center flex flex-col items-center gap-2">
+                                            <CheckCircle2 className="h-6 w-6 text-emerald-500/20" />
+                                            <p className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-widest">No upcoming deadlines</p>
                                         </div>
                                     )
                                 }
-                            </CardContent>
-                        </Card>
-
-                        {/* Neural Assistant */}
-                        <Card className="bg-card border-primary/20 overflow-hidden relative">
-                            {/* brand-tinted ambient glow using primary token */}
-                            <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full blur-2xl pointer-events-none bg-primary/[0.07]" />
-
-                            <CardHeader className="pt-4 pb-2 px-4 relative">
-                                <CardTitle className="text-sm font-black text-foreground uppercase tracking-wide flex items-center gap-2">
-                                    <div className="h-6 w-6 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                                        <Bot className="h-3 w-3 text-primary" />
-                                    </div>
-                                    Neural Assistant
-                                </CardTitle>
-                            </CardHeader>
-
-                            <CardContent className="px-4 pb-4 flex flex-col gap-3 relative">
-                                <div className="p-3 rounded-xl bg-muted/60 border border-border">
-                                    <p className="text-[11px] text-muted-foreground leading-relaxed font-medium">
-                                        {userPerformance?.pendingTasks?.length > 0
-                                            ? `You have ${userPerformance.pendingTasks.length} pending tasks.${overdueCount > 0 ? ` ⚠️ ${overdueCount} ${overdueCount === 1 ? 'is' : 'are'} overdue.` : ' Focus on high-priority items.'}`
-                                            : 'All systems nominal. Initialize a new project or invite your team to begin.'}
-                                    </p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button onClick={handleAnalyzeWorkspace} disabled={isAnalyzing}
-                                        className="flex-1 bg-primary/10 hover:bg-primary hover:text-primary-foreground text-primary font-black h-8 rounded-lg text-[9px] uppercase tracking-widest border border-primary/20 gap-1.5 transition-all"
-                                    >
-                                        {isAnalyzing
-                                            ? <><Loader2 className="h-3 w-3 animate-spin" />Analyzing</>
-                                            : <><Brain className="h-3 w-3" />Analyze</>
-                                        }
-                                    </Button>
-                                    <Button onClick={() => navigate('/ai-chat')} variant="outline"
-                                        className="border-border bg-transparent text-foreground font-black h-8 rounded-lg text-[9px] uppercase tracking-widest hover:border-primary/25 hover:bg-accent gap-1.5 transition-all"
-                                    >
-                                        <MessageSquare className="h-3 w-3" />Chat
-                                    </Button>
-                                </div>
                             </CardContent>
                         </Card>
 
@@ -702,26 +883,26 @@ const DashboardPage = () => {
                                     exit={{ opacity: 0, y: -8, scale: 0.98 }}
                                     transition={{ duration: 0.25 }}
                                 >
-                                    <Card className="bg-card border-primary/20">
-                                        <CardHeader className="pt-4 pb-2 px-4 border-b border-border">
+                                    <Card className="bg-card border-primary/25" style={{ boxShadow: '0 0 20px -8px rgba(var(--primary),0.15)' }}>
+                                        <CardHeader className="pt-4 pb-2 px-5 border-b border-border/40">
                                             <div className="flex justify-between items-center">
                                                 <CardTitle className="text-[9px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-1.5">
-                                                    <Zap className="h-3 w-3" />Intelligence Report
+                                                    <Sparkles className="h-3 w-3" />Intelligence Report
                                                 </CardTitle>
                                                 <button onClick={() => setAnalysisResult(null)}
-                                                    className="p-1 rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-accent transition-all"
+                                                    className="p-1 rounded-lg text-muted-foreground/30 hover:text-foreground hover:bg-accent transition-all"
                                                 >
                                                     <X className="h-3 w-3" />
                                                 </button>
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="p-4">
+                                        <CardContent className="p-5">
                                             <ReactMarkdown components={{
-                                                p:      ({ children }) => <p className="mb-2 last:mb-0 text-sm text-muted-foreground leading-relaxed">{children}</p>,
+                                                p:      ({ children }) => <p className="mb-2 last:mb-0 text-xs text-muted-foreground leading-relaxed">{children}</p>,
                                                 strong: ({ children }) => <strong className="text-primary font-black">{children}</strong>,
                                                 ul:     ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                                                li:     ({ children }) => <li className="text-[12px] text-muted-foreground">{children}</li>,
-                                                h2:     ({ children }) => <h2 className="text-sm font-black text-foreground mb-1.5 uppercase tracking-wide">{children}</h2>,
+                                                li:     ({ children }) => <li className="text-[11px] text-muted-foreground">{children}</li>,
+                                                h2:     ({ children }) => <h2 className="text-xs font-black text-foreground mb-1.5 uppercase tracking-wide">{children}</h2>,
                                             }}>
                                                 {analysisResult}
                                             </ReactMarkdown>
@@ -731,39 +912,10 @@ const DashboardPage = () => {
                             )}
                         </AnimatePresence>
 
-                        {/* Activity Feed */}
-                        <div>
-                            <div className="flex items-center gap-1.5 mb-3">
-                                <ActivityIcon className="h-4 w-4 text-emerald-400" />
-                                <h3 className="text-[12px] font-black text-foreground uppercase tracking-[0.2em]">Live Activity</h3>
-                            </div>
-                            <div className="relative border-l border-border ml-1.5 pl-4 flex flex-col gap-3">
-                                {analyticsLoading
-                                    ? Array.from({ length: 3 }).map((_, i) => <ActivitySkeleton key={i} />)
-                                    : analytics?.recentActivity && analytics.recentActivity.length > 0
-                                    ? analytics.recentActivity.map((activity: any) => (
-                                        <div key={activity.id || Math.random()} className="relative">
-                                            <div className="absolute -left-[1.32rem] top-1.5 w-2 h-2 rounded-full bg-primary/60 border-2 border-card" />
-                                            <p className="text-base text-foreground font-medium leading-snug">
-                                                <span className="text-primary font-bold">
-                                                    @{activity.actor?.name?.split(' ')[0] || 'System'}
-                                                </span>{' '}
-                                                {activity.description || activity.action?.replace(/_/g, ' ')}
-                                            </p>
-                                            <p className="text-[11px] text-foreground/70 font-bold uppercase tracking-widest mt-0.5">
-                                                {formatDistanceToNow(new Date(activity.created_at || activity.timestamp))} ago
-                                            </p>
-                                        </div>
-                                    ))
-                                    : <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-widest italic">No recent activity</p>
-                                }
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
-                    </div>{/* /right col */}
-                </div>{/* /main grid */}
-
-                <div className="h-6 sm:h-4" />
+                <div className="h-8" />
             </div>
         </div>
     );

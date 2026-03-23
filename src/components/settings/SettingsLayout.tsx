@@ -33,26 +33,26 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
     const visibleTabs = tabs.filter(tab => tab.visible !== false);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+        <div className="min-h-screen bg-background text-foreground">
             {/* Header */}
-            <div className="border-b border-white/10 bg-slate-900/50 backdrop-blur-sm">
-                <div className="max-w-7xl mx-auto px-6 py-6">
+            <div className="border-b border-border bg-secondary/30 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto px-6 py-8">
                     {/* Breadcrumbs */}
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-2 mb-6">
                         {breadcrumbs.map((crumb, index) => (
                             <React.Fragment key={index}>
                                 {index > 0 && (
-                                    <ChevronRight className="h-4 w-4 text-slate-600" />
+                                    <ChevronRight className="h-3 w-3 text-muted-foreground/40" />
                                 )}
                                 {crumb.href ? (
                                     <Link
                                         to={crumb.href}
-                                        className="text-sm text-slate-400 hover:text-white transition-colors"
+                                        className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
                                     >
                                         {crumb.label}
                                     </Link>
                                 ) : (
-                                    <span className="text-sm text-white font-medium">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground">
                                         {crumb.label}
                                     </span>
                                 )}
@@ -61,15 +61,15 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
                     </div>
 
                     {/* Title */}
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center">
-                            <Settings className="h-6 w-6 text-cyan-400" />
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg shadow-primary/5">
+                            <Settings className="h-7 w-7 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-heading font-black text-white uppercase tracking-tight slice-text">
+                            <h1 className="text-3xl font-heading font-black text-foreground uppercase tracking-tight italic">
                                 {title}
                             </h1>
-                            <p className="text-xs text-slate-500 uppercase tracking-widest font-black mt-0.5">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black mt-1">
                                 {subtitle || 'Configuration & Management'}
                             </p>
                         </div>
@@ -78,18 +78,18 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
             </div>
 
             {/* Content */}
-            <div className="max-w-7xl mx-auto px-6 py-8">
-                <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-6">
+            <div className="max-w-7xl mx-auto px-6 py-10">
+                <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-8">
                     {/* Tabs Navigation */}
-                    <div className="border-b border-white/10 overflow-x-auto custom-scrollbar">
-                        <TabsList className="bg-transparent h-auto p-0 gap-6 min-w-max">
+                    <div className="border-b border-border overflow-x-auto custom-scrollbar">
+                        <TabsList className="bg-transparent h-auto p-0 gap-8 min-w-max">
                             {visibleTabs.map((tab) => (
                                 <TabsTrigger
                                     key={tab.id}
                                     value={tab.id}
-                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] sm:text-xs tracking-widest transition-all gap-2"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none h-14 px-0 text-muted-foreground data-[state=active]:text-foreground font-black uppercase text-[10px] sm:text-xs tracking-widest transition-all gap-2.5"
                                 >
-                                    {tab.icon}
+                                    <span className="opacity-50 group-data-[state=active]:opacity-100">{tab.icon}</span>
                                     {tab.label}
                                 </TabsTrigger>
                             ))}
@@ -97,7 +97,9 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
                     </div>
 
                     {/* Tab Content */}
-                    {children}
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        {children}
+                    </div>
                 </Tabs>
             </div>
         </div>

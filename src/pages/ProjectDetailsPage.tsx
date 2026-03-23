@@ -8,12 +8,13 @@ import {
     Activity,
     Target,
     LayoutDashboard,
-    Clock,
     Shield,
     CheckCircle2,
     History,
     ChevronDown,
-    ChevronRight
+    ChevronRight,
+    Trash2,
+    MoreVertical
 } from 'lucide-react';
 import { useProjectStore } from '@/store/useProjectStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -21,6 +22,12 @@ import { useTaskStore } from '@/store/useTaskStore';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PermissionGate } from '@/components/auth/PermissionGate';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import KanbanBoard from '@/components/project/KanbanBoard';
 import AIOrchestrator from '@/components/project/AIOrchestrator';
 import { CreateTaskDialog } from '@/components/project/CreateTaskDialog';
@@ -28,11 +35,15 @@ import { ProjectInviteDialog } from '@/components/project/ProjectInviteDialog';
 import { useAIStore } from '@/store/useAIStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { AIChatPanel } from '@/components/ai/AIChatPanel';
 import { useProjectSocket } from '@/hooks/useSocket';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const ProjectDetailsPage = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -46,7 +57,8 @@ const ProjectDetailsPage = () => {
         fetchProjectInvitations,
         acceptProjectInvitation,
         projectActivities,
-        fetchProjectActivities
+        fetchProjectActivities,
+        updateProject
     } = useProjectStore();
     const { activeWorkspace } = useWorkspaceStore();
     const { user } = useAuthStore();
@@ -104,8 +116,8 @@ const ProjectDetailsPage = () => {
         return (
             <div className="flex items-center justify-center h-full bg-background">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="h-12 w-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Synchronizing neural link...</p>
+                    <div className="h-12 w-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Synchronizing neural link...</p>
                 </div>
             </div>
         );
@@ -114,13 +126,13 @@ const ProjectDetailsPage = () => {
     const isLead = project.your_role === 'lead' || activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin';
 
     const tabs = [
-        { value: 'kanban',       label: 'Board',          icon: LayoutDashboard, iconClass: 'text-white/40' },
-        { value: 'orchestrator', label: 'AI Orchestrator', icon: Brain,           iconClass: 'text-cyan-400'  },
-        { value: 'team',         label: 'Specialists',     icon: Users,           iconClass: 'text-white/40' },
+        { value: 'kanban',       label: 'Board',          icon: LayoutDashboard, iconClass: 'text-muted-foreground' },
+        { value: 'orchestrator', label: 'AI Orchestrator', icon: Brain,           iconClass: 'text-primary'  },
+        { value: 'team',         label: 'Specialists',     icon: Users,           iconClass: 'text-muted-foreground' },
         { value: 'activity',     label: 'Stream',          icon: Activity,        iconClass: 'text-emerald-400' },
     ];
 
-    const currentTab = [...tabs, { value: 'settings', label: 'Parameters', icon: Settings, iconClass: 'text-white/40' }]
+    const currentTab = [...tabs, { value: 'settings', label: 'Parameters', icon: Settings, iconClass: 'text-muted-foreground' }]
         .find(t => t.value === activeTab) ?? tabs[0];
     const CurrentIcon = currentTab.icon;
 
@@ -128,14 +140,14 @@ const ProjectDetailsPage = () => {
         <div className="h-full flex flex-col bg-background overflow-hidden">
 
             {/* ── Header ── */}
-            <header className="border-b border-white/[0.06] bg-[#030408]/80 backdrop-blur-xl flex-shrink-0">
+            <header className="border-b border-border bg-card/80 backdrop-blur-xl flex-shrink-0">
                 <div className="px-3 sm:px-6 lg:px-8 pt-3 pb-4">
 
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate('/projects')}
-                        className="text-white/40 hover:text-white -ml-2 gap-1.5 font-bold uppercase text-[9px] tracking-widest mb-3 h-7 px-2"
+                        className="text-muted-foreground hover:text-foreground -ml-2 gap-1.5 font-bold uppercase text-[9px] tracking-widest mb-3 h-7 px-2"
                     >
                         <ChevronLeft className="h-3 w-3" /> Back to Fleet
                     </Button>
@@ -144,14 +156,14 @@ const ProjectDetailsPage = () => {
 
                         {/* Project identity */}
                         <div className="flex items-start gap-3 min-w-0">
-                            <div className="mt-0.5 p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex-shrink-0">
-                                <Target className="h-5 w-5 text-cyan-400" />
+                            <div className="mt-0.5 p-2 rounded-xl bg-primary/10 border border-primary/20 flex-shrink-0">
+                                <Target className="h-5 w-5 text-primary" />
                             </div>
                             <div className="min-w-0 space-y-1">
-                                <h1 className="text-xl sm:text-2xl lg:text-[1.75rem] font-heading font-black tracking-tighter uppercase italic text-white truncate leading-none">
+                                <h1 className="text-xl sm:text-2xl lg:text-[1.75rem] font-heading font-black tracking-tighter uppercase italic text-foreground truncate leading-none">
                                     {project.name}
                                 </h1>
-                                <p className="text-white/40 font-bold uppercase text-[9px] tracking-widest leading-relaxed line-clamp-1 max-w-xl">
+                                <p className="text-muted-foreground font-bold uppercase text-[9px] tracking-widest leading-relaxed line-clamp-1 max-w-xl">
                                     {project.description || 'No primary objective defined for this orchestration.'}
                                 </p>
                             </div>
@@ -163,18 +175,18 @@ const ProjectDetailsPage = () => {
                             {/* Neural sync bar — md+ */}
                             <div className="hidden md:flex flex-col items-end gap-1.5">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[8px] font-black text-cyan-400/70 uppercase tracking-[0.2em] animate-pulse">Neural Sync</span>
-                                    <span className="text-[10px] font-black text-white tabular-nums">{syncProgress}%</span>
+                                    <span className="text-[8px] font-black text-primary/70 uppercase tracking-[0.2em] animate-pulse">Neural Sync</span>
+                                    <span className="text-[10px] font-black text-foreground tabular-nums">{syncProgress}%</span>
                                 </div>
                                 <progress
                                     value={syncProgress}
                                     max={100}
-                                    className="w-28 lg:w-36 h-[3px] overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-white/[0.06] [&::-webkit-progress-value]:bg-cyan-500 [&::-webkit-progress-value]:rounded-full [&::-moz-progress-bar]:bg-cyan-500"
+                                    className="w-28 lg:w-36 h-[3px] overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-value]:bg-primary [&::-webkit-progress-value]:rounded-full [&::-moz-progress-bar]:bg-primary"
                                     title="Neural sync progress"
                                 />
                             </div>
 
-                            <div className="hidden md:block w-px h-5 bg-white/10" />
+                            <div className="hidden md:block w-px h-5 bg-border" />
 
                             {/* Buttons */}
                             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -182,7 +194,7 @@ const ProjectDetailsPage = () => {
                                     onClick={() => navigate(`/projects/${projectId}/settings`)}
                                     variant="outline"
                                     size="sm"
-                                    className="h-8 px-3 bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.06] text-white/60 hover:text-white font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
+                                    className="h-8 px-3 bg-muted/30 border-border hover:border-border/60 hover:bg-accent text-muted-foreground hover:text-foreground font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
                                 >
                                     <Settings className="h-3.5 w-3.5" />
                                     <span className="hidden sm:inline">Settings</span>
@@ -215,7 +227,7 @@ const ProjectDetailsPage = () => {
                     className="flex-1 flex flex-col min-h-0"
                 >
                     {/* Tab bar */}
-                    <div className="border-b border-white/[0.06] px-4 sm:px-6 lg:px-8 flex-shrink-0 relative">
+                    <div className="border-b border-border px-4 sm:px-6 lg:px-8 flex-shrink-0 relative">
 
                         {/* Desktop */}
                         <div className="hidden sm:block">
@@ -227,11 +239,11 @@ const ProjectDetailsPage = () => {
                                         className="
                                             relative flex-shrink-0 mr-6 last:mr-0
                                             bg-transparent border-0 rounded-none h-11 px-0
-                                            text-white/40 data-[state=active]:text-white
+                                            text-muted-foreground data-[state=active]:text-foreground
                                             font-black uppercase text-[9px] tracking-widest
-                                            transition-colors gap-1.5 hover:text-white/60
+                                            transition-colors gap-1.5 hover:text-muted-foreground/80
                                             after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px]
-                                            after:bg-cyan-400 after:rounded-t-full after:scale-x-0
+                                            after:bg-primary after:rounded-t-full after:scale-x-0
                                             data-[state=active]:after:scale-x-100 after:transition-transform after:duration-200
                                         "
                                     >
@@ -245,11 +257,11 @@ const ProjectDetailsPage = () => {
                                         className="
                                             relative flex-shrink-0 ml-auto
                                             bg-transparent border-0 rounded-none h-11 px-0
-                                            text-white/40 data-[state=active]:text-white
+                                            text-muted-foreground data-[state=active]:text-foreground
                                             font-black uppercase text-[9px] tracking-widest
-                                            transition-colors gap-1.5 hover:text-white/60
+                                            transition-colors gap-1.5 hover:text-muted-foreground/80
                                             after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px]
-                                            after:bg-cyan-400 after:rounded-t-full after:scale-x-0
+                                            after:bg-primary after:rounded-t-full after:scale-x-0
                                             data-[state=active]:after:scale-x-100 after:transition-transform after:duration-200
                                         "
                                     >
@@ -268,27 +280,27 @@ const ProjectDetailsPage = () => {
                                 aria-label="Toggle section tabs"
                             >
                                 <CurrentIcon className={`h-3.5 w-3.5 flex-shrink-0 ${currentTab.iconClass}`} />
-                                <span className="text-white font-black uppercase text-[10px] tracking-widest flex-1 text-left">{currentTab.label}</span>
-                                <ChevronDown className={`h-3.5 w-3.5 text-white/40 transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+                                <span className="text-foreground font-black uppercase text-[10px] tracking-widest flex-1 text-left">{currentTab.label}</span>
+                                <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : ''}`} />
                             </button>
                         </div>
 
                         {/* Mobile dropdown */}
                         {mobileMenuOpen && (
-                            <div className="absolute top-full left-0 right-0 z-30 bg-[#080C14] border-b border-white/[0.08] shadow-2xl shadow-black/60 sm:hidden">
+                            <div className="absolute top-full left-0 right-0 z-30 bg-background border-b border-border shadow-2xl shadow-black/20 sm:hidden">
                                 {tabs.map(({ value, label, icon: Icon, iconClass }) => (
                                     <button
                                         key={value}
                                         onClick={() => { setActiveTab(value); setMobileMenuOpen(false); }}
                                         className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${
                                             activeTab === value
-                                                ? 'border-l-cyan-400 bg-cyan-500/[0.06] text-white'
-                                                : 'border-l-transparent text-white/40 hover:text-white hover:bg-white/[0.025]'
+                                                ? 'border-l-primary bg-primary/[0.06] text-foreground'
+                                                : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-accent/50'
                                         }`}
                                     >
-                                        <Icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === value ? iconClass : 'text-white/20'}`} />
+                                        <Icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === value ? iconClass : 'opacity-20'}`} />
                                         <span className="font-black uppercase text-[10px] tracking-widest">{label}</span>
-                                        {activeTab === value && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />}
+                                        {activeTab === value && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary))]" />}
                                     </button>
                                 ))}
                                 <PermissionGate roles={['owner', 'admin']}>
@@ -296,13 +308,13 @@ const ProjectDetailsPage = () => {
                                         onClick={() => { setActiveTab('settings'); setMobileMenuOpen(false); }}
                                         className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${
                                             activeTab === 'settings'
-                                                ? 'border-l-cyan-400 bg-cyan-500/[0.06] text-white'
-                                                : 'border-l-transparent text-white/40 hover:text-white hover:bg-white/[0.025]'
+                                                ? 'border-l-primary bg-primary/[0.06] text-foreground'
+                                                : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-accent/50'
                                         }`}
                                     >
-                                        <Settings className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === 'settings' ? 'text-cyan-400' : 'text-white/20'}`} />
+                                        <Settings className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === 'settings' ? 'text-primary' : 'opacity-20'}`} />
                                         <span className="font-black uppercase text-[10px] tracking-widest">Parameters</span>
-                                        {activeTab === 'settings' && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />}
+                                        {activeTab === 'settings' && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary))]" />}
                                     </button>
                                 </PermissionGate>
                             </div>
@@ -326,114 +338,178 @@ const ProjectDetailsPage = () => {
                             </TabsContent>
 
                             {/* Team */}
-                            <TabsContent value="team" className="m-0 flex-1 flex flex-col gap-8">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                    <div>
-                                        <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">Active Personnel</h3>
-                                        <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-0.5">Specialists currently assigned to this mission sector</p>
+                            <TabsContent value="team" className="m-0 flex-1 min-h-0">
+                            <ScrollArea className="h-full">
+                                <div className="p-4 sm:p-6 md:p-8 space-y-8 max-w-[1600px] mx-auto">
+                                
+                                {/* Header */}
+                                {isLead && (
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                                        <Users className="h-5 w-5 text-cyan-400" />
+                                        </div>
+                                        <div>
+                                        <h2 className="text-lg font-heading font-black text-foreground uppercase italic tracking-tight leading-none">Specialists Assembly</h2>
+                                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1.5">{projectMembers.length} Active · Sector Personnel Management</p>
+                                        </div>
                                     </div>
-                                    {isLead && <ProjectInviteDialog projectId={projectId!} />}
-                                </div>
+                                    <ProjectInviteDialog projectId={projectId!} />
+                                    </div>
+                                )}
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                                    {projectMembers.map((member) => (
-                                        <Card key={member.id} className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-xl backdrop-blur-md transition-all duration-300 hover:border-cyan-500/40 hover:bg-white/[0.05] group">
-                                            <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                                            <CardContent className="p-4 flex items-center gap-4 relative">
-                                                <div className="h-12 w-12 flex-shrink-0 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-cyan-400 font-black text-lg overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
-                                                    {member.user.avatar_url ? (
-                                                        <img src={member.user.avatar_url} alt={member.user.name} className="h-full w-full object-cover" />
-                                                    ) : (
-                                                        <span>{member.user.name.charAt(0)}</span>
-                                                    )}
-                                                    <div className="absolute inset-0 bg-cyan-400/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                {/* Main Grid */}
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                                    
+                                    {/* Active Personnel */}
+                                    <div className={` ${projectInvitations.filter(i => i.status === 'pending').length > 0 ? 'lg:col-span-8' : 'lg:col-span-12'} space-y-6`}>
+                                    <div className="flex items-center gap-3 pl-4 border-l-2 border-primary/40">
+                                        <div>
+                                        <h3 className="text-xs font-black text-foreground uppercase tracking-[0.3em]">Active Personnel</h3>
+                                        <p className="text-[10px] text-primary font-bold uppercase tracking-widest flex items-center gap-2 mt-1">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                            {projectMembers.length} Authorized Units Synced
+                                        </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                                        {projectMembers.map((member) => (
+                                        <Card
+                                            key={member.id}
+                                            className="group bg-card/40 border-primary/40 hover:border-primary/90 transition-all duration-300 rounded-2xl overflow-hidden pt-4"
+                                        >
+                                            <CardContent className="p-5 flex items-center gap-4">
+                                            <div className="relative flex-shrink-0">
+                                                <Avatar className="h-12 w-12 rounded-xl border-2 border-border shadow-xl">
+                                                <AvatarImage src={member.user?.avatar_url} />
+                                                <AvatarFallback className="bg-primary/10 text-primary font-black text-base italic">
+                                                    {member.user?.name?.substring(0, 2).toUpperCase()}
+                                                </AvatarFallback>
+                                                </Avatar>
+                                                <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-background border border-border shadow-md">
+                                                <Shield className="h-2.5 w-2.5 text-primary" />
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="text-[13px] font-black text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight truncate">{member.user.name}</h4>
-                                                    <div className="flex items-center gap-1.5 mt-1">
-                                                        <Shield className="h-3 w-3 text-cyan-500 flex-shrink-0" />
-                                                        <span className="text-[9px] text-white/60 font-black uppercase tracking-widest truncate">{member.project_role}</span>
-                                                    </div>
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <h4 className="text-sm font-black text-foreground uppercase tracking-tight truncate group-hover:text-primary transition-colors">
+                                                {member.user?.name}
+                                                </h4>
+                                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest truncate mt-0.5">
+                                                {member.project_role || 'Specialist'}
+                                                </p>
+                                                <div className="flex items-center gap-1.5 mt-2">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                <span className="text-[9px] text-emerald-400/70 font-black uppercase tracking-widest">Active</span>
                                                 </div>
-                                                <Badge variant="outline" className="border-white/[0.1] bg-white/[0.02] text-[9px] font-black tracking-widest uppercase flex-shrink-0 text-white/40 group-hover:text-cyan-400 transition-colors">
-                                                    {member.workspace_role}
-                                                </Badge>
+                                            </div>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all opacity-0 group-hover:opacity-100">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground backdrop-blur-2xl p-1.5 rounded-xl min-w-[160px]">
+                                                <DropdownMenuItem
+                                                    onClick={() => console.log('Remove member')}
+                                                    className="text-[10px] font-black uppercase tracking-widest text-red-400 focus:text-red-400 focus:bg-red-500/10 cursor-pointer rounded-lg h-9"
+                                                >
+                                                    <Trash2 className="h-3.5 w-3.5 mr-2.5" /> Revoke Access
+                                                </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                             </CardContent>
                                         </Card>
-                                    ))}
-                                </div>
-
-                                {isLead && projectInvitations.filter(i => i.status === 'pending').length > 0 && (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">Pending Authorizations</h3>
-                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-0.5">Awaiting sector entry confirmation from specialists</p>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                                            {projectInvitations.filter(i => i.status === 'pending').map((invite) => (
-                                                <Card key={invite.id} className="bg-white/[0.02] border border-dashed border-amber-500/30 relative overflow-hidden group/invite shadow-lg">
-                                                    <div className="absolute top-2.5 right-2.5">
-                                                        <Clock className="h-4 w-4 text-amber-500 animate-[pulse_2s_infinite]" />
-                                                    </div>
-                                                    <CardContent className="p-4 space-y-4">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="h-11 w-11 flex-shrink-0 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-white/20 group-hover/invite:text-amber-500 transition-colors">
-                                                                <Users size={18} />
-                                                            </div>
-                                                            <div className="min-w-0">
-                                                                <h4 className="text-[12px] font-black text-white uppercase truncate tracking-tight">{invite.invitee?.user?.name || 'Unknown User'}</h4>
-                                                                <p className="text-[9px] text-white/40 font-bold uppercase truncate mt-0.5 tracking-widest">{invite.invitee?.user?.email}</p>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <Shield className="h-3 w-3 text-cyan-400" />
-                                                                <span className="text-[9px] text-white/60 font-black uppercase tracking-widest">{invite.role}</span>
-                                                            </div>
-                                                            <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20 text-[9px] uppercase font-black tracking-tighter">pending</Badge>
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
-                                        </div>
+                                        ))}
                                     </div>
-                                )}
+                                    </div>
 
-                                {projectInvitations.some(i => i.invitee?.user?.id === user?.id && i.status === 'pending') && (
-                                    <div className="p-6 sm:p-8 rounded-2xl bg-cyan-500/[0.04] border border-cyan-500/20 flex flex-col items-center gap-5 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                        <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-                                            <Shield size={24} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <h3 className="text-lg sm:text-xl font-heading font-black text-white uppercase italic tracking-tight">Mission Authorization Detected</h3>
-                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest max-w-sm mx-auto">
-                                                You have been invited to join this mission sector as a specialist. Confirm authorization to proceed.
+                                    {/* Pending Sidebar */}
+                                    {isLead && projectInvitations.filter(i => i.status === 'pending').length > 0 && (
+                                    <div className="lg:col-span-4 space-y-5 border-l border-border/40 lg:pl-8">
+                                        <div className="flex items-center gap-3 pl-4 border-l-2 border-amber-500/30">
+                                        <div>
+                                            <h3 className="text-xs font-black text-foreground uppercase tracking-[0.3em]">Awaiting Clearance</h3>
+                                            <p className="text-[10px] text-amber-500/50 font-bold uppercase tracking-widest flex items-center gap-2 mt-1">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                            {projectInvitations.filter(i => i.status === 'pending').length} Pending Authorizations
                                             </p>
                                         </div>
-                                        <Button
-                                            onClick={async () => {
-                                                const invite = projectInvitations.find(i => i.invitee?.user?.id === user?.id && i.status === 'pending');
-                                                if (invite) {
-                                                    await acceptProjectInvitation(projectId!, invite.id);
-                                                    fetchNotifications();
-                                                    fetchUnreadCount();
-                                                }
-                                            }}
-                                            className="bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black px-8 h-10 rounded-xl uppercase tracking-widest text-[10px] shadow-lg shadow-cyan-500/20 gap-2 w-full sm:w-auto transition-all"
-                                        >
-                                            <CheckCircle2 className="h-4 w-4" /> Confirm Authorization
-                                        </Button>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                        {projectInvitations.filter(i => i.status === 'pending').map((invite) => (
+                                            <Card
+                                            key={invite.id}
+                                            className="group/invite bg-amber-500/[0.02] border border-amber-500/10 hover:border-amber-500/25 transition-all duration-300 rounded-2xl overflow-hidden"
+                                            >
+                                            <CardContent className="p-4 space-y-3">
+                                                <div className="flex items-center gap-3 pt-4">
+                                                <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-background border border-border flex items-center justify-center text-muted-foreground group-hover/invite:text-amber-500/60 transition-colors">
+                                                    <Users size={16} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="text-[11px] font-black text-foreground uppercase truncate tracking-tight">{invite.invitee?.user?.name || 'Inbound User'}</h4>
+                                                    <p className="text-[9px] text-muted-foreground font-mono truncate mt-0.5">{invite.invitee?.user?.email}</p>
+                                                </div>
+                                                </div>
+                                                <div className="flex items-center justify-between pt-3 border-t border-border/40">
+                                                <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted">
+                                                    <Shield className="h-2.5 w-2.5 text-amber-500/60" />
+                                                    <span className="text-[9px] text-muted-foreground font-black uppercase tracking-wide">{invite.role}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                                    <span className="text-[9px] text-amber-500 font-black uppercase tracking-widest">Pending</span>
+                                                </div>
+                                                </div>
+                                            </CardContent>
+                                            </Card>
+                                        ))}
+                                        </div>
                                     </div>
+                                    )}
+                                </div>
+
+                                {/* Invitation Acceptance Guard */}
+                                {projectInvitations.some(i => i.invitee?.user?.id === user?.id && i.status === 'pending') && (
+                                <div className="p-8 rounded-2xl bg-cyan-500/[0.03] border border-cyan-500/20 flex flex-col items-center gap-5 text-center animate-in zoom-in-95 duration-500 max-w-lg mx-auto">
+                                <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg">
+                                    <Shield size={28} />
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-base font-heading font-black text-foreground uppercase italic tracking-tight">Mission Authorization Required</h3>
+                                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest max-w-xs mx-auto">
+                                    You have been designated as a specialist. Confirm authorization to access project resources.
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={async () => {
+                                    const invite = projectInvitations.find(i => i.invitee?.user?.id === user?.id && i.status === 'pending');
+                                    if (invite) {
+                                        await acceptProjectInvitation(projectId!, invite.id);
+                                        fetchNotifications();
+                                        fetchUnreadCount();
+                                    }
+                                    }}
+                                    className="bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black px-8 h-10 rounded-xl uppercase tracking-widest text-[10px] shadow-lg shadow-cyan-500/30 gap-2 transition-all"
+                                >
+                                    <CheckCircle2 className="h-4 w-4" /> Confirm Authorization
+                                </Button>
+                                </div>
                                 )}
+                                </div>
+                            </ScrollArea>
                             </TabsContent>
 
                             {/* Activity */}
                             <TabsContent value="activity" className="m-0 flex-1 min-h-0 pr-1">
-                                <div className="space-y-5 max-w-3xl">
+                                <ScrollArea className="h-full w-full">
+                                <div className="p-4 sm:p-6 md:p-8 space-y-5 w-full border-t border-border">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">Mission Stream</h3>
-                                            <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-0.5">Real-time chronicle of neural status transitions</p>
+                                            <h3 className="text-base sm:text-lg font-heading font-black text-foreground uppercase italic tracking-tight">Mission Stream</h3>
+                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Real-time chronicle of neural status transitions</p>
                                         </div>
                                         <History size={18} className="text-emerald-500/40 flex-shrink-0" />
                                     </div>
@@ -443,35 +519,35 @@ const ProjectDetailsPage = () => {
                                             (projectActivities || []).map((activity: any) => (
                                                 <div
                                                     key={activity.id}
-                                                    className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] border-l-4 border-l-cyan-500/40 hover:border-l-cyan-400 hover:bg-white/[0.05] transition-all shadow-lg"
+                                                    className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border border-l-4 border-l-primary/40 hover:border-l-primary hover:bg-accent/40 transition-all shadow-lg"
                                                 >
-                                                    <div className="h-9 w-9 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center relative flex-shrink-0">
+                                                    <div className="h-9 w-9 rounded-xl bg-muted border border-border flex items-center justify-center relative flex-shrink-0">
                                                         {activity.actor?.avatar_url ? (
                                                             <img src={activity.actor.avatar_url} alt={activity.actor.name} className="h-full w-full object-cover rounded-xl" />
                                                         ) : (
-                                                            <span className="text-[11px] font-black text-cyan-400">{activity.actor?.name?.charAt(0)}</span>
+                                                            <span className="text-[11px] font-black text-primary">{activity.actor?.name?.charAt(0)}</span>
                                                         )}
-                                                        <span className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-[#030408] rounded-full flex items-center justify-center">
+                                                        <span className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-background rounded-full flex items-center justify-center">
                                                             <span className="h-2 w-2 bg-emerald-400 rounded-full shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
                                                         </span>
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-start justify-between gap-3">
-                                                            <p className="text-[12px] text-white font-medium leading-snug">
-                                                                <span className="text-cyan-400 font-black uppercase tracking-tighter">{activity.actor?.name}</span>
+                                                            <p className="text-[12px] text-foreground font-medium leading-snug">
+                                                                <span className="text-primary font-black uppercase tracking-tighter">{activity.actor?.name}</span>
                                                                 {' '}transitioned{' '}
-                                                                <span className="text-white/90 font-bold">"{activity.meta?.task_title}"</span>
+                                                                <span className="text-foreground/90 font-bold">"{activity.meta?.task_title}"</span>
                                                             </p>
-                                                            <span className="text-[9px] font-black text-white/20 uppercase flex-shrink-0 tabular-nums font-mono">
+                                                            <span className="text-[9px] font-black text-muted-foreground/40 uppercase flex-shrink-0 tabular-nums font-mono">
                                                                 {format(new Date(activity.created_at), 'HH:mm')}
                                                             </span>
                                                         </div>
                                                         <div className="flex items-center gap-2 mt-2 flex-wrap">
-                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-white/[0.04] text-white/40 border border-white/5 line-through">
+                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-muted text-muted-foreground/60 border border-border line-through">
                                                                 {activity.meta?.old_status}
                                                             </span>
-                                                            <ChevronRight className="h-3 w-3 text-white/10" />
-                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-cyan-500/15 text-cyan-400 border border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
+                                                            <ChevronRight className="h-3 w-3 text-muted-foreground/20" />
+                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-primary/15 text-primary border border-primary/20 shadow-[0_0_10px_hsl(var(--primary)/0.1)]">
                                                                 {activity.meta?.new_status}
                                                             </span>
                                                         </div>
@@ -479,27 +555,81 @@ const ProjectDetailsPage = () => {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="py-20 text-center bg-white/[0.02] border border-dashed border-white/[0.1] rounded-3xl flex flex-col items-center justify-center gap-4">
+                                            <div className="py-20 text-center bg-card border border-dashed border-border rounded-3xl flex flex-col items-center justify-center gap-4">
                                                 <Activity className="h-10 w-10 text-emerald-500/20" />
                                                 <div className="space-y-1">
-                                                    <h3 className="text-base font-heading font-black text-white/40 uppercase italic tracking-[0.2em]">Neural Silence</h3>
-                                                    <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">No activity detected in this sector yet.</p>
+                                                    <h3 className="text-base font-heading font-black text-muted-foreground uppercase italic tracking-[0.2em]">Neural Silence</h3>
+                                                    <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest">No activity detected in this sector yet.</p>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
                                 </div>
+                                </ScrollArea>
                             </TabsContent>
 
                             {/* Settings */}
                             <TabsContent value="settings" className="m-0 flex-1 min-h-0">
-                                <div className="py-20 text-center bg-white/[0.02] border border-dashed border-white/[0.1] rounded-3xl h-full flex flex-col items-center justify-center gap-4">
-                                    <Settings className="h-12 w-12 text-white/10" />
-                                    <div className="space-y-1">
-                                        <h3 className="text-base font-heading font-black text-white/40 uppercase italic tracking-[0.2em]">Mission Parameters</h3>
-                                        <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Configuring sector variables and access overrides...</p>
+                                <ScrollArea className="h-full">
+                                    <div className="p-4 sm:p-6 md:p-8 max-w-2xl mx-auto space-y-8">
+                                        <div className="space-y-1">
+                                            <h3 className="text-lg font-heading font-black text-foreground uppercase italic tracking-[0.2em]">Mission Parameters</h3>
+                                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Recalibrating sector variables and access overrides...</p>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <div className="space-y-4 pt-4 border-t border-border">
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Project Name</Label>
+                                                    <Input 
+                                                        value={project.name}
+                                                        onChange={(e) => updateProject(project.id, { name: e.target.value })}
+                                                        className="bg-muted/40 border-border rounded-xl h-12 text-foreground font-bold"
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Objective Description</Label>
+                                                    <Textarea 
+                                                        value={project.description || ''}
+                                                        onChange={(e) => updateProject(project.id, { description: e.target.value })}
+                                                        className="bg-muted/40 border-border rounded-xl min-h-[120px] text-foreground/90 font-bold"
+                                                        placeholder="Define the core mission objective..."
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Fleet Status</Label>
+                                                    <div className="grid grid-cols-3 gap-3">
+                                                        {(['active', 'completed', 'archived'] as const).map((status) => (
+                                                            <button
+                                                                key={status}
+                                                                onClick={() => updateProject(project.id, { status })}
+                                                                className={`h-11 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+                                                                    project.status === status 
+                                                                        ? 'bg-primary/10 border-primary/50 text-primary' 
+                                                                        : 'bg-muted/40 border-border text-muted-foreground hover:border-border/60'
+                                                                }`}
+                                                            >
+                                                                {status}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-6 rounded-2xl bg-red-500/5 border border-red-500/20 space-y-4">
+                                                <div className="space-y-1">
+                                                    <h4 className="text-xs font-black text-red-500/80 uppercase tracking-widest">Danger Zone</h4>
+                                                    <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-tight">Irreversible sector purge protocols</p>
+                                                </div>
+                                                <Button variant="destructive" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[10px] bg-red-500/20 hover:bg-red-500 border border-red-500/20 text-red-500 hover:text-white transition-all">
+                                                    Purge Project Files
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                </ScrollArea>
                             </TabsContent>
 
                         </div>
@@ -508,7 +638,7 @@ const ProjectDetailsPage = () => {
             </main>
 
             {/* AI Chat panel */}
-            <div className={`fixed top-0 right-0 h-full w-full sm:w-[30rem] bg-[#080C18] shadow-2xl shadow-black/60 border-l border-white/[0.06] transition-transform duration-300 ease-in-out z-50 ${showChat ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className={`fixed top-0 right-0 h-full w-full sm:w-[30rem] bg-card shadow-2xl shadow-black/60 border-l border-border transition-transform duration-300 ease-in-out z-50 ${showChat ? 'translate-x-0' : 'translate-x-full'}`}>
                 <AIChatPanel projectId={projectId!} onClose={() => setShowChat(false)} />
             </div>
 

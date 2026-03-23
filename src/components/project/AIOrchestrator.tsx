@@ -77,8 +77,8 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                         <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
                     </div>
                     <div className="space-y-0.5 min-w-0">
-                        <h2 className="text-lg sm:text-xl font-heading font-black text-white uppercase italic tracking-tighter">
-                            Neural <span className="text-cyan-400">Llama Orchestrator</span>
+                        <h2 className="text-lg sm:text-xl font-heading font-black text-foreground uppercase italic tracking-tighter">
+                            Neural <span className="text-primary">Llama Orchestrator</span>
                         </h2>
                         <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest leading-relaxed">
                             Provide mission parameters for automated milestone decomposition
@@ -89,17 +89,17 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                 {/* Input card */}
                 <div className="relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-2xl blur opacity-20 group-focus-within:opacity-60 transition-opacity" />
-                    <div className="relative bg-[#08090d] border border-white/[0.08] rounded-2xl p-4 space-y-4">
+                    <div className="relative bg-card border border-primary/60 rounded-2xl p-4 space-y-4">
 
                         <Textarea
                             value={prompt}
                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setPrompt(e.target.value)}
                             placeholder="e.g. Build a secure client portal with file sharing, real-time collaboration, and multi-factor authentication..."
-                            className="bg-transparent border-none focus-visible:ring-0 text-white placeholder:text-muted-foreground/20 resize-none min-h-[80px] sm:min-h-[100px] font-bold text-sm leading-relaxed p-0"
+                            className="bg-transparent text-muted-foreground focus-visible:ring-0 placeholder:text-muted-foreground/60 resize-none min-h-[80px] sm:min-h-[100px] font-bold text-sm leading-relaxed p-0 hover:border-primary/90 p-3"
                         />
 
                         {/* Controls row — stacks on mobile */}
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-3 border-t border-white/[0.06]">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-3 border-t border-border">
 
                             {/* Left: slider + meta */}
                             <div className="flex flex-col xs:flex-row xs:items-center gap-3 sm:gap-6 flex-1">
@@ -114,18 +114,18 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                             max="15"
                                             value={taskCount}
                                             onChange={(e) => setTaskCount(parseInt(e.target.value))}
-                                            className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-white/5 accent-cyan-500"
+                                            className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-muted-foreground/40 accent-primary"
                                             aria-label="Generated task count"
                                             title="Generated task count"
                                         />
                                     </div>
-                                    <span className="text-xs font-black text-cyan-400 tabular-nums min-w-[2ch] text-center flex-shrink-0">{taskCount}</span>
+                                    <span className="text-xs font-black text-primary tabular-nums min-w-[2ch] text-center flex-shrink-0">{taskCount}</span>
                                 </div>
 
                                 {/* Engine meta — hidden on mobile */}
                                 <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
                                     <span className="text-[8px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Groq / Llama 3.3 70B</span>
-                                    <span className="text-white/10">·</span>
+                                    <span className="text-foreground/10">·</span>
                                     <span className="text-[8px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">Latency: Optimized</span>
                                 </div>
                             </div>
@@ -134,7 +134,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                             <Button
                                 onClick={handleGenerate}
                                 disabled={isGenerating || !prompt.trim()}
-                                className="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-[#030408] font-black h-10 rounded-xl px-5 uppercase tracking-widest text-[10px] shadow-lg shadow-cyan-500/20 gap-2 flex-shrink-0 transition-all"
+                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-black h-10 rounded-xl px-5 uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 gap-2 flex-shrink-0 transition-all font-heading"
                             >
                                 {isGenerating ? (
                                     <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
@@ -154,8 +154,8 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                     {/* Section header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="space-y-0.5">
-                            <h3 className="text-base sm:text-lg font-heading font-black text-white uppercase italic tracking-tight">
-                                Generated <span className="text-cyan-400">Milestones</span>
+                            <h3 className="text-base sm:text-lg font-heading font-black text-foreground uppercase italic tracking-tight">
+                                Generated <span className="text-primary">Milestones</span>
                             </h3>
                             <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
                                 {selectedIndices.length} of {currentGen.generated_tasks.length} selected
@@ -168,7 +168,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                 variant="ghost"
                                 onClick={() => setSelectedIndices(currentGen.generated_tasks.map((_, i) => i))}
                                 disabled={selectedIndices.length === currentGen.generated_tasks.length}
-                                className="flex-shrink-0 text-muted-foreground/40 hover:text-white uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
+                                className="flex-shrink-0 text-muted-foreground/40 hover:text-foreground uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
                             >
                                 All
                             </Button>
@@ -176,14 +176,14 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                 variant="ghost"
                                 onClick={() => setSelectedIndices([])}
                                 disabled={selectedIndices.length === 0}
-                                className="flex-shrink-0 text-muted-foreground/40 hover:text-white uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
+                                className="flex-shrink-0 text-muted-foreground/40 hover:text-foreground uppercase font-black text-[9px] tracking-widest h-8 px-3 disabled:opacity-30"
                             >
                                 None
                             </Button>
                             <Button
                                 onClick={handleAccept}
                                 disabled={isGenerating || selectedIndices.length === 0}
-                                className="flex-shrink-0 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-[#030408] font-black h-9 rounded-xl px-4 sm:px-5 uppercase tracking-widest text-[9px] shadow-lg shadow-emerald-500/20 gap-2 transition-all"
+                                className="flex-shrink-0 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-black h-9 rounded-xl px-4 sm:px-5 uppercase tracking-widest text-[9px] shadow-lg shadow-emerald-500/20 gap-2 transition-all"
                             >
                                 <CheckCircle2 className="h-3.5 w-3.5" />
                                 Deploy {selectedIndices.length} {selectedIndices.length === 1 ? 'Task' : 'Tasks'}
@@ -202,7 +202,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                     className={`border transition-all duration-200 group cursor-pointer ${
                                         isSelected
                                             ? 'bg-emerald-500/[0.04] border-emerald-500/40'
-                                            : 'bg-white/[0.02] border-white/[0.06] hover:border-cyan-500/25 hover:bg-white/[0.035]'
+                                            : 'bg-muted/10 border-border/50 hover:border-primary/25 hover:bg-accent/30'
                                     }`}
                                 >
                                     <CardContent className="p-3 sm:p-4 flex items-start gap-3 sm:gap-4">
@@ -223,7 +223,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                         {/* Task body */}
                                         <div className="flex-1 space-y-1.5 min-w-0">
                                             <h4 className={`text-sm font-bold transition-colors leading-snug ${
-                                                isSelected ? 'text-emerald-400' : 'text-white group-hover:text-cyan-400'
+                                                isSelected ? 'text-emerald-400' : 'text-foreground group-hover:text-primary'
                                             }`}>
                                                 {task.title}
                                             </h4>
@@ -238,7 +238,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                                     <Flag className="h-3 w-3 text-muted-foreground/20 flex-shrink-0" />
                                                     <Badge
                                                         variant="outline"
-                                                        className="text-[8px] border-white/10 text-muted-foreground/60 h-4 px-1.5 uppercase font-black tracking-widest"
+                                                        className="text-[8px] border-border text-muted-foreground/60 h-4 px-1.5 uppercase font-black tracking-widest"
                                                     >
                                                         {task.priority || 'medium'}
                                                     </Badge>
@@ -252,8 +252,8 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                                 )}
 
                                                 {task.suggested_assignee && (
-                                                    <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-cyan-500/70">
-                                                        <div className="h-4 w-4 rounded-md bg-cyan-500/10 flex items-center justify-center text-[8px] font-black flex-shrink-0">
+                                                    <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-primary/70">
+                                                        <div className="h-4 w-4 rounded-md bg-primary/10 flex items-center justify-center text-[8px] font-black flex-shrink-0">
                                                             {task.suggested_assignee.charAt(0).toUpperCase()}
                                                         </div>
                                                         <span className="truncate max-w-[12ch]">{task.suggested_assignee}</span>
@@ -263,7 +263,7 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                                         </div>
 
                                         <ChevronRight className={`h-4 w-4 flex-shrink-0 mt-1 transition-colors ${
-                                            isSelected ? 'text-emerald-500' : 'text-white/10 group-hover:text-cyan-500'
+                                            isSelected ? 'text-emerald-500' : 'text-muted-foreground/20 group-hover:text-primary'
                                         }`} />
                                     </CardContent>
                                 </Card>
