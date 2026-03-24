@@ -790,12 +790,12 @@ const DashboardPage = () => {
                                                             <span className="text-primary font-bold">@{act.actor?.name?.split(' ')[0] || 'System'}</span>{' '}
                                                             {act.description || act.action?.replace(/_/g, ' ')}
                                                         </p>
-                                                        <p className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-widest mt-0.5">
+                                                        <p className="text-[9px] text-muted-foreground/80 font-black uppercase tracking-widest mt-0.5">
                                                             {formatDistanceToNow(new Date(act.created_at || act.timestamp))} ago
                                                         </p>
                                                     </div>
                                                 ))
-                                                : <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest italic">No recent activity</p>
+                                                : <p className="text-[10px] text-muted-foreground/80 font-bold uppercase tracking-widest italic">No recent activity</p>
                                             }
                                         </div>
                                     </div>
