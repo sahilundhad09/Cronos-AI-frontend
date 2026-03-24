@@ -15,6 +15,7 @@ import {
     Sun,
     TrendingUp,
     Users,
+    X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -42,7 +43,6 @@ interface MainLayoutProps {
     children: React.ReactNode;
 }
 
-
 // Error Boundary Component
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
     constructor(props: { children: React.ReactNode }) {
@@ -65,8 +65,8 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
         if (this.state.hasError) {
             return (
                 <div className="min-h-screen flex items-center justify-center bg-background">
-                    <div className="text-center space-y-4">
-                        <h1 className="text-2xl font-black">Something went wrong</h1>
+                    <div className="text-center space-y-4 px-4">
+                        <h1 className="text-xl sm:text-2xl font-black">Something went wrong</h1>
                         <Button onClick={() => window.location.reload()}>
                             Refresh Page
                         </Button>
@@ -169,14 +169,14 @@ const NotificationItem = memo(({
     onMarkAsRead 
 }: any) => (
     <div
-        className={`p-3 rounded-xl transition-colors mb-1 last:mb-0 hover:bg-white/[0.02] group relative ${!notification.is_read ? 'bg-cyan-500/[0.02]' : ''}`}
+        className={`p-3 rounded-xl transition-colors mb-1 last:mb-0 hover:bg-accent/50 group relative ${!notification.is_read ? 'bg-primary/5' : ''}`}
     >
         <div className="flex gap-3">
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                notification.type === 'workspace_invite' ? 'bg-amber-500/10 text-amber-400' :
-                notification.type === 'project_invite' ? 'bg-purple-500/10 text-purple-400' :
-                notification.type === 'task_assigned' ? 'bg-cyan-500/10 text-cyan-400' :
-                'bg-slate-500/10 text-slate-400'
+                notification.type === 'workspace_invite' ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400' :
+                notification.type === 'project_invite' ? 'bg-purple-500/10 text-purple-500 dark:text-purple-400' :
+                notification.type === 'task_assigned' ? 'bg-primary/10 text-primary' :
+                'bg-muted text-muted-foreground'
             }`}>
                 {notification.type === 'workspace_invite' ? <Briefcase className="h-4 w-4" /> :
                  notification.type === 'project_invite' ? <Users className="h-4 w-4" /> :
@@ -184,12 +184,12 @@ const NotificationItem = memo(({
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start gap-3 mb-1.5 flex-wrap">
-                    <p className="text-[11px] font-black text-white leading-tight break-words flex-1">{notification.title}</p>
-                    <span className="text-[8px] font-bold text-slate-600 whitespace-nowrap pt-0.5">
+                    <p className="text-[11px] font-black text-foreground leading-tight break-words flex-1">{notification.title}</p>
+                    <span className="text-[8px] font-bold text-muted-foreground whitespace-nowrap pt-0.5">
                         {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true }).replace('about ', '')}
                     </span>
                 </div>
-                <p className="text-[10px] text-slate-400 leading-relaxed mb-2 font-medium break-words">
+                <p className="text-[10px] text-muted-foreground leading-relaxed mb-2 font-medium break-words">
                     {notification.message}
                 </p>
                 {notification.type === 'workspace_invite' && !notification.is_read && (
@@ -199,7 +199,7 @@ const NotificationItem = memo(({
                                 Signal Corrupted: Missing Auth Token
                             </p>
                         )}
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                             <Button
                                 size="sm"
                                 disabled={!notification.meta?.token}
@@ -211,7 +211,7 @@ const NotificationItem = memo(({
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-7 px-3 text-slate-500 hover:text-white font-black text-[9px] uppercase tracking-tighter rounded-lg"
+                                className="h-7 px-3 text-muted-foreground hover:text-foreground font-black text-[9px] uppercase tracking-tighter rounded-lg"
                                 onClick={() => onDeclineWorkspaceInvite(notification.meta?.token, notification.id)}
                             >
                                 Decline
@@ -226,21 +226,19 @@ const NotificationItem = memo(({
                                 Signal Corrupted: Missing Auth Token
                             </p>
                         )}
-                        <div className="flex gap-2">
-                            <Button
-                                size="sm"
-                                className="h-7 px-3 bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black text-[9px] uppercase tracking-tighter rounded-lg"
-                                onClick={() => onAcceptProjectInvite(notification.meta.projectId, notification.meta.invitationId, notification.id)}
-                            >
-                                Authorize Entry
-                            </Button>
-                        </div>
+                        <Button
+                            size="sm"
+                            className="h-7 px-3 bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black text-[9px] uppercase tracking-tighter rounded-lg"
+                            onClick={() => onAcceptProjectInvite(notification.meta.projectId, notification.meta.invitationId, notification.id)}
+                        >
+                            Authorize Entry
+                        </Button>
                     </div>
                 )}
                 {!notification.is_read && notification.type !== 'project_invite' && notification.type !== 'workspace_invite' && (
                     <button
                         onClick={() => onMarkAsRead(notification.id)}
-                        className="text-[9px] font-black text-cyan-400 uppercase tracking-widest hover:text-cyan-300 transition-colors"
+                        className="text-[9px] font-black text-primary uppercase tracking-widest hover:text-primary/80 transition-colors"
                     >
                         Acknowledge
                     </button>
@@ -248,7 +246,7 @@ const NotificationItem = memo(({
             </div>
         </div>
         {!notification.is_read && (
-            <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-cyan-500 rounded-full" />
+            <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-primary rounded-full" />
         )}
     </div>
 ));
@@ -361,7 +359,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 e.preventDefault();
                 setIsSearchOpen((open) => !open);
             }
-            // Escape key to close search
             if (e.key === 'Escape' && isSearchOpen) {
                 setIsSearchOpen(false);
             }
@@ -460,9 +457,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (!isInitialized) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="text-center space-y-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-                    <p className="text-sm font-medium text-muted-foreground">Initializing Neural Interface...</p>
+                <div className="text-center space-y-4 px-4">
+                    <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary mx-auto" />
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Initializing Neural Interface...</p>
                 </div>
             </div>
         );
@@ -499,95 +496,112 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
                 {/* Main Content Area */}
                 <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                    {/* Navbar */}
-                    <header className="h-20 border-b border-border px-4 sm:px-6 flex items-center justify-between bg-[hsl(var(--app-header-bg))] backdrop-blur-xl z-40">
-                        <div className="flex items-center gap-4">
-                            {/* Mobile/Desktop Sidebar Toggle (Hamburger) */}
+                    {/* Responsive Navbar */}
+                    <header className="h-16 sm:h-20 border-b border-border px-3 sm:px-4 md:px-6 flex items-center justify-between bg-[hsl(var(--app-header-bg))] backdrop-blur-xl z-40 gap-2">
+                        {/* Left Section - Hamburger & Workspace Info */}
+                        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
+                            {/* Mobile/Desktop Sidebar Toggle */}
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className={`text-foreground hover:bg-accent ${isDesktop && !isSidebarCollapsed ? 'lg:hidden' : 'flex'}`}
-                                onClick={() => isDesktop ? setIsSidebarCollapsed(false) : setIsMobileMenuOpen(true)}
+                                className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 text-foreground hover:bg-accent shrink-0"
+                                onClick={() => isDesktop ? setIsSidebarCollapsed(!isSidebarCollapsed) : setIsMobileMenuOpen(true)}
                             >
-                                <Menu className="h-6 w-6" />
+                                {isMobileMenuOpen && !isDesktop ? (
+                                    <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                                ) : (
+                                    <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
+                                )}
                             </Button>
 
-                            <div className="flex items-center gap-2">
-                                <div className="hidden sm:flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                                    <Layers className="h-4 w-4 text-primary" />
+                            {/* Workspace Icon & Breadcrumb */}
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                <div className="hidden sm:flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 shrink-0">
+                                    <Layers className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
                                 </div>
 
-                                {/* Breadcrumbs / Page Title Placeholder */}
-                                <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground font-bold text-[10px] sm:text-[11px] md:text-xs tracking-widest uppercase overflow-hidden">
-                                    <span className="hover:text-foreground cursor-pointer transition-colors max-w-[80px] sm:max-w-[150px] truncate whitespace-nowrap">
+                                {/* Breadcrumb - Responsive text handling */}
+                                <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground font-bold text-[9px] sm:text-[10px] md:text-[11px] lg:text-xs tracking-widest uppercase overflow-hidden">
+                                    <span className="hover:text-foreground cursor-pointer transition-colors max-w-[100px] sm:max-w-[150px] md:max-w-[200px] truncate whitespace-nowrap">
                                         {activeWorkspace?.name || 'Workspace'}
                                     </span>
-                                    <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground/30 flex-shrink-0" />
-                                    <span className="text-foreground max-w-[100px] sm:max-w-none truncate whitespace-nowrap">
+                                    <ChevronRight className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 text-muted-foreground/30 flex-shrink-0" />
+                                    <span className="text-foreground max-w-[80px] sm:max-w-[120px] md:max-w-[150px] lg:max-w-none truncate whitespace-nowrap">
                                         {location.pathname.split('/')[1]?.charAt(0).toUpperCase() + location.pathname.split('/')[1]?.slice(1) || 'Dashboard'}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
-                            {/* Command Hub Search Trigger */}
+                        {/* Right Section - Actions */}
+                        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 shrink-0">
+                            {/* Search / Command Hub - Hidden on smallest screens */}
                             <button 
                                 onClick={() => setIsSearchOpen(true)}
-                                className="hidden md:flex items-center gap-2 bg-card border border-border px-4 h-11 rounded-xl w-56 lg:w-64 hover:border-primary/40 hover:bg-accent/40 transition-all group text-left"
+                                className="hidden sm:flex items-center gap-2 bg-card border border-border px-2 sm:px-3 md:px-4 h-8 sm:h-9 md:h-10 lg:h-11 rounded-lg sm:rounded-xl w-auto min-w-[120px] sm:min-w-[160px] md:w-48 lg:w-56 xl:w-64 hover:border-primary/40 hover:bg-accent transition-all group text-left shadow-sm"
                             >
-                                <Search className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                                <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest flex-1">
+                                <Search className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-muted-foreground group-hover:text-primary shrink-0" />
+                                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest flex-1 hidden xs:inline">
                                     Command Hub
                                 </span>
-                                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-muted border border-border group-hover:border-primary/20">
-                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">⌘K</span>
+                                <div className="hidden md:flex items-center gap-1 px-1 py-0.5 rounded-lg bg-muted border border-border group-hover:border-primary/20">
+                                    <span className="text-[7px] sm:text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-tighter">⌘K</span>
                                 </div>
                             </button>
 
+                            {/* Mobile Search Button */}
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl"
+                                className="sm:hidden h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg"
+                                onClick={() => setIsSearchOpen(true)}
+                            >
+                                <Search className="h-4 w-4" />
+                            </Button>
+
+                            {/* Theme Toggle */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg sm:rounded-xl"
                                 onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
                                 aria-label="Toggle theme mode"
-                                title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
                             >
-                                {mode === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                                {mode === 'dark' ? <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" /> : <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />}
                             </Button>
 
                             {/* Notifications */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary hover:bg-accent rounded-xl">
-                                        <Bell className="h-5 w-5" />
+                                    <Button variant="ghost" size="icon" className="relative h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg sm:rounded-xl">
+                                        <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                                         <AnimatePresence>
                                             {unreadCount > 0 && (
                                                 <motion.span
                                                     initial={{ scale: 0 }}
                                                     animate={{ scale: 1 }}
                                                     exit={{ scale: 0 }}
-                                                    className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background"
+                                                    className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full border-2 border-background"
                                                 />
                                             )}
                                         </AnimatePresence>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-[calc(100vw-2rem)] sm:w-[420px] bg-popover border-border text-popover-foreground rounded-2xl p-2" align="end" sideOffset={12}>
+                                <DropdownMenuContent className="w-[calc(100vw-2rem)] sm:w-[380px] md:w-[420px] bg-popover border-border text-popover-foreground rounded-xl sm:rounded-2xl p-2 mx-2 sm:mx-0" align="end" sideOffset={8} side="bottom">
                                     <DropdownMenuLabel className="flex justify-between items-center px-2 py-1.5 flex-wrap gap-2">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 shrink-0">Neural Signals</span>
+                                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 shrink-0">Neural Signals</span>
                                         {unreadCount > 0 && (
-                                            <span className="text-[9px] font-black bg-cyan-500/10 text-cyan-400 px-1.5 py-0.5 rounded-full shrink-0">
+                                            <span className="text-[8px] sm:text-[9px] font-black bg-primary/10 text-primary px-1.5 py-0.5 rounded-full shrink-0">
                                                 {unreadCount} Pending
                                             </span>
                                         )}
                                     </DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-white/5" />
-                                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                    <DropdownMenuSeparator className="bg-border/50" />
+                                    <div className="max-h-[350px] sm:max-h-[400px] overflow-y-auto custom-scrollbar">
                                         {notifications.length === 0 ? (
-                                            <div className="p-8 text-center">
-                                                <Bell className="h-8 w-8 text-muted-foreground mx-auto mb-3 opacity-30" />
-                                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">No Active Signals</p>
+                                            <div className="p-6 sm:p-8 text-center">
+                                                <Bell className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground mx-auto mb-2 sm:mb-3 opacity-30" />
+                                                <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-widest">No Active Signals</p>
                                             </div>
                                         ) : (
                                             notifications.map((n) => (
@@ -603,7 +617,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                         )}
                                     </div>
                                     <DropdownMenuSeparator className="bg-border" />
-                                    <DropdownMenuItem className="justify-center text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-white rounded-xl py-2 cursor-pointer">
+                                    <DropdownMenuItem className="justify-center text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground rounded-lg sm:rounded-xl py-2 cursor-pointer">
                                         Signal History
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -612,41 +626,43 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                             {/* User Profile */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="relative h-10 w-10 rounded-xl hover:bg-white/5 p-0">
-                                        <Avatar className="h-10 w-10 rounded-xl border border-white/10 group-hover:border-cyan-500/30 transition-all">
+                                    <Button variant="ghost" className="relative h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg sm:rounded-xl hover:bg-accent p-0 shrink-0">
+                                        <Avatar className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg sm:rounded-xl border border-border group-hover:border-primary/30 transition-all">
                                             <AvatarImage src={user?.avatar_url} />
-                                            <AvatarFallback className="bg-cyan-500 text-[#030408] font-black">
+                                            <AvatarFallback className="bg-primary text-primary-foreground font-black text-xs sm:text-sm">
                                                 {user?.name?.substring(0, 2).toUpperCase()}
                                             </AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-64 max-w-[calc(100vw-2rem)] bg-popover border-border text-popover-foreground rounded-2xl p-2" align="end" forceMount sideOffset={12}>
+                                <DropdownMenuContent className="w-56 sm:w-64 max-w-[calc(100vw-2rem)] bg-popover border-border text-popover-foreground rounded-xl sm:rounded-2xl p-2 mx-2 sm:mx-0" align="end" sideOffset={8} side="bottom">
                                     <DropdownMenuLabel className="font-normal overflow-hidden">
-                                        <div className="flex flex-col space-y-1.5 p-2">
-                                            <p className="text-sm font-black leading-tight tracking-tight break-words">{user?.name}</p>
-                                            <p className="text-[10px] leading-tight text-slate-500 font-bold uppercase tracking-wider break-all">{user?.email}</p>
+                                        <div className="flex flex-col space-y-1 p-2">
+                                            <p className="text-xs sm:text-sm font-black leading-tight tracking-tight break-words">{user?.name}</p>
+                                            <p className="text-[8px] sm:text-[9px] md:text-[10px] leading-tight text-muted-foreground font-bold uppercase tracking-wider break-all">{user?.email}</p>
                                         </div>
                                     </DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-white/5" />
-                                    <DropdownMenuItem className="rounded-xl hover:bg-cyan-500 hover:text-[#030408] font-bold uppercase text-[10px] tracking-widest transition-colors cursor-pointer p-3" onClick={() => navigate('/profile')}>
+                                    <DropdownMenuSeparator className="bg-border/50" />
+                                    <DropdownMenuItem className="rounded-lg sm:rounded-xl hover:bg-primary hover:text-primary-foreground font-bold uppercase text-[9px] sm:text-[10px] tracking-widest transition-colors cursor-pointer p-2 sm:p-3" onClick={() => navigate('/profile')}>
                                         Profile Protocol
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="rounded-xl hover:bg-primary hover:text-primary-foreground font-bold uppercase text-[10px] tracking-widest transition-colors cursor-pointer p-3" onClick={() => navigate(activeWorkspace?.id ? `/workspaces/${activeWorkspace.id}/settings` : '/dashboard')}>
+                                    <DropdownMenuItem className="rounded-lg sm:rounded-xl hover:bg-accent hover:text-accent-foreground font-bold uppercase text-[9px] sm:text-[10px] tracking-widest transition-colors cursor-pointer p-2 sm:p-3" onClick={() => navigate(activeWorkspace?.id ? `/workspaces/${activeWorkspace.id}/settings` : '/dashboard')}>
                                         Settings
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="rounded-xl hover:bg-cyan-500 hover:text-[#030408] font-bold uppercase text-[10px] tracking-widest transition-colors cursor-pointer p-3" onClick={() => navigate('/theme-selector')}>
+                                    <DropdownMenuItem className="rounded-lg sm:rounded-xl hover:bg-primary hover:text-primary-foreground font-bold uppercase text-[9px] sm:text-[10px] tracking-widest transition-colors cursor-pointer p-2 sm:p-3" onClick={() => navigate('/theme-selector')}>
                                         Theme Selector
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="bg-white/5" />
-                                    <DropdownMenuItem className="rounded-xl hover:bg-red-500/20 hover:text-red-400 font-bold uppercase text-[10px] tracking-widest transition-colors cursor-pointer p-3" onClick={handleLogout}>
+                                    <DropdownMenuSeparator className="bg-border/50" />
+                                    <DropdownMenuItem className="rounded-lg sm:rounded-xl hover:bg-destructive/10 hover:text-destructive font-bold uppercase text-[9px] sm:text-[10px] tracking-widest transition-colors cursor-pointer p-2 sm:p-3" onClick={handleLogout}>
                                         Terminate Session
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
-                        <CommandHub isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
                     </header>
+
+                    {/* Command Hub Modal */}
+                    <CommandHub isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
 
                     {/* Dynamic Page Content */}
                     <main className="flex-1 overflow-y-auto bg-[linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--card)/0.35)_100%)]">

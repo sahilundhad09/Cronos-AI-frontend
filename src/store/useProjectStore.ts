@@ -9,6 +9,7 @@ export interface Project {
     description: string;
     status: 'active' | 'archived' | 'completed';
     progress: number;
+    color?: string;
     image_url?: string;
     created_at: string;
     updated_at: string;
@@ -25,7 +26,7 @@ interface ProjectState {
     error: string | null;
     fetchProjects: (workspaceId: string) => Promise<void>;
     fetchProjectById: (projectId: string) => Promise<void>;
-    createProject: (workspaceId: string, data: { name: string; description?: string }) => Promise<void>;
+    createProject: (workspaceId: string, data: { name: string; description?: string; color?: string }) => Promise<void>;
     setActiveProject: (project: Project | null) => void;
     fetchProjectMembers: (projectId: string) => Promise<void>;
     inviteToProject: (projectId: string, workspaceMemberId: string, role: string) => Promise<void>;
@@ -77,7 +78,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
         }
     },
 
-    createProject: async (workspaceId: string, data) => {
+    createProject: async (workspaceId: string, data: { name: string; description?: string; color?: string }) => {
         set({ isLoading: true, error: null });
         try {
             const response = await api.post(`/workspaces/${workspaceId}/projects`, data);

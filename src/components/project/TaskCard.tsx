@@ -210,11 +210,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                         <div className="flex items-center gap-2 text-muted-foreground/60">
                                             <div className="flex items-center gap-1">
                                                 <MessageSquare className="h-2.5 w-2.5" />
-                                                <span className="text-[8px] font-black tracking-widest">2</span>
+                                                <span className="text-[8px] font-black tracking-widest">{task.comment_count || 0}</span>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <Paperclip className="h-2.5 w-2.5" />
-                                                <span className="text-[8px] font-black tracking-widest">1</span>
+                                                <span className="text-[8px] font-black tracking-widest">{task.attachment_count || 0}</span>
                                             </div>
                                         </div>
                                     </div>

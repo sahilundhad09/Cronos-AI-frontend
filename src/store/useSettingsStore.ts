@@ -9,6 +9,7 @@ export interface Project {
     name: string;
     description: string | null;
     color: string | null;
+    image_url: string | null;
     start_date: string | null;
     end_date: string | null;
     archived: boolean;
@@ -115,6 +116,7 @@ interface SettingsState {
     updateProject: (projectId: string, data: Partial<Project>) => Promise<void>;
     archiveProject: (projectId: string, archived: boolean) => Promise<void>;
     deleteProject: (projectId: string) => Promise<void>;
+    uploadProjectImage: (projectId: string, file: File) => Promise<void>;
 
     // Workspace actions
     loadWorkspaceSettings: (workspaceId: string) => Promise<void>;
@@ -244,6 +246,36 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
             const message = error.response?.data?.message || 'Failed to delete project';
             set({ error: message, isSaving: false });
             toast.error('Delete Error', { description: message });
+            throw error;
+        }
+    },
+
+    uploadProjectImage: async (projectId: string, file: File) => {
+        set({ isSaving: true, error: null });
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const response = await api.post(`/projects/${projectId}/image`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            set({
+                currentProject: response.data.data,
+                isSaving: false
+            });
+            
+            toast.success('Project Emblem Uplinked', {
+                description: 'Mission identity has been synchronized.',
+            });
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to upload project image';
+            set({ error: message, isSaving: false });
+            toast.error('Uplink Failed', {
+                description: message,
+            });
             throw error;
         }
     },

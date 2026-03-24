@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Brain, Loader2, Zap, ShieldCheck, Eye, EyeOff, Lock, Key, Shield } from 'lucide-react';
+import { Loader2, Zap, ShieldCheck, Eye, EyeOff, Lock, Key, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -179,9 +179,10 @@ const LoginPage = () => {
                 {/* Home Link - Top Left */}
                 <Link to="/" className="absolute top-12 left-12 flex items-center gap-3 group z-20">
                     <div className="bg-white/5 p-2 rounded-xl group-hover:bg-cyan-500 transition-all duration-500">
-                        <Brain className="h-6 w-6 text-cyan-400 group-hover:text-[#030408]" />
+                        {/* <Brain className="h-6 w-6 text-cyan-400 group-hover:text-[#030408]" /> */}
+                        <img src="/favicon.png" alt="Cronos AI" className="h-12 w-12 rounded-xl" />
                     </div>
-                    <span className="font-heading font-black text-2xl tracking-tighter">Cronos AI</span>
+                    <span className="font-heading font-black text-3xl tracking-tighter">Cronos AI</span>
                 </Link>
 
                 <motion.div
@@ -216,7 +217,8 @@ const LoginPage = () => {
                 <div className="w-full max-w-md space-y-12">
                     {/* Logo for mobile */}
                     <Link to="/" className="lg:hidden flex items-center gap-3 justify-center mb-12 animate-fade-in">
-                        <Brain className="h-8 w-8 text-cyan-500" />
+                        {/* <Brain className="h-8 w-8 text-cyan-500" /> */}
+                        <img src="/favicon.png" alt="Cronos AI" className="h-10 w-10 rounded-xl" />
                         <span className="font-heading font-black text-2xl tracking-tighter">Cronos AI</span>
                     </Link>
 

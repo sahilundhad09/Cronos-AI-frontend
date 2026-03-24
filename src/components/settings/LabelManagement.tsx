@@ -124,28 +124,28 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                 <div>
-                    <h2 className="text-xl font-heading font-black text-foreground uppercase tracking-tight italic">
+                    <h2 className="text-lg sm:text-xl font-heading font-black text-foreground uppercase tracking-tight italic">
                         Project Labels
                     </h2>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-black mt-1.5">
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-black mt-1 sm:mt-1.5 opacity-70 leading-relaxed">
                         Create and manage labels to organize your tasks
                     </p>
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest px-8 shadow-lg shadow-primary/20">
+                        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest px-8 shadow-lg shadow-primary/20 h-10">
                             <Plus className="h-4 w-4 mr-2" />
                             New Label
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-card border-border shadow-2xl">
                         <DialogHeader>
-                            <DialogTitle className="text-xl font-heading font-black uppercase tracking-tight italic text-foreground">
+                            <DialogTitle className="text-lg sm:text-xl font-heading font-black uppercase tracking-tight italic text-foreground text-left">
                                 Create New Label
                             </DialogTitle>
-                            <DialogDescription className="text-muted-foreground text-xs font-semibold leading-relaxed">
+                            <DialogDescription className="text-muted-foreground text-[11px] sm:text-xs font-semibold leading-relaxed text-left">
                                 Add a new label to categorize your tasks in the neural network.
                             </DialogDescription>
                         </DialogHeader>
@@ -219,51 +219,53 @@ export const LabelManagement: React.FC<LabelManagementProps> = ({ projectId }) =
 
             {/* Search */}
             {projectLabels.length > 0 && (
-                <div className="relative group/search mb-6">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 group-focus-within/search:text-primary transition-colors" />
+                <div className="relative group/search mb-4 sm:mb-6">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground/50 group-focus-within/search:text-primary transition-colors" />
                     <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Filter labels by name..."
-                        className="pl-11 bg-secondary/30 border-border text-foreground h-12 focus:border-primary/50 transition-all font-semibold italic text-sm"
+                        className="pl-10 sm:pl-11 bg-secondary/30 border-border text-foreground h-10 sm:h-12 focus:border-primary/50 transition-all font-black uppercase text-[10px] sm:text-[11px] tracking-tight placeholder:opacity-50"
                     />
                 </div>
             )}
 
             {/* Labels List */}
-            <div className="bg-card/50 border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-card/30 border border-border rounded-xl shadow-sm overflow-hidden">
                 {filteredLabels.length === 0 ? (
                     <div className="p-16 text-center">
-                        <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.1em] italic">
+                        <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] italic opacity-50">
                             {searchQuery ? 'Zero matches found in terminal.' : 'No active labels detected in this sector.'}
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-border">
+                    <div className="divide-y divide-border/50">
                         {filteredLabels.map((label) => (
                             <div
                                 key={label.id}
-                                className="p-5 flex items-center justify-between hover:bg-primary/[0.02] transition-colors group"
+                                className="p-4 sm:p-5 flex flex-col xs:flex-row xs:items-center justify-between hover:bg-secondary/10 transition-colors group gap-3 xs:gap-4"
                             >
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 sm:gap-4">
                                     <div
-                                        className="w-3.5 h-3.5 rounded-full shadow-sm ring-1 ring-border"
+                                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full shadow-sm ring-1 ring-border shrink-0"
                                         style={{ backgroundColor: label.color }}
                                     />
-                                    <span className="text-foreground font-black uppercase text-[13px] tracking-tight">{label.name}</span>
-                                    <Badge
-                                        variant="outline"
-                                        className="text-[9px] border-border text-muted-foreground font-black uppercase tracking-widest h-4.5 px-2 bg-secondary/30"
-                                        style={{
-                                            backgroundColor: `${label.color}10`,
-                                            borderColor: `${label.color}20`,
-                                            color: label.color
-                                        }}
-                                    >
-                                        {label.color}
-                                    </Badge>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="text-foreground font-black uppercase text-[11px] sm:text-[12px] tracking-tight truncate max-w-[120px] sm:max-w-none">{label.name}</span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-[8px] sm:text-[9px] border-border/50 text-muted-foreground font-black uppercase tracking-[0.15em] h-4 sm:h-4.5 px-1.5 sm:px-2 bg-secondary/20 shrink-0"
+                                            style={{
+                                                backgroundColor: `${label.color}15`,
+                                                borderColor: `${label.color}30`,
+                                                color: label.color
+                                            }}
+                                        >
+                                            {label.color}
+                                        </Badge>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center justify-end gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                     <Dialog
                                         open={editingLabel?.id === label.id}
                                         onOpenChange={(open) => {

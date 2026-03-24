@@ -273,9 +273,10 @@ const SidebarContent = memo<SidebarContentProps>(({
         {/* ── Logo ── */}
         <div className="px-5 pt-7 pb-6 flex-shrink-0 flex items-center justify-between relative">
             <Link to="/" onClick={onClose} className="flex items-center gap-3 group text-left">
-                <div className="bg-gradient-to-br from-primary to-primary/70 p-2 rounded-xl shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all group-hover:scale-105">
-                    <Brain className="h-5 w-5 text-primary-foreground" />
-                </div>
+                {/* <div className="bg-gradient-to-br from-primary to-primary/70 p-2 rounded-xl shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all group-hover:scale-105"> */}
+                    {/* <Brain className="h-5 w-5 text-primary-foreground" /> */}
+                    <img src="/favicon.png" alt="Cronos AI" className="h-10 w-10 rounded-xl" />
+                {/* </div> */}
                 <div className="flex flex-col">
                     <span className="font-heading font-black text-xl tracking-tighter text-foreground uppercase italic leading-none">
                         Cronos <span className="text-primary">AI</span>

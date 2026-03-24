@@ -183,15 +183,32 @@ const ProjectDetailsPage = () => {
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
                         {/* Project identity */}
-                        <div className="flex items-start gap-3 min-w-0">
-                            <div className="mt-0.5 p-2 rounded-xl bg-primary/10 border border-primary/20 flex-shrink-0">
-                                <Target className="h-5 w-5 text-primary" />
+                        <div className="flex items-start gap-4 min-w-0">
+                            <div 
+                                className="mt-0.5 w-14 h-14 rounded-2xl border flex-shrink-0 flex items-center justify-center overflow-hidden transition-all duration-500 shadow-xl group/icon"
+                                style={{ 
+                                    backgroundColor: project.color ? `${project.color}15` : 'rgba(var(--primary),0.1)',
+                                    borderColor: project.color ? `${project.color}30` : 'rgba(var(--primary),0.2)'
+                                }}
+                            >
+                                {project.image_url ? (
+                                    <img 
+                                        src={project.image_url} 
+                                        alt={project.name} 
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover/icon:scale-110" 
+                                    />
+                                ) : (
+                                    <Target 
+                                        className="h-6 w-6 transition-colors duration-500" 
+                                        style={{ color: project.color || 'var(--primary)' }}
+                                    />
+                                )}
                             </div>
-                            <div className="min-w-0 space-y-1">
-                                <h1 className="text-xl sm:text-2xl lg:text-[1.75rem] font-heading font-black tracking-tighter uppercase italic text-foreground truncate leading-none">
+                            <div className="min-w-0 space-y-1.5 pt-1">
+                                <h1 className="text-xl sm:text-2xl lg:text-[1.85rem] font-heading font-black tracking-tighter uppercase italic text-foreground truncate leading-none">
                                     {project.name}
                                 </h1>
-                                <p className="text-muted-foreground font-bold uppercase text-[9px] tracking-widest leading-relaxed line-clamp-1 max-w-xl">
+                                <p className="text-muted-foreground font-bold uppercase text-[9px] tracking-[0.15em] leading-relaxed line-clamp-1 max-w-xl opacity-70">
                                     {project.description || 'No primary objective defined for this orchestration.'}
                                 </p>
                             </div>
@@ -684,6 +701,32 @@ const ProjectDetailsPage = () => {
                                                         className="bg-muted/40 border-border rounded-xl min-h-[120px] text-foreground/90 font-bold"
                                                         placeholder="Define the core mission objective..."
                                                     />
+                                                </div>
+
+                                                <div className="space-y-3 pt-2">
+                                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Neural Color Signature</Label>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#6366F1'].map((c) => (
+                                                                <button
+                                                                    key={c}
+                                                                    type="button"
+                                                                    onClick={() => updateProject(project.id, { color: c })}
+                                                                    className={`w-8 h-8 rounded-lg border-2 transition-all ${project.color === c ? 'border-primary ring-2 ring-primary/20 scale-110' : 'border-border hover:border-primary/30'}`}
+                                                                    style={{ backgroundColor: c }}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/40 border border-border">
+                                                            <Input 
+                                                                type="color"
+                                                                value={project.color || '#3B82F6'}
+                                                                onChange={(e) => updateProject(project.id, { color: e.target.value })}
+                                                                className="w-10 h-8 p-0 border-none bg-transparent cursor-pointer"
+                                                            />
+                                                            <span className="text-[10px] font-mono font-bold uppercase opacity-50">{project.color || '#3B82F6'}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <div className="space-y-2">

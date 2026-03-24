@@ -42,9 +42,10 @@ const LandingPage = () => {
             {/* Navigation */}
             <header className="px-6 lg:px-12 h-20 flex items-center border-b border-border sticky top-0 bg-background/80 backdrop-blur-xl z-50">
                 <Link className="flex items-center gap-2.5 group" to="/">
-                    <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-xl shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-all duration-300">
+                    {/* <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-xl shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-all duration-300">
                         <Brain className="h-6 w-6 text-[#030408]" />
-                    </div>
+                    </div> */}
+                    <img src="/favicon.png" alt="Cronos AI" className="h-8 w-8 rounded-xl" />
                     <span className="font-heading font-extrabold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60">
                         Cronos AI
                     </span>
@@ -287,9 +288,10 @@ const LandingPage = () => {
                 <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
                     <div className="flex flex-col items-center md:items-start gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="bg-foreground/5 p-2 rounded-xl">
+                            <img src="/favicon.png" alt="Cronos AI" className="h-8 w-8 rounded-xl" />
+                            {/* <div className="bg-foreground/5 p-2 rounded-xl">
                                 <Brain className="h-6 w-6 text-cyan-400" />
-                            </div>
+                            </div> */}
                             <span className="font-heading font-bold text-2xl tracking-tight">Cronos AI</span>
                         </div>
                         <p className="text-sm text-muted-foreground font-bold tracking-widest uppercase">The Apex of Project Management</p>

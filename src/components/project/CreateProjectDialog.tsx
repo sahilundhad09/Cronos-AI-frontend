@@ -29,6 +29,7 @@ const CreateProjectDialog: React.FC<CreateProjectDialogProps> = ({ trigger }) =>
     const [isOpen, setIsOpen] = useState(false);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [color, setColor] = useState('#3B82F6');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -48,7 +49,8 @@ const CreateProjectDialog: React.FC<CreateProjectDialogProps> = ({ trigger }) =>
         try {
             const project = await createProject(activeWorkspace.id, {
                 name,
-                description
+                description,
+                color
             }) as any;
 
             if (project && selectedFile) {
@@ -109,6 +111,30 @@ const CreateProjectDialog: React.FC<CreateProjectDialogProps> = ({ trigger }) =>
                                 className="bg-secondary/30 border-border rounded-xl h-12 focus:border-primary/50 transition-all font-bold"
                                 placeholder="Define mission focus..."
                             />
+                        </div>
+
+                        {/* Color Picker */}
+                        <div className="space-y-3">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Tactical Identity Color</Label>
+                            <div className="flex items-center gap-3">
+                                <div className="flex flex-wrap gap-2">
+                                    {['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'].map((c) => (
+                                        <button
+                                            key={c}
+                                            type="button"
+                                            onClick={() => setColor(c)}
+                                            className={`w-8 h-8 rounded-lg border-2 transition-all ${color === c ? 'border-primary ring-2 ring-primary/20 scale-110' : 'border-border hover:border-primary/30'}`}
+                                            style={{ backgroundColor: c }}
+                                        />
+                                    ))}
+                                </div>
+                                <Input
+                                    type="color"
+                                    value={color}
+                                    onChange={(e) => setColor(e.target.value)}
+                                    className="w-12 h-8 p-0 border-none bg-transparent cursor-pointer"
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-3">

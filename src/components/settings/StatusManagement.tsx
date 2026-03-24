@@ -145,29 +145,29 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                 <div>
-                    <h2 className="text-xl font-heading font-black text-foreground uppercase tracking-tight italic">
+                    <h2 className="text-lg sm:text-xl font-heading font-black text-foreground uppercase tracking-tight italic">
                         Task Statuses
                     </h2>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-black mt-1.5">
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-black mt-1 sm:mt-1.5 opacity-70 leading-relaxed">
                         Manage the columns in your Kanban board
                     </p>
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest px-8 shadow-lg shadow-primary/20">
+                        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest px-8 shadow-lg shadow-primary/20 h-10">
                             <Plus className="h-4 w-4 mr-2" />
                             New Status
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-card border-border shadow-2xl">
                         <DialogHeader>
-                            <DialogTitle className="text-xl font-heading font-black uppercase tracking-tight italic text-foreground">
+                            <DialogTitle className="text-lg sm:text-xl font-heading font-black uppercase tracking-tight italic text-foreground text-left">
                                 Create New Status
                             </DialogTitle>
-                            <DialogDescription className="text-muted-foreground text-xs font-semibold leading-relaxed">
-                                Add a new status column to your Kanban board.
+                            <DialogDescription className="text-muted-foreground text-[11px] sm:text-xs font-semibold leading-relaxed text-left">
+                                Add a new status column to your Kanban board sector.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-6 py-4">
@@ -239,35 +239,37 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
             </div>
 
             {/* Statuses List */}
-            <div className="bg-card/50 border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-card/30 border border-border rounded-xl shadow-sm overflow-hidden">
                 {sortedStatuses.length === 0 ? (
                     <div className="p-16 text-center">
-                        <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.1em] italic">
+                        <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] italic opacity-50">
                             No active statuses detected. Configure terminal columns.
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-border">
+                    <div className="divide-y divide-border/50">
                         {sortedStatuses.map((status) => (
                             <div
                                 key={status.id}
-                                className="p-5 flex items-center justify-between hover:bg-primary/[0.02] transition-colors group"
+                                className="p-4 sm:p-5 flex flex-col xs:flex-row xs:items-center justify-between hover:bg-secondary/10 transition-colors group gap-3 xs:gap-4"
                             >
-                                <div className="flex items-center gap-4">
-                                    <GripVertical className="h-5 w-5 text-muted-foreground/30 cursor-grab active:cursor-grabbing" />
+                                <div className="flex items-center gap-3 sm:gap-4">
+                                    <GripVertical className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground/30 cursor-grab active:cursor-grabbing shrink-0" />
                                     <div
-                                        className="w-3.5 h-3.5 rounded-full shadow-sm ring-1 ring-border"
+                                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full shadow-sm ring-1 ring-border shrink-0"
                                         style={{ backgroundColor: status.color }}
                                     />
-                                    <span className="text-foreground font-black uppercase text-[13px] tracking-tight">{status.name}</span>
-                                    <Badge
-                                        variant="outline"
-                                        className="text-[9px] border-border text-muted-foreground font-black uppercase tracking-widest px-2 py-0 h-4.5 bg-secondary/30"
-                                    >
-                                        Position {status.position + 1}
-                                    </Badge>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="text-foreground font-black uppercase text-[11px] sm:text-[12px] tracking-tight truncate max-w-[120px] sm:max-w-none">{status.name}</span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-[8px] sm:text-[9px] border-border/50 text-muted-foreground font-black uppercase tracking-[0.15em] px-1.5 sm:px-2 py-0 h-4 sm:h-4.5 bg-secondary/20 shrink-0"
+                                        >
+                                            Sector {status.position + 1}
+                                        </Badge>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center justify-end gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                     <Dialog
                                         open={editingStatus?.id === status.id}
                                         onOpenChange={(open) => {
@@ -282,7 +284,7 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest"
+                                                className="text-muted-foreground hover:text-foreground font-black uppercase text-[9px] sm:text-[10px] tracking-widest h-8"
                                             >
                                                 Edit Parameters
                                             </Button>
@@ -362,7 +364,7 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                         size="sm"
                                         onClick={() => handleDeleteClick(status)}
                                         disabled={sortedStatuses.length === 1}
-                                        className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 disabled:opacity-30 transition-all rounded-lg"
+                                        className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 disabled:opacity-30 transition-all rounded-lg h-8 w-8 p-0 shrink-0"
                                         title={sortedStatuses.length === 1 ? 'Last status retention active' : 'Terminate status'}
                                     >
                                         <Trash2 className="h-4 w-4" />
@@ -376,12 +378,12 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent className="bg-card border-destructive/20 shadow-2xl">
+                <DialogContent className="bg-card border-destructive/20 shadow-2xl max-w-[95vw] sm:max-w-lg rounded-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-heading font-black uppercase tracking-tight italic text-destructive">
+                        <DialogTitle className="text-lg sm:text-xl font-heading font-black uppercase tracking-tight italic text-destructive text-left">
                             Decommission Status
                         </DialogTitle>
-                        <DialogDescription className="text-muted-foreground text-xs font-semibold leading-relaxed">
+                        <DialogDescription className="text-muted-foreground text-[11px] sm:text-xs font-semibold leading-relaxed text-left">
                             Terminal operation detected. Re-route active task data to an alternative sector.
                         </DialogDescription>
                     </DialogHeader>

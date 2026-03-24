@@ -14,7 +14,20 @@ export interface Task {
     completed_at?: string;
     created_at: string;
     updated_at: string;
-    assignees?: any[];
+    comment_count?: number;
+    attachment_count?: number;
+    subtask_count?: number;
+    completed_subtasks?: number;
+    assignees?: {
+        id: string;
+        user: {
+            id: string;
+            name: string;
+            email: string;
+            avatar_url?: string;
+        };
+        assigned_at: string;
+    }[];
     tags?: any[];
 }
 
