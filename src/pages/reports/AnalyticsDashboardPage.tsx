@@ -525,27 +525,27 @@ const AnalyticsDashboardPage = () => {
                             >
                                 <Card className="bg-gradient-to-br from-purple-500/[0.03] to-cyan-500/[0.03] border-purple-500/20 overflow-hidden">
                                     <CardContent className="p-6">
-                                        <div className="flex items-center gap-3 mb-6">
+                                        <div className="flex items-center gap-3 mb-6 pt-4">
                                             <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-white/10">
                                                 <Sparkles className="h-5 w-5 text-purple-400" />
                                             </div>
                                             <div>
-                                                <h3 className="text-sm font-black text-white uppercase tracking-widest">AI Workspace Analysis</h3>
-                                                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                                                <h3 className="text-sm font-black text-primary uppercase tracking-widest">AI Workspace Analysis</h3>
+                                                <p className="text-[9px] text-foreground font-bold uppercase tracking-widest mt-0.5 opacity-70">
                                                     Generated {new Date(aiAnalysis.generated_at).toLocaleString()}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed">
+                                        <div className="prose prose-invert prose-sm max-w-none text-foreground leading-relaxed">
                                             <ReactMarkdown
                                                 components={{
                                                     p: ({ children }) => <p className="mb-3 last:mb-0 text-sm">{children}</p>,
                                                     ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
                                                     ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-1">{children}</ol>,
-                                                    strong: ({ children }) => <strong className="text-white font-black">{children}</strong>,
-                                                    h1: ({ children }) => <h1 className="text-lg font-black text-white mb-2">{children}</h1>,
-                                                    h2: ({ children }) => <h2 className="text-base font-black text-white mb-2">{children}</h2>,
-                                                    h3: ({ children }) => <h3 className="text-sm font-black text-white mb-2">{children}</h3>,
+                                                    strong: ({ children }) => <strong className="text-primary font-black">{children}</strong>,
+                                                    h1: ({ children }) => <h1 className="text-lg font-black text-primary mb-2">{children}</h1>,
+                                                    h2: ({ children }) => <h2 className="text-base font-black text-primary mb-2">{children}</h2>,
+                                                    h3: ({ children }) => <h3 className="text-sm font-black text-primary mb-2">{children}</h3>,
                                                 }}
                                             >
                                                 {aiAnalysis.analysis}
