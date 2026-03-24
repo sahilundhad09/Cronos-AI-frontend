@@ -248,8 +248,12 @@ const ProjectCard = ({
             >
                 {/* Left */}
                 <div className="flex items-center gap-4 min-w-0">
-                    <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-all">
-                        <Briefcase className="h-5 w-5" />
+                    <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-muted border border-border/40 overflow-hidden flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-all">
+                        {project.image_url ? (
+                            <img src={project.image_url} alt={project.name} className="h-full w-full object-cover" />
+                        ) : (
+                            <Briefcase className="h-5 w-5" />
+                        )}
                     </div>
                     <div className="min-w-0 space-y-0.5">
                         <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-colors uppercase tracking-tight truncate">{project.name}</h3>
@@ -295,8 +299,12 @@ const ProjectCard = ({
 
                     {/* Card top */}
                     <div className="flex items-start justify-between mt-3">
-                        <div className="p-2.5 rounded-xl bg-muted group-hover:bg-primary/10 transition-all duration-300">
-                            <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <div className="w-12 h-12 rounded-2xl bg-muted border border-border/40 overflow-hidden flex items-center justify-center group-hover:bg-primary/10 transition-all duration-300">
+                            {project.image_url ? (
+                                <img src={project.image_url} alt={project.name} className="h-full w-full object-cover" />
+                            ) : (
+                                <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                            )}
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>

@@ -9,6 +9,7 @@ export interface Project {
     description: string;
     status: 'active' | 'archived' | 'completed';
     progress: number;
+    image_url?: string;
     created_at: string;
     updated_at: string;
     owner_id: string;
@@ -32,6 +33,7 @@ interface ProjectState {
     acceptProjectInvitation: (projectId: string, invitationId: string) => Promise<void>;
     fetchProjectActivities: (projectId: string) => Promise<void>;
     updateProject: (projectId: string, data: Partial<Project>) => Promise<void>;
+    uploadProjectImage: (projectId: string, file: File) => Promise<void>;
 }
 
 export const useProjectStore = create<ProjectState>((set) => ({
@@ -180,6 +182,40 @@ export const useProjectStore = create<ProjectState>((set) => ({
             toast.error('Update Failed', {
                 description: error.response?.data?.message || 'Please try again.',
             });
+        }
+    },
+    
+    uploadProjectImage: async (projectId: string, file: File) => {
+        set({ isLoading: true, error: null });
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const response = await api.post(`/projects/${projectId}/image`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            const updatedProject = response.data.data;
+            set((state) => ({
+                projects: state.projects.map(p => p.id === projectId ? updatedProject : p),
+                activeProject: state.activeProject?.id === projectId ? updatedProject : state.activeProject,
+                isLoading: false
+            }));
+            
+            toast.success('Project Emblem Uplinked', {
+                description: 'Mission identity has been synchronized.',
+            });
+        } catch (error: any) {
+            set({
+                error: error.response?.data?.message || 'Failed to upload project image',
+                isLoading: false
+            });
+            toast.error('Uplink Failed', {
+                description: error.response?.data?.message || 'Neural connection lost.',
+            });
+            throw error;
         }
     }
 }));

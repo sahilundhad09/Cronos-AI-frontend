@@ -11,10 +11,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { Plus, Camera, X as CloseIcon } from 'lucide-react';
 import { useProjectStore } from '@/store/useProjectStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRef } from 'react';
 
 interface CreateProjectDialogProps {
     trigger?: React.ReactNode;
@@ -28,16 +29,31 @@ const CreateProjectDialog: React.FC<CreateProjectDialogProps> = ({ trigger }) =>
     const [isOpen, setIsOpen] = useState(false);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!activeWorkspace) return;
 
         try {
-            await createProject(activeWorkspace.id, {
+            const project = await createProject(activeWorkspace.id, {
                 name,
                 description
-            });
+            }) as any;
+
+            if (project && selectedFile) {
+                await useProjectStore.getState().uploadProjectImage(project.id, selectedFile);
+            }
 
             // Invalidate dashboard and project queries
             queryClient.invalidateQueries({ queryKey: ['workspace-projects', activeWorkspace.id] });
@@ -46,6 +62,8 @@ const CreateProjectDialog: React.FC<CreateProjectDialogProps> = ({ trigger }) =>
             setIsOpen(false);
             setName('');
             setDescription('');
+            setSelectedFile(null);
+            setPreviewUrl(null);
         } catch (error) {
             console.error('Failed to create project', error);
         }
@@ -91,6 +109,58 @@ const CreateProjectDialog: React.FC<CreateProjectDialogProps> = ({ trigger }) =>
                                 className="bg-secondary/30 border-border rounded-xl h-12 focus:border-primary/50 transition-all font-bold"
                                 placeholder="Define mission focus..."
                             />
+                        </div>
+
+                        <div className="space-y-3">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Project Emblem (Optional)</Label>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                className="hidden"
+                            />
+                            
+                            <div 
+                                onClick={() => !previewUrl && fileInputRef.current?.click()}
+                                className={`
+                                    relative h-32 w-full rounded-2xl border-2 border-dashed 
+                                    flex flex-col items-center justify-center gap-2 transition-all cursor-pointer
+                                    ${previewUrl ? 'border-primary/20 bg-primary/5' : 'border-border hover:border-primary/40 hover:bg-secondary/20'}
+                                `}
+                            >
+                                {previewUrl ? (
+                                    <>
+                                        <img src={previewUrl} className="h-full w-full object-cover rounded-2xl opacity-80" alt="Preview" />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity rounded-2xl">
+                                            <Button 
+                                                type="button"
+                                                variant="secondary" 
+                                                size="sm" 
+                                                onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                                                className="h-8 text-[9px] font-black uppercase tracking-widest rounded-lg bg-card"
+                                            >
+                                                Change
+                                            </Button>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            size="icon"
+                                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-white shadow-lg"
+                                            onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setPreviewUrl(null); }}
+                                        >
+                                            <CloseIcon size={12} />
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground">
+                                            <Camera size={20} />
+                                        </div>
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Upload Emblem</p>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

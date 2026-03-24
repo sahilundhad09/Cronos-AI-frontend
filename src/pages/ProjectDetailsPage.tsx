@@ -70,6 +70,10 @@ const ProjectDetailsPage = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('kanban');
     const tabScrollRef = useRef<HTMLDivElement | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     const { fetchGenerations } = useAIStore();
     const { tasks, statuses } = useTaskStore();
@@ -111,6 +115,30 @@ const ProjectDetailsPage = () => {
             tabScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }, [activeTab]);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
+    };
+
+    const handleUploadImage = async () => {
+        if (!selectedFile || !projectId) return;
+
+        setIsUploading(true);
+        try {
+            await useProjectStore.getState().uploadProjectImage(projectId, selectedFile);
+            setSelectedFile(null);
+            setPreviewUrl(null);
+        } catch (error) {
+            console.error('Failed to upload image', error);
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     if (!project) {
         return (
@@ -578,6 +606,66 @@ const ProjectDetailsPage = () => {
                                         </div>
 
                                         <div className="space-y-6">
+                                            <input
+                                                type="file"
+                                                ref={fileInputRef}
+                                                onChange={handleImageChange}
+                                                accept="image/*"
+                                                className="hidden"
+                                            />
+
+                                            <div className="space-y-2.5">
+                                                <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground ml-1">Project Emblem</Label>
+                                                <div className="flex flex-col sm:flex-row items-center gap-6 p-6 rounded-2xl bg-muted/30 border border-border group/emblem">
+                                                    <div className="relative flex-shrink-0">
+                                                        <div className="w-24 h-24 rounded-2xl bg-card border border-primary/20 overflow-hidden flex items-center justify-center text-primary group-hover/emblem:border-primary/40 transition-all duration-500 shadow-xl">
+                                                            {previewUrl ? (
+                                                                <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                                                            ) : project.image_url ? (
+                                                                <img src={project.image_url} alt={project.name} className="h-full w-full object-cover" />
+                                                            ) : (
+                                                                <Target size={32} className="opacity-40" />
+                                                            )}
+                                                        </div>
+                                                        <Button
+                                                            size="icon"
+                                                            onClick={() => fileInputRef.current?.click()}
+                                                            className="absolute -bottom-2 -right-2 h-8 w-8 rounded-xl bg-primary text-primary-foreground shadow-lg hover:scale-110 active:scale-95 transition-all"
+                                                        >
+                                                            <Activity size={14} />
+                                                        </Button>
+                                                    </div>
+                                                    <div className="flex-1 space-y-3">
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black uppercase tracking-tight text-foreground">Mission Visual Identity</h4>
+                                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest leading-relaxed mt-1">
+                                                                Define the operational emblem for sector identification. Best viewed at 256x256 resolutions.
+                                                            </p>
+                                                        </div>
+                                                        {selectedFile && (
+                                                            <div className="flex items-center gap-2 pt-1 animate-in slide-in-from-left-4 duration-300">
+                                                                <Button
+                                                                    size="sm"
+                                                                    onClick={handleUploadImage}
+                                                                    disabled={isUploading}
+                                                                    className="h-8 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#030408] font-black uppercase text-[9px] tracking-widest px-4 shadow-lg shadow-emerald-500/20"
+                                                                >
+                                                                    {isUploading ? 'Linking...' : 'Confirm Sync'}
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="ghost"
+                                                                    onClick={() => { setSelectedFile(null); setPreviewUrl(null); }}
+                                                                    className="h-8 rounded-lg text-muted-foreground font-black uppercase text-[9px] tracking-widest hover:text-foreground"
+                                                                >
+                                                                    Discard
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <div className="space-y-4 pt-4 border-t border-border">
                                                 <div className="space-y-2">
                                                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Project Name</Label>

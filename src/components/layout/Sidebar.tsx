@@ -360,23 +360,36 @@ const SidebarContent = memo<SidebarContentProps>(({
             </div>
 
             {/* User profile card */}
-            <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-muted/40 border border-border hover:border-primary/30 transition-all group">
-                <div className="relative flex-shrink-0">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/60 border border-primary/30 flex items-center justify-center font-black text-xs text-primary-foreground">
-                        {user?.name?.substring(0, 2).toUpperCase() || 'U'}
+            <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-muted/40 border border-border hover:border-primary/30 transition-all group overflow-hidden">
+                <Link 
+                    to="/profile" 
+                    onClick={onClose}
+                    className="flex items-center gap-3 flex-1 min-w-0 group/profile"
+                >
+                    <div className="relative flex-shrink-0">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center font-black text-xs text-primary overflow-hidden shadow-sm transition-all group-hover/profile:scale-105 group-hover/profile:border-primary/40">
+                            {user?.avatar_url ? (
+                                <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
+                            ) : (
+                                <span className="opacity-80">{user?.name?.substring(0, 2).toUpperCase() || 'U'}</span>
+                            )}
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[hsl(var(--app-sidebar-bg))] shadow-sm" />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[hsl(var(--app-sidebar-bg))]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-black text-foreground truncate leading-none mb-0.5">{user?.name || 'User'}</p>
-                    <p className="text-[8px] font-bold text-muted-foreground truncate uppercase tracking-widest">{activeWorkspace?.role || 'Member'}</p>
-                </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-black text-foreground truncate leading-none mb-1 group-hover/profile:text-primary transition-colors">{user?.name || 'Operative'}</p>
+                        <p className="text-[8px] font-bold text-muted-foreground truncate uppercase tracking-[0.15em] opacity-60">{activeWorkspace?.role || 'Access Level: 1'}</p>
+                    </div>
+                </Link>
+                
+                <div className="w-[1px] h-6 bg-border/50 mx-1" />
+
                 <button
                     onClick={handleLogout}
                     title="Logout"
-                    className="flex-shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+                    className="flex-shrink-0 p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all hover:scale-110 active:scale-90"
                 >
-                    <LogOut className="h-3.5 w-3.5" />
+                    <LogOut className="h-[14px] w-[14px]" />
                 </button>
             </div>
         </div>
