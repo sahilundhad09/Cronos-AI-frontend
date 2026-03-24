@@ -32,6 +32,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PermissionGate } from '@/components/auth/PermissionGate';
+import { useSidebar } from '@/context/SidebarContext';
 
 // ── Types ──
 
@@ -72,7 +73,7 @@ export interface SidebarContentProps {
     handleLogout: () => void;
     user: any;
     onClose?: () => void;
-    isCollapsed?: boolean;
+    onToggle?: () => void;
 }
 
 // ── Workspace Switcher ──
@@ -260,8 +261,11 @@ const SidebarContent = memo<SidebarContentProps>(({
     handleLogout,
     user,
     onClose,
-    isCollapsed
-}) => (
+    onToggle
+}) => {
+    const { isCollapsed } = useSidebar();
+    
+    return (
     <div className="flex flex-col h-full bg-[hsl(var(--app-sidebar-bg))] relative overflow-hidden">
         {/* Ambient background orb */}
         <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-[80px] -mr-24 -mt-24 pointer-events-none" />
@@ -280,11 +284,11 @@ const SidebarContent = memo<SidebarContentProps>(({
                 </div>
             </Link>
 
-            {/* Collapse Button */}
+            {/* Collapse Button (Desktop) / Close Button (Mobile) */}
             <Button
                 variant="ghost"
                 size="icon"
-                onClick={onClose}
+                onClick={onToggle}
                 className="text-muted-foreground hover:text-foreground hover:bg-accent -mr-1"
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
@@ -377,7 +381,8 @@ const SidebarContent = memo<SidebarContentProps>(({
             </div>
         </div>
     </div>
-));
+    );
+});
 
 SidebarContent.displayName = 'SidebarContent';
 

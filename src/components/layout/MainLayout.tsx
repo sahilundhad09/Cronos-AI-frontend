@@ -32,11 +32,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetHeader } from '@/components/ui/sheet';
 import { useSocketInit, useNotificationSocket } from '@/hooks/useSocket';
 import { useThemeStore } from '@/store/useThemeStore';
 import { CommandHub } from './CommandHub';
 import { SidebarContent } from './Sidebar';
+import { useSidebar } from '@/context/SidebarContext';
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -266,8 +266,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         fetchWorkspaces,
         setActiveWorkspace,
         createWorkspace,
-        acceptWorkspaceInvitation,
-        declineWorkspaceInvitation,
         isLoading
     } = useWorkspaceStore();
 
@@ -281,8 +279,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const setMode = useThemeStore((state) => state.setMode);
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const { 
+        isCollapsed: isSidebarCollapsed, 
+        setCollapsed: setIsSidebarCollapsed,
+        isMobileMenuOpen,
+        setMobileMenuOpen: setIsMobileMenuOpen
+    } = useSidebar();
     
     // Robust media query to sync JS with Tailwind's lg breakpoint (1024px)
     const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
@@ -422,8 +424,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         location,
         handleLogout,
         user,
-        onClose: () => isDesktop ? setIsSidebarCollapsed(true) : setIsMobileMenuOpen(false),
-        isCollapsed: isSidebarCollapsed
+        onClose: () => {
+            if (!isDesktop) {
+                setIsMobileMenuOpen(false);
+            }
+        },
+        onToggle: () => {
+            if (isDesktop) {
+                setIsSidebarCollapsed(!isSidebarCollapsed);
+            } else {
+                setIsMobileMenuOpen(false);
+            }
+        }
     }), [
         workspaces,
         activeWorkspace,
@@ -441,7 +453,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         handleLogout,
         user,
         isDesktop,
-        isSidebarCollapsed
+        setIsSidebarCollapsed,
+        setIsMobileMenuOpen
     ]);
 
     if (!isInitialized) {

@@ -8,6 +8,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import MainLayout from './components/layout/MainLayout';
 import { useAuthStore } from './store/useAuthStore';
+import { SidebarProvider } from './context/SidebarContext';
 
 const queryClient = new QueryClient();
 
@@ -54,126 +55,128 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <Toaster />
-            <Router>
-                <Routes>
-                    {/* Public Landing Page */}
-                    <Route path="/" element={<LandingPage />} />
+            <SidebarProvider>
+                <Toaster />
+                <Router>
+                    <Routes>
+                        {/* Public Landing Page */}
+                        <Route path="/" element={<LandingPage />} />
 
-                    {/* Auth Routes */}
-                    <Route
-                        path="/login"
-                        element={
-                            <PublicRoute>
-                                <LoginPage />
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path="/register"
-                        element={
-                            <PublicRoute>
-                                <RegisterPage />
-                            </PublicRoute>
-                        }
-                    />
+                        {/* Auth Routes */}
+                        <Route
+                            path="/login"
+                            element={
+                                <PublicRoute>
+                                    <LoginPage />
+                                </PublicRoute>
+                            }
+                        />
+                        <Route
+                            path="/register"
+                            element={
+                                <PublicRoute>
+                                    <RegisterPage />
+                                </PublicRoute>
+                            }
+                        />
 
-                    {/* Protected Dashboard Routes */}
-                    <Route
-                        path="/dashboard"
-                        element={
-                            <ProtectedRoute>
-                                <DashboardPage />
-                            </ProtectedRoute>
-                        }
-                    />
+                        {/* Protected Dashboard Routes */}
+                        <Route
+                            path="/dashboard"
+                            element={
+                                <ProtectedRoute>
+                                    <DashboardPage />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    {/* Additional Placeholder Routes to catch Sidebar navigation */}
-                    <Route
-                        path="/projects"
-                        element={
-                            <ProtectedRoute>
-                                <ProjectsPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/projects/:projectId"
-                        element={
-                            <ProtectedRoute>
-                                <ProjectDetailsPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/projects/:projectId/settings"
-                        element={
-                            <ProtectedRoute>
-                                <ProjectSettingsPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/workspaces/:workspaceId/settings"
-                        element={
-                            <ProtectedRoute>
-                                <WorkspaceSettingsPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/profile"
-                        element={
-                            <ProtectedRoute>
-                                <ProfilePage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/team"
-                        element={
-                            <ProtectedRoute>
-                                <TeamPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/ai-chat"
-                        element={
-                            <ProtectedRoute>
-                                <AIChatPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/analytics"
-                        element={
-                            <ProtectedRoute>
-                                <AnalyticsDashboardPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/growth"
-                        element={
-                            <ProtectedRoute>
-                                <GrowthPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/theme-selector"
-                        element={
-                            <ProtectedRoute>
-                                <ThemeSelectorPage />
-                            </ProtectedRoute>
-                        }
-                    />
+                        {/* Additional Placeholder Routes to catch Sidebar navigation */}
+                        <Route
+                            path="/projects"
+                            element={
+                                <ProtectedRoute>
+                                    <ProjectsPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/projects/:projectId"
+                            element={
+                                <ProtectedRoute>
+                                    <ProjectDetailsPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/projects/:projectId/settings"
+                            element={
+                                <ProtectedRoute>
+                                    <ProjectSettingsPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/workspaces/:workspaceId/settings"
+                            element={
+                                <ProtectedRoute>
+                                    <WorkspaceSettingsPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute>
+                                    <ProfilePage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/team"
+                            element={
+                                <ProtectedRoute>
+                                    <TeamPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/ai-chat"
+                            element={
+                                <ProtectedRoute>
+                                    <AIChatPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/analytics"
+                            element={
+                                <ProtectedRoute>
+                                    <AnalyticsDashboardPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/growth"
+                            element={
+                                <ProtectedRoute>
+                                    <GrowthPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/theme-selector"
+                            element={
+                                <ProtectedRoute>
+                                    <ThemeSelectorPage />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    {/* Catch-all */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-            </Router>
+                        {/* Catch-all */}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </Router>
+            </SidebarProvider>
         </QueryClientProvider>
     );
 }

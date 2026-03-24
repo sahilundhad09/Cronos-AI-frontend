@@ -21,7 +21,11 @@ const getStoredTemplateId = () => {
 const getStoredMode = (): ThemeMode => {
     if (typeof window === 'undefined') return 'dark';
     const storedMode = localStorage.getItem(THEME_MODE_STORAGE_KEY);
-    return storedMode === 'light' ? 'light' : 'dark';
+    // Explicitly default to dark if no valid stored mode exists
+    if (!storedMode || (storedMode !== 'light' && storedMode !== 'dark')) {
+        return 'dark';
+    }
+    return storedMode as ThemeMode;
 };
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
