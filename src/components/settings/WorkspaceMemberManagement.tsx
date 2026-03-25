@@ -59,7 +59,7 @@ export const WorkspaceMemberManagement: React.FC<WorkspaceMemberManagementProps>
     useEffect(() => {
         if (workspaceId) {
             loadWorkspaceMembers(workspaceId);
-            loadWorkspaceInvitations(workspaceId);
+            loadWorkspaceInvitations(workspaceId, 'pending');
         }
     }, [workspaceId, loadWorkspaceMembers, loadWorkspaceInvitations]);
 

@@ -135,7 +135,7 @@ interface SettingsState {
     inviteWorkspaceMember: (workspaceId: string, email: string, role: string) => Promise<void>;
     updateWorkspaceMemberRole: (workspaceId: string, memberId: string, role: string) => Promise<void>;
     removeWorkspaceMember: (workspaceId: string, memberId: string) => Promise<void>;
-    loadWorkspaceInvitations: (workspaceId: string) => Promise<void>;
+    loadWorkspaceInvitations: (workspaceId: string, status?: string) => Promise<void>;
     cancelInvitation: (workspaceId: string, invitationId: string) => Promise<void>;
 
     // Label actions
@@ -474,7 +474,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         set({ isSaving: true, error: null });
         try {
             await api.post(`/workspaces/${workspaceId}/invitations`, { email, role });
-            await get().loadWorkspaceInvitations(workspaceId);
+            await get().loadWorkspaceInvitations(workspaceId, 'pending');
             set({ isSaving: false });
             toast.success('Invitation Sent', {
                 description: `Invitation sent to ${email}.`
@@ -521,13 +521,16 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         }
     },
 
-    loadWorkspaceInvitations: async (workspaceId: string) => {
+    loadWorkspaceInvitations: async (workspaceId: string, status?: string) => {
         set((state) => ({
             loadingStates: { ...state.loadingStates, invitations: true },
             error: null
         }));
         try {
-            const response = await api.get(`/workspaces/${workspaceId}/invitations`);
+            const url = status 
+                ? `/workspaces/${workspaceId}/invitations?status=${status}`
+                : `/workspaces/${workspaceId}/invitations`;
+            const response = await api.get(url);
             set((state) => ({
                 workspaceInvitations: response.data.data || [],
                 loadingStates: { ...state.loadingStates, invitations: false }
@@ -546,7 +549,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         set({ isSaving: true, error: null });
         try {
             await api.delete(`/workspaces/${workspaceId}/invitations/${invitationId}`);
-            await get().loadWorkspaceInvitations(workspaceId);
+            await get().loadWorkspaceInvitations(workspaceId, 'pending');
             set({ isSaving: false });
             toast.success('Invitation Cancelled', {
                 description: 'Invitation has been cancelled.'
