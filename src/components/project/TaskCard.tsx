@@ -25,9 +25,10 @@ import { ArrowRightLeft, FileText, UserPlus as UserPlusIcon } from 'lucide-react
 interface TaskCardProps {
     task: Task;
     index: number;
+    isLead?: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, index, isLead }) => {
     const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const { statuses, moveTask } = useTaskStore();
@@ -138,20 +139,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                                                 View Details
                                             </DropdownMenuItem>
                                             
-                                            <DropdownMenuItem 
-                                                onClick={() => setIsAssignDialogOpen(true)}
-                                                className="rounded-lg gap-2.5 text-[11px] font-bold uppercase tracking-widest cursor-pointer py-2"
-                                            >
-                                                <UserPlusIcon className="h-3.5 w-3.5 text-amber-400" />
-                                                Manage Specialists
-                                            </DropdownMenuItem>
+                                            {isLead && (
+                                                <DropdownMenuItem 
+                                                    onClick={() => setIsAssignDialogOpen(true)}
+                                                    className="rounded-lg gap-2.5 text-[11px] font-bold uppercase tracking-widest cursor-pointer py-2"
+                                                >
+                                                    <UserPlusIcon className="h-3.5 w-3.5 text-amber-400" />
+                                                    Manage Specialists
+                                                </DropdownMenuItem>
+                                            )}
 
                                             <DropdownMenuSeparator className="bg-border/50" />
 
                                             <DropdownMenuSub>
                                                 <DropdownMenuSubTrigger 
-                                                    disabled={!isAssignee}
-                                                    className={`rounded-lg gap-2.5 text-[11px] font-bold uppercase tracking-widest py-2 ${!isAssignee ? 'opacity-50' : 'cursor-pointer'}`}
+                                                    disabled={!isAssignee && !isLead}
+                                                    className={`rounded-lg gap-2.5 text-[11px] font-bold uppercase tracking-widest py-2 ${(!isAssignee && !isLead) ? 'opacity-50' : 'cursor-pointer'}`}
                                                 >
                                                     <ArrowRightLeft className="h-3.5 w-3.5 text-primary" />
                                                     Move to Column

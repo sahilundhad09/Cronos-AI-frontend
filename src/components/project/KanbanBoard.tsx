@@ -6,9 +6,10 @@ import { LayoutDashboard } from 'lucide-react';
 
 interface KanbanBoardProps {
     projectId: string;
+    isLead?: boolean;
 }
 
-const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId, isLead }) => {
     const {
         tasks,
         statuses,
@@ -88,6 +89,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ projectId }) => {
                                 status={status}
                                 projectId={projectId}
                                 tasks={tasks.filter((t) => t.status_id === status.id)}
+                                isLead={isLead}
                             />
                         ))}
                 </div>

@@ -14,14 +14,14 @@ import {
     ChevronDown,
     ChevronRight,
     Trash2,
-    MoreVertical
+    MoreVertical,
+    Settings2
 } from 'lucide-react';
 import { useProjectStore } from '@/store/useProjectStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useTaskStore } from '@/store/useTaskStore';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PermissionGate } from '@/components/auth/PermissionGate';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -158,7 +158,7 @@ const ProjectDetailsPage = () => {
         { value: 'orchestrator', label: 'AI Orchestrator', icon: Brain,           iconClass: 'text-primary'  },
         { value: 'team',         label: 'Specialists',     icon: Users,           iconClass: 'text-muted-foreground' },
         { value: 'activity',     label: 'Stream',          icon: Activity,        iconClass: 'text-emerald-400' },
-    ];
+    ].filter(t => t.value !== 'orchestrator' || isLead);
 
     const currentTab = [...tabs, { value: 'settings', label: 'Parameters', icon: Settings, iconClass: 'text-muted-foreground' }]
         .find(t => t.value === activeTab) ?? tabs[0];
@@ -235,29 +235,31 @@ const ProjectDetailsPage = () => {
 
                             {/* Buttons */}
                             <div className="flex items-center gap-2 w-full sm:w-auto">
-                                <Button
-                                    onClick={() => navigate(`/projects/${projectId}/settings`)}
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 px-3 bg-muted/30 border-border hover:border-border/60 hover:bg-accent text-muted-foreground hover:text-foreground font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
-                                >
-                                    <Settings className="h-3.5 w-3.5" />
-                                    <span className="hidden sm:inline">Settings</span>
-                                </Button>
+                                {isLead && (
+                                    <>
+                                        <Button
+                                            onClick={() => navigate(`/projects/${projectId}/settings`)}
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-8 px-3 bg-muted/30 border-border hover:border-border/60 hover:bg-accent text-muted-foreground hover:text-foreground font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
+                                        >
+                                            <Settings className="h-3.5 w-3.5" />
+                                            <span className="hidden sm:inline">Settings</span>
+                                        </Button>
 
-                                <Button
-                                    onClick={() => setShowChat(!showChat)}
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 px-3 bg-purple-500/[0.07] border-purple-500/20 hover:border-purple-400/40 hover:bg-purple-500/[0.12] text-purple-300 hover:text-purple-200 font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
-                                >
-                                    <Brain className="h-3.5 w-3.5" />
-                                    <span className="hidden sm:inline">AI Assistant</span>
-                                </Button>
+                                        <Button
+                                            onClick={() => setShowChat(!showChat)}
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-8 px-3 bg-purple-500/[0.07] border-purple-500/20 hover:border-purple-400/40 hover:bg-purple-500/[0.12] text-purple-300 hover:text-purple-200 font-black uppercase text-[9px] tracking-widest gap-1.5 transition-all rounded-lg"
+                                        >
+                                            <Brain className="h-3.5 w-3.5" />
+                                            <span className="hidden sm:inline">AI Assistant</span>
+                                        </Button>
+                                    </>
+                                )}
 
-                                <PermissionGate roles={['owner', 'admin']}>
-                                    <CreateTaskDialog projectId={projectId!} />
-                                </PermissionGate>
+                                {isLead && <CreateTaskDialog projectId={projectId!} />}
                             </div>
                         </div>
                     </div>
@@ -296,7 +298,7 @@ const ProjectDetailsPage = () => {
                                         {label}
                                     </TabsTrigger>
                                 ))}
-                                <PermissionGate roles={['owner', 'admin']}>
+                                {(activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin' || isLead) && (
                                     <TabsTrigger
                                         value="settings"
                                         className="
@@ -312,7 +314,7 @@ const ProjectDetailsPage = () => {
                                     >
                                         <Settings className="h-3.5 w-3.5" /> Parameters
                                     </TabsTrigger>
-                                </PermissionGate>
+                                )}
                             </TabsList>
                         </div>
 
@@ -348,7 +350,7 @@ const ProjectDetailsPage = () => {
                                         {activeTab === value && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary))]" />}
                                     </button>
                                 ))}
-                                <PermissionGate roles={['owner', 'admin']}>
+                                {(activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin' || isLead) && (
                                     <button
                                         onClick={() => { setActiveTab('settings'); setMobileMenuOpen(false); }}
                                         className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${
@@ -361,7 +363,7 @@ const ProjectDetailsPage = () => {
                                         <span className="font-black uppercase text-[10px] tracking-widest">Parameters</span>
                                         {activeTab === 'settings' && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary))]" />}
                                     </button>
-                                </PermissionGate>
+                                )}
                             </div>
                         )}
                     </div>
@@ -372,13 +374,13 @@ const ProjectDetailsPage = () => {
 
                             {/* Board */}
                             <TabsContent value="kanban" className="m-0 flex-1 flex flex-col min-h-0">
-                                <KanbanBoard projectId={projectId!} />
+                                <KanbanBoard projectId={projectId!} isLead={isLead} />
                             </TabsContent>
 
                             {/* Orchestrator */}
                             <TabsContent value="orchestrator" className="m-0 flex-1 flex flex-col min-h-0">
                                 <div className="w-full max-w-5xl mx-auto flex-1 min-h-0 mt-4">
-                                    <AIOrchestrator projectId={projectId!} isActive={activeTab === 'orchestrator'} />
+                                    <AIOrchestrator projectId={projectId!} isActive={activeTab === 'orchestrator'} canInitialize={isLead} />
                                 </div>
                             </TabsContent>
 
@@ -448,21 +450,29 @@ const ProjectDetailsPage = () => {
                                                 <span className="text-[9px] text-emerald-400/70 font-black uppercase tracking-widest">Active</span>
                                                 </div>
                                             </div>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all opacity-0 group-hover:opacity-100">
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground backdrop-blur-2xl p-1.5 rounded-xl min-w-[160px]">
-                                                <DropdownMenuItem
-                                                    onClick={() => console.log('Remove member')}
-                                                    className="text-[10px] font-black uppercase tracking-widest text-red-400 focus:text-red-400 focus:bg-red-500/10 cursor-pointer rounded-lg h-9"
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5 mr-2.5" /> Revoke Access
-                                                </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            {isLead && (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all opacity-0 group-hover:opacity-100">
+                                                        <MoreVertical className="h-4 w-4" />
+                                                    </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground backdrop-blur-2xl p-1.5 rounded-xl min-w-[160px]">
+                                                    <DropdownMenuItem
+                                                        onClick={() => navigate(`/projects/${projectId}/settings?tab=members`)}
+                                                        className="text-[10px] font-black uppercase tracking-widest text-foreground focus:text-foreground focus:bg-accent cursor-pointer rounded-lg h-9"
+                                                    >
+                                                        <Settings2 className="h-3.5 w-3.5 mr-2.5" /> Change Role
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => console.log('Remove member')}
+                                                        className="text-[10px] font-black uppercase tracking-widest text-red-400 focus:text-red-400 focus:bg-red-500/10 cursor-pointer rounded-lg h-9"
+                                                    >
+                                                        <Trash2 className="h-3.5 w-3.5 mr-2.5" /> Revoke Access
+                                                    </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            )}
                                             </CardContent>
                                         </Card>
                                         ))}

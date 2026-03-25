@@ -120,7 +120,7 @@ const ProjectsPage = () => {
                             </button>
                         </div>
 
-                        <PermissionGate roles={['owner', 'admin', 'member']}>
+                        <PermissionGate roles={['owner', 'admin']}>
                             <CreateProjectDialog />
                         </PermissionGate>
                     </div>
@@ -189,6 +189,7 @@ const ProjectsPage = () => {
                                 <ProjectCard
                                     key={project.id}
                                     project={project}
+                                    activeWorkspace={activeWorkspace}
                                     viewMode={viewMode}
                                     itemVariants={itemVariants}
                                     onOpen={() => {
@@ -228,11 +229,13 @@ const ProjectsPage = () => {
 ───────────────────────────────────────────── */
 const ProjectCard = ({
     project,
+    activeWorkspace,
     viewMode,
     itemVariants,
     onOpen
 }: {
     project: Project;
+    activeWorkspace: any;
     viewMode: 'grid' | 'list';
     itemVariants: any;
     onOpen: () => void;
@@ -306,23 +309,38 @@ const ProjectCard = ({
                                 <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                             )}
                         </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 text-muted-foreground/40 hover:text-foreground hover:bg-accent rounded-lg"
-                                >
-                                    <MoreVertical className="h-3.5 w-3.5" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-card border-border text-foreground p-1.5 rounded-xl min-w-[160px]">
-                                <DropdownMenuItem className="rounded-lg text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-accent px-3 py-2 cursor-pointer">Mission Profile</DropdownMenuItem>
-                                <DropdownMenuItem className="rounded-lg text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-accent px-3 py-2 cursor-pointer">Parameters</DropdownMenuItem>
-                                <DropdownMenuSeparator className="bg-border my-1" />
-                                <DropdownMenuItem className="rounded-lg text-[9px] font-black uppercase tracking-widest text-destructive hover:text-destructive hover:bg-destructive/10 px-3 py-2 cursor-pointer">Archive Link</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {(() => {
+                            const isProjectLead = (project as any).your_role === 'lead' || activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin';
+                            const isProjectMember = (project as any).your_role === 'member' || isProjectLead;
+
+                            return (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-7 w-7 text-muted-foreground/40 hover:text-foreground hover:bg-accent rounded-lg"
+                                        >
+                                            <MoreVertical className="h-3.5 w-3.5" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="bg-card border-border text-foreground p-1.5 rounded-xl min-w-[160px]">
+                                        <DropdownMenuItem className="rounded-lg text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-accent px-3 py-2 cursor-pointer">Mission Profile</DropdownMenuItem>
+                                        
+                                        {isProjectMember && (
+                                            <DropdownMenuItem className="rounded-lg text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-accent px-3 py-2 cursor-pointer">Parameters</DropdownMenuItem>
+                                        )}
+                                        
+                                        {isProjectLead && (
+                                            <>
+                                                <DropdownMenuSeparator className="bg-border my-1" />
+                                                <DropdownMenuItem className="rounded-lg text-[9px] font-black uppercase tracking-widest text-destructive hover:text-destructive hover:bg-destructive/10 px-3 py-2 cursor-pointer">Archive Link</DropdownMenuItem>
+                                            </>
+                                        )}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            );
+                        })()}
                     </div>
 
                     {/* Name + description */}

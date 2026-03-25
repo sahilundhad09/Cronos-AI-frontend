@@ -34,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 
 import { type Variants } from 'framer-motion';
 
@@ -91,16 +92,17 @@ const GrowthPage = () => {
     }, [activeWorkspace, fetchIndividualGrowth, fetchWorkspaceGrowth]);
 
     const ig = individualGrowth;
-    const wg = workspaceGrowth;
+    const wg = Array.isArray(workspaceGrowth) ? workspaceGrowth : [];
 
-    const radarData = ig ? [
-        { subject: 'To Do', A: ig.focusArea.todo, fullMark: Math.max(ig.focusArea.todo, ig.focusArea.inProgress, ig.focusArea.done) + 1 },
-        { subject: 'In Progress', A: ig.focusArea.inProgress, fullMark: Math.max(ig.focusArea.todo, ig.focusArea.inProgress, ig.focusArea.done) + 1 },
-        { subject: 'Completed', A: ig.focusArea.done, fullMark: Math.max(ig.focusArea.todo, ig.focusArea.inProgress, ig.focusArea.done) + 1 },
+    const radarData = ig?.focusArea ? [
+        { subject: 'To Do', A: ig.focusArea.todo || 0, fullMark: Math.max(ig.focusArea.todo || 0, ig.focusArea.inProgress || 0, ig.focusArea.done || 0) + 1 },
+        { subject: 'In Progress', A: ig.focusArea.inProgress || 0, fullMark: Math.max(ig.focusArea.todo || 0, ig.focusArea.inProgress || 0, ig.focusArea.done || 0) + 1 },
+        { subject: 'Completed', A: ig.focusArea.done || 0, fullMark: Math.max(ig.focusArea.todo || 0, ig.focusArea.inProgress || 0, ig.focusArea.done || 0) + 1 },
     ] : [];
 
     return (
-        <div className="h-full bg-background text-foreground overflow-hidden flex flex-col">
+        <PermissionGate roles={['owner', 'admin', 'member']}>
+            <div className="h-full bg-background text-foreground overflow-hidden flex flex-col">
             {/* Neural Header */}
             <header className="border-b border-border bg-[hsl(var(--app-header-bg))] backdrop-blur-xl px-8 py-6 flex-shrink-0 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -mr-48 -mt-48 animate-pulse" />
@@ -176,7 +178,7 @@ const GrowthPage = () => {
                                     <StatCard 
                                         icon={Zap} 
                                         label="Velocity" 
-                                        value={ig ? Math.round(ig.velocity.reduce((acc, v) => acc + v.completed, 0) / 6) : 0} 
+                                        value={ig?.velocity?.length ? Math.round(ig.velocity.reduce((acc, v) => acc + (v.completed || 0), 0) / 6) : 0} 
                                         sub="Weekly Avg Tasks" 
                                         color="cyan"
                                         trend="up"
@@ -304,7 +306,7 @@ const GrowthPage = () => {
                                                 const date = new Date();
                                                 date.setDate(date.getDate() - (29 - i));
                                                 const dateStr = date.toISOString().split('T')[0];
-                                                const isActive = ig?.consistency.activeDays.includes(dateStr);
+                                                const isActive = ig?.consistency?.activeDays?.includes(dateStr);
                                                 
                                                 return (
                                                     <motion.div
@@ -339,7 +341,8 @@ const GrowthPage = () => {
                             </motion.div>
                         </TabsContent>
 
-                        <TabsContent key="team" value="team">
+                        {(activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin') && (
+                            <TabsContent key="team" value="team">
                             <motion.div 
                                 variants={containerVariants}
                                 initial="hidden"
@@ -410,10 +413,12 @@ const GrowthPage = () => {
                                 </div>
                             </motion.div>
                         </TabsContent>
-                    </AnimatePresence>
+                    )}
+                </AnimatePresence>
                 </Tabs>
             </main>
         </div>
+        </PermissionGate>
     );
 };
 

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Zap, Target, TrendingUp, Plus, ArrowUpRight, Bot, Layers,
-    Activity as ActivityIcon, AlertCircle, Loader2, CheckCircle2,
+    Zap, Target, TrendingUp, Plus, ArrowUpRight, Bot, Layers, AlertCircle, Loader2, CheckCircle2,
     Clock, AlertTriangle, Calendar, Brain, BarChart3, Users,
     MessageSquare, Rocket, Flame, ChevronRight, X, Sparkles,
-    CircleDot, Shield, Command
+    CircleDot, Command
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -469,10 +468,10 @@ const DashboardPage = () => {
         .slice(0, 5);
 
     const overdueCount = upcomingDeadlines.filter((t: any) => isPast(new Date(t.due_date))).length;
-
     const firstName = user?.name?.split(' ')[0] || 'Commander';
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    const isAdmin = activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin';
 
     const quickActions = [
         { icon: Plus,          label: 'New Project', sub: 'Create',   onClick: () => {},                    accent: 'primary' },
@@ -483,7 +482,10 @@ const DashboardPage = () => {
         { icon: MessageSquare, label: 'Messages',    sub: 'Inbox',    onClick: () => navigate('/ai-chat'),   accent: 'teal'    },
         { icon: Rocket,        label: 'Deploy',      sub: 'Launch',   onClick: () => toast.info('Deployment engine initializing. Feature available soon.'), accent: 'indigo' },
         { icon: Zap,           label: 'Quick Task',  sub: 'Add',      onClick: () => {},                    accent: 'rose'    },
-    ];
+    ].filter(a => {
+        if (a.label === 'Analytics' || a.label === 'New Project') return isAdmin;
+        return true;
+    });
 
     /* ── Empty state ── */
     if (!activeWorkspace && !analyticsLoading) {
@@ -540,16 +542,20 @@ const DashboardPage = () => {
                     </motion.div>
 
                     <motion.div variants={fadeUp} className="flex items-center gap-2 flex-shrink-0">
-                        <Button variant="outline" onClick={() => navigate('/analytics')}
-                            className="hidden sm:flex h-9 border-border/60 bg-card hover:bg-accent text-foreground font-black rounded-xl px-4 text-[9px] uppercase tracking-widest gap-1.5"
-                        >
-                            <BarChart3 className="h-3.5 w-3.5" /> Analytics
-                        </Button>
-                        <CreateProjectDialog trigger={
-                            <Button className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl px-4 text-[9px] uppercase tracking-widest shadow-lg shadow-primary/20 gap-1.5">
-                                <Plus className="h-3.5 w-3.5" /> New Project
-                            </Button>
-                        } />
+                        {isAdmin && (
+                            <>
+                                <Button variant="outline" onClick={() => navigate('/analytics')}
+                                    className="hidden sm:flex h-9 border-border/60 bg-card hover:bg-accent text-foreground font-black rounded-xl px-4 text-[9px] uppercase tracking-widest gap-1.5"
+                                >
+                                    <BarChart3 className="h-3.5 w-3.5" /> Analytics
+                                </Button>
+                                <CreateProjectDialog trigger={
+                                    <Button className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl px-4 text-[9px] uppercase tracking-widest shadow-lg shadow-primary/20 gap-1.5">
+                                        <Plus className="h-3.5 w-3.5" /> New Project
+                                    </Button>
+                                } />
+                            </>
+                        )}
                     </motion.div>
                 </motion.header>
 
@@ -560,7 +566,7 @@ const DashboardPage = () => {
                     <StatCard label="Active Projects" value={analytics?.projectCount?.toString() || '0'}                icon={<Layers className="h-4 w-4" />}       accent="primary"  isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
                     <StatCard label="In Progress"     value={analytics?.statusBreakdown?.inProgress?.toString() || '0'} icon={<Zap className="h-4 w-4" />}          accent="teal"     isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
                     <StatCard label="Completed"       value={analytics?.statusBreakdown?.done?.toString() || '0'}       icon={<CheckCircle2 className="h-4 w-4" />}  accent="emerald"  isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
-                    <StatCard label="Productivity"    value={`${analytics?.completionRate || 0}%`}                      icon={<TrendingUp className="h-4 w-4" />}    accent="indigo"   isLoading={analyticsLoading} onClick={() => navigate('/analytics')} />
+                    <StatCard label="Productivity"    value={`${analytics?.completionRate || 0}%`}                      icon={<TrendingUp className="h-4 w-4" />}    accent="indigo"   isLoading={analyticsLoading} onClick={isAdmin ? () => navigate('/analytics') : undefined} />
                 </motion.div>
 
                 {/* ── QUICK ACTIONS ─────────────────────────────────────────── */}
@@ -613,11 +619,15 @@ const DashboardPage = () => {
                                         <div className="col-span-full flex flex-col items-center justify-center py-14 bg-muted/20 border border-dashed border-border/60 rounded-2xl gap-3">
                                             <Layers className="h-8 w-8 text-muted-foreground/20" />
                                             <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">No projects initialized</p>
-                                            <CreateProjectDialog trigger={
-                                                <Button size="sm" className="h-8 bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-black rounded-xl px-3 text-[9px] uppercase tracking-widest border border-primary/20 gap-1.5 transition-all">
-                                                    <Plus className="h-3 w-3" /> Create First Project
-                                                </Button>
-                                            } />
+                                            {isAdmin ? (
+                                                <CreateProjectDialog trigger={
+                                                    <Button size="sm" className="h-8 bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-black rounded-xl px-3 text-[9px] uppercase tracking-widest border border-primary/20 gap-1.5 transition-all">
+                                                        <Plus className="h-3 w-3" /> Create First Project
+                                                    </Button>
+                                                } />
+                                            ) : (
+                                                <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Awaiting sector initialization by command.</p>
+                                            )}
                                         </div>
                                     )
                                 }
@@ -869,9 +879,8 @@ const DashboardPage = () => {
                             </CardContent>
                         </Card>
 
-                        {/* Project Pulse */}
                         {projectsData && projectsData.length > 0 && (
-                            <ProjectPulse projectId={projectsData[0].id} />
+                            <ProjectPulse projectId={projectsData[0].id} canInitialize={isAdmin} />
                         )}
 
                         {/* AI Analysis Result */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { SettingsLayout } from '@/components/settings/SettingsLayout';
 import { TabsContent } from '@/components/ui/tabs';
@@ -28,7 +28,13 @@ import { StatusManagement } from '@/components/settings/StatusManagement';
 export const ProjectSettingsPage: React.FC = () => {
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('general');
+    const [searchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'general');
+
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) setActiveTab(tab);
+    }, [searchParams]);
 
     const currentProject = useSettingsStore(state => state.currentProject);
     const isLoading = useSettingsStore(state => state.loadingStates.project);

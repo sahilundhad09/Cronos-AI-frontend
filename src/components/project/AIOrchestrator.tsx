@@ -18,9 +18,14 @@ import { Badge } from '@/components/ui/badge';
 interface AIOrchestratorProps {
     projectId: string;
     isActive?: boolean;
+    canInitialize?: boolean;
 }
 
-const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = true }) => {
+const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ 
+    projectId, 
+    isActive = true,
+    canInitialize = false 
+}) => {
     const { generateTasks, acceptGeneration, isGenerating } = useAIStore();
     const { fetchProjectTasks } = useTaskStore();
     const [prompt, setPrompt] = useState('');
@@ -131,17 +136,23 @@ const AIOrchestrator: React.FC<AIOrchestratorProps> = ({ projectId, isActive = t
                             </div>
 
                             {/* Generate button */}
-                            <Button
-                                onClick={handleGenerate}
-                                disabled={isGenerating || !prompt.trim()}
-                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-black h-10 rounded-xl px-5 uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 gap-2 flex-shrink-0 transition-all font-heading"
-                            >
-                                {isGenerating ? (
-                                    <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
-                                ) : (
-                                    <><Zap className="h-3.5 w-3.5" /> Initialize Generation</>
-                                )}
-                            </Button>
+                            {canInitialize ? (
+                                <Button
+                                    onClick={handleGenerate}
+                                    disabled={isGenerating || !prompt.trim()}
+                                    className="w-full sm:w-auto bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-black h-10 rounded-xl px-5 uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 gap-2 flex-shrink-0 transition-all font-heading"
+                                >
+                                    {isGenerating ? (
+                                        <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
+                                    ) : (
+                                        <><Zap className="h-3.5 w-3.5" /> Initialize Generation</>
+                                    )}
+                                </Button>
+                            ) : (
+                                <div className="h-10 flex items-center px-4 bg-muted/20 border border-dashed border-border rounded-xl">
+                                    <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest">Initialization restricted to project leads</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

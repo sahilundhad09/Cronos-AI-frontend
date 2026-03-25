@@ -122,6 +122,7 @@ interface SettingsState {
     loadWorkspaceSettings: (workspaceId: string) => Promise<void>;
     updateWorkspace: (workspaceId: string, data: Partial<Workspace>) => Promise<void>;
     deleteWorkspace: (workspaceId: string) => Promise<void>;
+    uploadWorkspaceLogo: (workspaceId: string, file: File) => Promise<void>;
 
     // Project member actions
     loadProjectMembers: (projectId: string) => Promise<void>;
@@ -335,6 +336,36 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
             const message = error.response?.data?.message || 'Failed to delete workspace';
             set({ error: message, isSaving: false });
             toast.error('Delete Error', { description: message });
+            throw error;
+        }
+    },
+
+    uploadWorkspaceLogo: async (workspaceId: string, file: File) => {
+        set({ isSaving: true, error: null });
+        try {
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            const response = await api.post(`/workspaces/${workspaceId}/logo`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            set({
+                currentWorkspace: response.data.data,
+                isSaving: false
+            });
+            
+            toast.success('Workspace Emblem Uplinked', {
+                description: 'Workspace identity has been synchronized.',
+            });
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to upload workspace logo';
+            set({ error: message, isSaving: false });
+            toast.error('Uplink Failed', {
+                description: message,
+            });
             throw error;
         }
     },

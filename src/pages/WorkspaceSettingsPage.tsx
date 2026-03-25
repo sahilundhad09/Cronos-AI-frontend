@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Loader2, Save, Trash2, ShieldAlert, Info, Users, AlertTriangle, Palette } from 'lucide-react';
+import { Loader2, Save, Trash2, ShieldAlert, Info, Users, AlertTriangle, Palette, Upload, X, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { WorkspaceMemberManagement } from '@/components/settings/WorkspaceMemberManagement';
 import { ThemeCustomization } from '@/components/settings/ThemeCustomization';
@@ -25,6 +26,11 @@ export const WorkspaceSettingsPage: React.FC = () => {
     const isSaving = useSettingsStore(state => state.isSaving);
 
     const { fetchWorkspaces } = useWorkspaceStore();
+    const uploadWorkspaceLogo = useSettingsStore(state => state.uploadWorkspaceLogo);
+
+    // Image upload state
+    const [stagedImage, setStagedImage] = useState<{ file: File; preview: string } | null>(null);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -53,14 +59,40 @@ export const WorkspaceSettingsPage: React.FC = () => {
         try {
             const updateData = {
                 name: formData.name,
-                description: formData.description || null,
-                logo_url: formData.logo_url || null
+                description: formData.description || null
             };
             await updateWorkspace(workspaceId, updateData);
             // Refresh workspaces in the sidebar
             fetchWorkspaces();
         } catch (error) {
             console.error('Failed to update workspace:', error);
+        }
+    };
+
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const preview = URL.createObjectURL(file);
+            setStagedImage({ file, preview });
+        }
+    };
+
+    const handleEmblemSync = async () => {
+        if (!workspaceId || !stagedImage) return;
+        try {
+            await uploadWorkspaceLogo(workspaceId, stagedImage.file);
+            setStagedImage(null);
+            // Refresh sidebar to show new logo
+            fetchWorkspaces();
+        } catch (error) {
+            console.error('Failed to sync workspace emblem:', error);
+        }
+    };
+
+    const handleAbortEmblem = () => {
+        if (stagedImage) {
+            URL.revokeObjectURL(stagedImage.preview);
+            setStagedImage(null);
         }
     };
 
@@ -121,7 +153,90 @@ export const WorkspaceSettingsPage: React.FC = () => {
                     </h2>
 
                     <form onSubmit={handleSaveGeneral} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                        {/* Emblem Management */}
+                        <div className="bg-secondary/10 border border-border rounded-2xl p-6 flex flex-col items-center">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-6 self-start opacity-70">
+                                Workspace Emblem
+                            </h3>
+                            
+                            <div className="relative group mb-6">
+                                <div className="w-32 h-32 rounded-3xl border-2 border-dashed border-border group-hover:border-primary/50 transition-all flex items-center justify-center overflow-hidden bg-secondary/20 relative shadow-xl">
+                                    {stagedImage || formData.logo_url ? (
+                                        <>
+                                            <img 
+                                                src={stagedImage?.preview || formData.logo_url} 
+                                                alt="Workspace logo" 
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <AnimatePresence>
+                                                {stagedImage && (
+                                                    <motion.div 
+                                                        initial={{ top: "-100%" }}
+                                                        animate={{ top: "100%" }}
+                                                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                                        className="absolute left-0 right-0 h-0.5 bg-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.5)] z-10"
+                                                    />
+                                                )}
+                                            </AnimatePresence>
+                                        </>
+                                    ) : (
+                                        <div className="text-center p-4">
+                                            <Zap className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+                                            <p className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground/50">Neural Link Offline</p>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <Button 
+                                    type="button"
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl h-10 w-10 shadow-lg"
+                                >
+                                    <Upload className="h-4 w-4" />
+                                </Button>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    onChange={handleImageSelect} 
+                                    className="hidden" 
+                                    accept="image/*"
+                                />
+                            </div>
+
+                            <AnimatePresence>
+                                {stagedImage && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="flex items-center gap-2 w-full"
+                                    >
+                                        <Button 
+                                            type="button"
+                                            onClick={handleEmblemSync}
+                                            disabled={isSaving}
+                                            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[9px] tracking-widest h-9 rounded-xl"
+                                        >
+                                            {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "SYNC EMBLEM"}
+                                        </Button>
+                                        <Button 
+                                            type="button"
+                                            onClick={handleAbortEmblem}
+                                            variant="ghost" 
+                                            className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground rounded-xl"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* General Info */}
+                        <div className="lg:col-span-2 space-y-6">
                             <div className="space-y-2.5">
                                 <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground">
                                     Workspace Name *
@@ -134,30 +249,20 @@ export const WorkspaceSettingsPage: React.FC = () => {
                                     required
                                 />
                             </div>
+
                             <div className="space-y-2.5">
                                 <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground">
-                                    Logo URL
+                                    Description
                                 </Label>
-                                <Input
-                                    value={formData.logo_url}
-                                    onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-                                    placeholder="https://example.com/logo.png"
-                                    className="bg-secondary/30 border-border text-foreground h-11 px-4 focus:border-primary/50 transition-colors"
+                                <Textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Brief description of this workspace"
+                                    className="bg-secondary/30 border-border text-foreground min-h-[120px] p-4 focus:border-primary/50 transition-colors resize-none"
                                 />
                             </div>
                         </div>
-
-                        <div className="space-y-2.5">
-                            <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground">
-                                Description
-                            </Label>
-                            <Textarea
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="Brief description of this workspace"
-                                className="bg-secondary/30 border-border text-foreground min-h-[120px] p-4 focus:border-primary/50 transition-colors resize-none"
-                            />
-                        </div>
+                    </div>
 
                         <div className="pt-6 flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4">
                             <Button

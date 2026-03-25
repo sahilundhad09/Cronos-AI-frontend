@@ -4,7 +4,6 @@ import {
     LogOut,
     Plus,
     Check,
-    Brain,
     ChevronsUpDown,
     Settings,
     Palette,
@@ -99,8 +98,12 @@ const WorkspaceSwitcher = memo<WorkspaceSwitcherProps>(({
                     className="w-full flex items-center justify-between px-3 py-5 bg-primary/5 border border-primary/20 rounded-2xl hover:bg-primary/10 hover:border-primary/40 transition-all group"
                 >
                     <div className="flex items-center gap-3 overflow-hidden text-left">
-                        <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 border border-primary/30 flex items-center justify-center font-black text-sm text-primary-foreground shadow-lg shadow-primary/20">
-                            {activeWorkspace?.name?.substring(0, 1).toUpperCase() || 'C'}
+                        <div className="flex-shrink-0 w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-primary to-primary/60 border border-primary/30 flex items-center justify-center font-black text-sm text-primary-foreground shadow-lg shadow-primary/20">
+                            {activeWorkspace?.logo_url ? (
+                                <img src={activeWorkspace.logo_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                activeWorkspace?.name?.substring(0, 1).toUpperCase() || 'C'
+                            )}
                         </div>
                         <div className="overflow-hidden">
                             <p className="text-sm font-black text-foreground truncate leading-none mb-1">
@@ -131,12 +134,16 @@ const WorkspaceSwitcher = memo<WorkspaceSwitcherProps>(({
                             }`}
                         >
                             <div className="flex items-center gap-3 overflow-hidden">
-                                <div className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black ${
+                                <div className={`flex-shrink-0 w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center text-[10px] font-black ${
                                     activeWorkspace?.id === ws.id
                                         ? 'bg-primary text-primary-foreground'
                                         : 'bg-muted text-muted-foreground'
                                 }`}>
-                                    {ws.name.substring(0, 1).toUpperCase()}
+                                    {ws.logo_url ? (
+                                        <img src={ws.logo_url} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                        ws.name.substring(0, 1).toUpperCase()
+                                    )}
                                 </div>
                                 <span className="text-xs font-bold truncate">{ws.name}</span>
                             </div>

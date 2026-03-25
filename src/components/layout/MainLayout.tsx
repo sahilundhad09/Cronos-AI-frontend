@@ -375,6 +375,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         navigate('/login');
     }, [logout, navigate]);
 
+    const handleWorkspaceSwitch = useCallback((workspaceId: string) => {
+        setActiveWorkspace(workspaceId);
+        navigate('/dashboard');
+        if (!isDesktop) {
+            setIsMobileMenuOpen(false);
+        }
+    }, [setActiveWorkspace, navigate, isDesktop, setIsMobileMenuOpen]);
+
     const handleCreateWorkspace = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newWorkspaceName.trim()) {
@@ -396,19 +404,26 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         }
     }, [createWorkspace, newWorkspaceName, newWorkspaceDesc]);
 
-    const menuItems = useMemo(() => [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', exact: true },
-        { icon: Briefcase, label: 'Projects', path: '/projects' },
-        { icon: Users, label: 'Team', path: '/team' },
-        { icon: Brain, label: 'Neural Engine', path: '/ai-chat' },
-        { icon: BarChart3, label: 'Analytics', path: '/analytics' },
-        { icon: TrendingUp, label: 'Growth', path: '/growth' },
-    ], []);
+    const menuItems = useMemo(() => {
+        const isAdmin = activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin';
+        return [
+            { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', exact: true },
+            { icon: Briefcase, label: 'Projects', path: '/projects' },
+            { icon: Users, label: 'Team', path: '/team' },
+            { icon: Brain, label: 'Neural Engine', path: '/ai-chat' },
+            { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+            { icon: TrendingUp, label: 'Growth', path: '/growth' },
+        ].filter(item => {
+            if (item.label === 'Analytics') return isAdmin;
+            if (item.label === 'Growth') return isAdmin || activeWorkspace?.role === 'member';
+            return true;
+        });
+    }, [activeWorkspace?.role]);
 
     const sidebarProps = useMemo(() => ({
         workspaces,
         activeWorkspace,
-        setActiveWorkspace,
+        setActiveWorkspace: handleWorkspaceSwitch,
         isCreateDialogOpen,
         setIsCreateDialogOpen,
         newWorkspaceName,

@@ -15,9 +15,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProjectPulseProps {
     projectId: string;
+    canInitialize?: boolean;
 }
 
-const ProjectPulse: React.FC<ProjectPulseProps> = ({ projectId }) => {
+const ProjectPulse: React.FC<ProjectPulseProps> = ({ projectId, canInitialize = false }) => {
     const { getProjectPulse, isGenerating } = useAIStore();
     const [pulseData, setPulseData] = useState<any>(null);
 
@@ -145,13 +146,19 @@ const ProjectPulse: React.FC<ProjectPulseProps> = ({ projectId }) => {
                             animate={{ opacity: 1 }}
                             className="text-center py-6 space-y-4"
                         >
-                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Neural analytics pending for this sector</p>
-                            <Button
-                                onClick={fetchPulse}
-                                className="bg-cyan-500/10 hover:bg-cyan-500 hover:text-[#030408] text-cyan-400 font-black h-10 rounded-xl px-6 uppercase tracking-widest text-[10px] border border-cyan-500/20"
-                            >
-                                Initialize Analytics
-                            </Button>
+                            {canInitialize ? (
+                                <>
+                                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Neural analytics pending for this sector</p>
+                                    <Button
+                                        onClick={fetchPulse}
+                                        className="bg-cyan-500/10 hover:bg-cyan-500 hover:text-[#030408] text-cyan-400 font-black h-10 rounded-xl px-6 uppercase tracking-widest text-[10px] border border-cyan-500/20"
+                                    >
+                                        Initialize Analytics
+                                    </Button>
+                                </>
+                            ) : (
+                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">Neural analytics pending (Admin access required)</p>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>

@@ -21,9 +21,10 @@ interface KanbanColumnProps {
     status: TaskStatus;
     projectId: string;
     tasks: Task[];
+    isLead?: boolean;
 }
 
-const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, projectId, tasks }) => {
+const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, projectId, tasks, isLead }) => {
     const { deleteStatus } = useTaskStore();
 
     const handleDeleteColumn = () => {
@@ -58,21 +59,23 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, projectId, tasks })
                             </Button>
                         }
                     />
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                                <MoreVertical className="h-3.5 w-3.5" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground">
-                            <DropdownMenuItem 
-                                onClick={handleDeleteColumn}
-                                className="text-[10px] font-black uppercase tracking-widest text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
-                            >
-                                <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete Column
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {isLead && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                                    <MoreVertical className="h-3.5 w-3.5" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground">
+                                <DropdownMenuItem 
+                                    onClick={handleDeleteColumn}
+                                    className="text-[10px] font-black uppercase tracking-widest text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete Column
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
             </div>
 
@@ -86,7 +89,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, projectId, tasks })
                         {tasks
                             .sort((a, b) => a.position - b.position)
                             .map((task, index) => (
-                                <TaskCard key={task.id} task={task} index={index} />
+                                <TaskCard key={task.id} task={task} index={index} isLead={isLead} />
                             ))}
                         {provided.placeholder}
                     </div>

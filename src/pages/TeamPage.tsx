@@ -59,7 +59,7 @@ const TeamPage = () => {
     const { data: invitations, isLoading: invitesLoading } = useQuery({
         queryKey: ['workspace-invitations', activeWorkspace?.id],
         queryFn: async () => {
-            const response = await api.get(`/workspaces/${activeWorkspace?.id}/invitations`);
+            const response = await api.get(`/workspaces/${activeWorkspace?.id}/invitations?status=pending`);
             return response.data.data;
         },
         enabled: !!activeWorkspace && (activeWorkspace.role === 'owner' || activeWorkspace.role === 'admin')
@@ -80,6 +80,19 @@ const TeamPage = () => {
         onError: (error: any) => {
             const message = error.response?.data?.message || 'Failed to transmit neural link. Connection interrupted.';
             setMutationError(message);
+        }
+    });
+
+    // Cancel invitation mutation
+    const cancelInviteMutation = useMutation({
+        mutationFn: async (invitationId: string) => {
+            return api.delete(`/workspaces/${activeWorkspace?.id}/invitations/${invitationId}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workspace-invitations'] });
+        },
+        onError: (error: any) => {
+            console.error('Failed to cancel invitation:', error);
         }
     });
 
@@ -346,7 +359,15 @@ const TeamPage = () => {
                                                     <p className="text-[10px] text-foreground font-bold">{inv.email}</p>
                                                     <p className="text-[8px] text-muted-foreground/60 font-black uppercase tracking-widest">{inv.role} Interface</p>
                                                 </div>
-                                                <button className="text-muted-foreground/40 hover:text-destructive transition-colors">
+                                                 <button 
+                                                    onClick={() => {
+                                                        if (window.confirm(`Are you sure you want to revoke this neural link for ${inv.email}?`)) {
+                                                            cancelInviteMutation.mutate(inv.id);
+                                                        }
+                                                    }}
+                                                    disabled={cancelInviteMutation.isPending}
+                                                    className="text-muted-foreground/40 hover:text-destructive transition-colors disabled:opacity-50"
+                                                >
                                                     <Trash2 className="h-3 w-3" />
                                                 </button>
                                             </div>
