@@ -4,6 +4,11 @@ import { toast } from 'sonner';
 import {
     BarChart3,
     Bell,
+    LogOut,
+    ChevronRight,
+    Plus,
+    Check,
+    Briefcase,
     Brain,
     Briefcase,
     ChevronRight,
@@ -22,6 +27,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { useProjectStore } from '@/store/useProjectStore';
+import SearchDialog from '@/components/layout/SearchDialog';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -590,6 +596,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                 </div>
                             </div>
                         </div>
+                    <div className="flex items-center gap-6">
+                        {/* Command Hub Search */}
+                        <SearchDialog />
 
                         {/* Right Section - Actions */}
                         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 shrink-0">

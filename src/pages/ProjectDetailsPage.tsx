@@ -16,6 +16,7 @@ import {
     Trash2,
     MoreVertical,
     Settings2
+    Sparkles
 } from 'lucide-react';
 import { useProjectStore } from '@/store/useProjectStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -44,6 +45,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import AISuggestionsPanel from '@/components/project/AISuggestionsPanel';
 
 const ProjectDetailsPage = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -314,6 +316,43 @@ const ProjectDetailsPage = () => {
                                     </TabsTrigger>
                                 ))}
                                 {(activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin' || isLead) && (
+            {/* Tabbed Interface */}
+            <main className="flex-1 overflow-hidden flex flex-col">
+                <Tabs defaultValue="kanban" className="flex-1 flex flex-col min-h-0">
+                    <div className="border-b border-white/5 px-6 flex-shrink-0">
+                        <div className="mx-auto">
+                            <TabsList className="bg-transparent h-12 p-0 gap-6 justify-start">
+                                <TabsTrigger
+                                    value="kanban"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                                >
+                                    <LayoutDashboard className="h-4 w-4" /> Board
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="orchestrator"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-14 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                                >
+                                    <Brain className="h-4 w-4 text-cyan-500" /> AI Orchestrator
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="team"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                                >
+                                    <Users className="h-4 w-4" /> Specialists
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="activity"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                                >
+                                    <Activity className="h-4 w-4 text-emerald-500" /> Stream
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="insights"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                                >
+                                    <Sparkles className="h-4 w-4 text-purple-500" /> AI Insights
+                                </TabsTrigger>
+                                <PermissionGate roles={['owner', 'admin']}>
                                     <TabsTrigger
                                         value="settings"
                                         className="
@@ -415,6 +454,15 @@ const ProjectDetailsPage = () => {
                                         <h2 className="text-lg font-heading font-black text-foreground uppercase italic tracking-tight leading-none">Specialists Assembly</h2>
                                         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1.5">{projectMembers.length} Active · Sector Personnel Management</p>
                                         </div>
+                            <TabsContent value="insights" className="m-0 h-full overflow-y-auto custom-scrollbar w-full py-4">
+                                <AISuggestionsPanel projectId={projectId!} />
+                            </TabsContent>
+
+                            <TabsContent value="team" className="m-0 flex-1 flex flex-col gap-8 overflow-y-auto custom-scrollbar pr-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="space-y-1">
+                                        <h3 className="text-xl font-heading font-black text-white uppercase italic tracking-tighter">Active Personnel</h3>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Specialists currently assigned to this mission sector</p>
                                     </div>
                                     <ProjectInviteDialog projectId={projectId!} />
                                     </div>
