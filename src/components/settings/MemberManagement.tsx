@@ -10,7 +10,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Trash2, Loader2, Search } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProjectInviteDialog } from '@/components/project/ProjectInviteDialog';
 
 interface MemberManagementProps {
@@ -71,7 +71,7 @@ export const MemberManagement: React.FC<MemberManagementProps> = ({ projectId })
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -79,74 +79,77 @@ export const MemberManagement: React.FC<MemberManagementProps> = ({ projectId })
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-lg font-heading font-black text-white uppercase tracking-tight">
+                    <h2 className="text-base sm:text-lg font-heading font-black text-foreground uppercase tracking-tight">
                         Project Members
                     </h2>
-                    <p className="text-sm text-slate-400 mt-1">
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
                         Manage who has access to this project
                     </p>
                 </div>
-                <ProjectInviteDialog projectId={projectId} />
+                <div className="w-full sm:w-auto">
+                    <ProjectInviteDialog projectId={projectId} />
+                </div>
             </div>
 
             {/* Search */}
             {projectMembers.length > 0 && (
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search members..."
-                        className="pl-10 bg-slate-800/50 border-white/10 text-white"
+                        className="pl-10 bg-secondary/30 border-border text-foreground"
                     />
                 </div>
             )}
 
             {/* Members List */}
-            <div className="bg-slate-900/50 border border-white/10 rounded-xl">
+            <div className="bg-card/50 border border-border rounded-xl mt-4">
                 {filteredMembers.length === 0 ? (
                     <div className="p-12 text-center">
-                        <p className="text-slate-500 text-sm">
-                            {searchQuery ? 'No members found matching your search.' : 'No members yet. Invite members to collaborate on this project.'}
+                        <p className="text-muted-foreground text-sm uppercase tracking-widest font-black italic opacity-50">
+                            {searchQuery ? 'Zero results in terminal' : 'No operatives in this sector'}
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-white/5">
+                    <div className="divide-y divide-border">
                         {filteredMembers.map((member: any) => (
                             <div
                                 key={member.id}
-                                className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group"
+                                className="p-3 sm:p-4 flex flex-col xs:flex-row xs:items-center justify-between hover:bg-secondary/20 transition-colors group gap-3 sm:gap-4"
                             >
                                 <div className="flex items-center gap-3">
-                                    <Avatar className="h-10 w-10 border-2 border-white/10">
-                                        <AvatarFallback className="bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-white font-bold">
+                                    <Avatar className="h-9 w-9 sm:h-10 sm:w-10 border-2 border-border/50 shrink-0">
+                                        <AvatarImage src={member.user?.avatar_url} />
+                                        <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
                                             {getInitials(member.user?.name || 'U')}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div>
-                                        <p className="text-white font-medium">{member.user?.name}</p>
-                                        <p className="text-xs text-slate-500">{member.user?.email}</p>
+                                    <div className="min-w-0">
+                                        <p className="text-foreground font-bold text-sm tracking-tight truncate">{member.user?.name}</p>
+                                        <p className="text-[9px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest opacity-70 truncate">{member.user?.email}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-between xs:justify-end gap-2 sm:gap-3 w-full xs:w-auto">
                                     <Select
                                         value={member.project_role}
                                         onValueChange={(newRole: string) => handleRoleChange(member.id, newRole)}
                                         disabled={isSaving}
                                     >
-                                        <SelectTrigger className="w-32 bg-slate-800/50 border-white/10 text-white h-8 text-xs">
+                                        <SelectTrigger className="w-full xs:w-28 sm:w-32 bg-secondary/30 border-border text-foreground h-9 xs:h-8 text-[10px] sm:text-[11px] font-black uppercase tracking-tight">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-slate-800 border-white/10">
-                                            <SelectItem value="lead" className="text-white text-xs">
+                                        <SelectContent className="bg-card border-border">
+                                            <SelectItem value="lead" className="text-foreground text-[10px] sm:text-[11px] font-black uppercase tracking-tight">
                                                 Lead
                                             </SelectItem>
-                                            <SelectItem value="member" className="text-white text-xs">
+                                            <SelectItem value="member" className="text-foreground text-[10px] sm:text-[11px] font-black uppercase tracking-tight">
                                                 Member
                                             </SelectItem>
-                                            <SelectItem value="viewer" className="text-white text-xs">
+                                            <SelectItem value="viewer" className="text-foreground text-[10px] sm:text-[11px] font-black uppercase tracking-tight">
                                                 Viewer
                                             </SelectItem>
                                         </SelectContent>
@@ -155,7 +158,7 @@ export const MemberManagement: React.FC<MemberManagementProps> = ({ projectId })
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => handleRemoveMember(member.id, member.user?.name || 'this member')}
-                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-9 w-9 xs:h-8 xs:w-8 p-0"
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -167,8 +170,8 @@ export const MemberManagement: React.FC<MemberManagementProps> = ({ projectId })
             </div>
 
             {/* Member Count */}
-            <div className="text-xs text-slate-500 text-center">
-                {projectMembers.length} {projectMembers.length === 1 ? 'member' : 'members'} in this project
+            <div className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] text-center opacity-60">
+                {projectMembers.length} {projectMembers.length === 1 ? 'operative' : 'operatives'} in this sector
             </div>
         </div>
     );

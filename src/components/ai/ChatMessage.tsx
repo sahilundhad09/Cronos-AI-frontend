@@ -30,24 +30,24 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ role, content, timesta
             <div className={`flex-1 max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
                 <div className={`rounded-2xl px-4 py-3 ${isUser
                     ? 'bg-cyan-500/10 border border-cyan-500/30'
-                    : 'bg-slate-800/50 border border-white/5'
+                    : 'bg-card border border-border'
                     }`}>
                     {isUser ? (
-                        <p className="text-sm text-white leading-relaxed">{content}</p>
+                        <p className="text-sm text-foreground leading-relaxed">{content}</p>
                     ) : (
-                        <div className="prose prose-invert prose-sm max-w-none text-sm text-slate-200 leading-relaxed">
+                        <div className="prose prose-sm max-w-none text-sm text-foreground leading-relaxed">
                             <ReactMarkdown
                                 components={{
                                     p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                                     ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
                                     ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
                                     code: ({ children }) => (
-                                        <code className="bg-slate-900/50 px-1.5 py-0.5 rounded text-cyan-400 text-xs font-mono">
+                                        <code className="bg-muted px-1.5 py-0.5 rounded text-cyan-500 text-xs font-mono">
                                             {children}
                                         </code>
                                     ),
                                     pre: ({ children }) => (
-                                        <pre className="bg-slate-900/50 p-3 rounded-lg overflow-x-auto mb-2">
+                                        <pre className="bg-muted p-3 rounded-lg overflow-x-auto mb-2">
                                             {children}
                                         </pre>
                                     ),

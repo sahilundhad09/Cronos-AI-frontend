@@ -11,10 +11,19 @@ const SOCKET_URL = import.meta.env.VITE_API_URL
  * Get or create the socket connection (singleton)
  */
 export function getSocket(): Socket | null {
-    if (socket?.connected) return socket;
-
     const token = useAuthStore.getState().accessToken;
     if (!token) return null;
+
+    const currentToken = socket?.auth && (socket.auth as any).token;
+    
+    // If socket exists but token has changed, disconnect it to force a new one
+    if (socket && currentToken !== token) {
+        console.log('🔌 Auth token changed, recreating socket connection...');
+        socket.disconnect();
+        socket = null;
+    }
+
+    if (socket?.connected) return socket;
 
     socket = io(SOCKET_URL, {
         auth: { token },
@@ -30,6 +39,15 @@ export function getSocket(): Socket | null {
 
     socket.on('connect_error', (err) => {
         console.error('🔌 Socket connection error:', err.message);
+        
+        // If authentication fails, disconnect and wait for a new token
+        if (err.message === 'Authentication required' || 
+            err.message === 'Invalid token' || 
+            err.message === 'Token expired' ||
+            err.message === 'jwt expired') {
+            console.warn('🔌 Authentication error, disconnecting socket...');
+            socket?.disconnect();
+        }
     });
 
     socket.on('disconnect', (reason) => {

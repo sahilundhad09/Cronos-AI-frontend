@@ -79,9 +79,10 @@ const RegisterPage = () => {
                 {/* Home Link - Top Left */}
                 <Link to="/" className="absolute top-12 left-12 flex items-center gap-3 group z-20">
                     <div className="bg-white/5 p-2 rounded-xl group-hover:bg-cyan-500 transition-all duration-500">
-                        <Brain className="h-6 w-6 text-cyan-400 group-hover:text-[#030408]" />
+                        {/* <Brain className="h-6 w-6 text-cyan-400 group-hover:text-[#030408]" /> */}
+                        <img src="/favicon.png" alt="Cronos AI" className="h-12 w-12 rounded-xl" />
                     </div>
-                    <span className="font-heading font-black text-2xl tracking-tighter">Cronos AI</span>
+                    <span className="font-heading font-black text-3xl tracking-tighter">Cronos AI</span>
                 </Link>
 
                 <motion.div
@@ -120,8 +121,9 @@ const RegisterPage = () => {
                 <div className="w-full max-w-md space-y-10">
                     {/* Logo for mobile */}
                     <Link to="/" className="lg:hidden flex items-center gap-3 justify-center mb-10">
-                        <Brain className="h-8 w-8 text-cyan-500" />
-                        <span className="font-heading font-black text-2xl tracking-tighter">Cronos AI</span>
+                        {/* <Brain className="h-8 w-8 text-cyan-500" /> */}
+                        <img src="/favicon.png" alt="Cronos AI" className="h-12 w-12 rounded-xl" />
+                        <span className="font-heading font-black text-3xl tracking-tighter">Cronos AI</span>
                     </Link>
 
                     <div className="space-y-3 text-center lg:text-left">

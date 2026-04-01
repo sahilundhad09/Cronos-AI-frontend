@@ -9,6 +9,7 @@ export interface Project {
     name: string;
     description: string | null;
     color: string | null;
+    image_url: string | null;
     start_date: string | null;
     end_date: string | null;
     archived: boolean;
@@ -115,11 +116,13 @@ interface SettingsState {
     updateProject: (projectId: string, data: Partial<Project>) => Promise<void>;
     archiveProject: (projectId: string, archived: boolean) => Promise<void>;
     deleteProject: (projectId: string) => Promise<void>;
+    uploadProjectImage: (projectId: string, file: File) => Promise<void>;
 
     // Workspace actions
     loadWorkspaceSettings: (workspaceId: string) => Promise<void>;
     updateWorkspace: (workspaceId: string, data: Partial<Workspace>) => Promise<void>;
     deleteWorkspace: (workspaceId: string) => Promise<void>;
+    uploadWorkspaceLogo: (workspaceId: string, file: File) => Promise<void>;
 
     // Project member actions
     loadProjectMembers: (projectId: string) => Promise<void>;
@@ -132,7 +135,7 @@ interface SettingsState {
     inviteWorkspaceMember: (workspaceId: string, email: string, role: string) => Promise<void>;
     updateWorkspaceMemberRole: (workspaceId: string, memberId: string, role: string) => Promise<void>;
     removeWorkspaceMember: (workspaceId: string, memberId: string) => Promise<void>;
-    loadWorkspaceInvitations: (workspaceId: string) => Promise<void>;
+    loadWorkspaceInvitations: (workspaceId: string, status?: string) => Promise<void>;
     cancelInvitation: (workspaceId: string, invitationId: string) => Promise<void>;
 
     // Label actions
@@ -248,6 +251,36 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         }
     },
 
+    uploadProjectImage: async (projectId: string, file: File) => {
+        set({ isSaving: true, error: null });
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const response = await api.post(`/projects/${projectId}/image`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            set({
+                currentProject: response.data.data,
+                isSaving: false
+            });
+            
+            toast.success('Project Emblem Uplinked', {
+                description: 'Mission identity has been synchronized.',
+            });
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to upload project image';
+            set({ error: message, isSaving: false });
+            toast.error('Uplink Failed', {
+                description: message,
+            });
+            throw error;
+        }
+    },
+
     // Workspace actions
     loadWorkspaceSettings: async (workspaceId: string) => {
         set((state) => ({
@@ -303,6 +336,36 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
             const message = error.response?.data?.message || 'Failed to delete workspace';
             set({ error: message, isSaving: false });
             toast.error('Delete Error', { description: message });
+            throw error;
+        }
+    },
+
+    uploadWorkspaceLogo: async (workspaceId: string, file: File) => {
+        set({ isSaving: true, error: null });
+        try {
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            const response = await api.post(`/workspaces/${workspaceId}/logo`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            set({
+                currentWorkspace: response.data.data,
+                isSaving: false
+            });
+            
+            toast.success('Workspace Emblem Uplinked', {
+                description: 'Workspace identity has been synchronized.',
+            });
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to upload workspace logo';
+            set({ error: message, isSaving: false });
+            toast.error('Uplink Failed', {
+                description: message,
+            });
             throw error;
         }
     },
@@ -411,7 +474,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         set({ isSaving: true, error: null });
         try {
             await api.post(`/workspaces/${workspaceId}/invitations`, { email, role });
-            await get().loadWorkspaceInvitations(workspaceId);
+            await get().loadWorkspaceInvitations(workspaceId, 'pending');
             set({ isSaving: false });
             toast.success('Invitation Sent', {
                 description: `Invitation sent to ${email}.`
@@ -458,13 +521,16 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         }
     },
 
-    loadWorkspaceInvitations: async (workspaceId: string) => {
+    loadWorkspaceInvitations: async (workspaceId: string, status?: string) => {
         set((state) => ({
             loadingStates: { ...state.loadingStates, invitations: true },
             error: null
         }));
         try {
-            const response = await api.get(`/workspaces/${workspaceId}/invitations`);
+            const url = status 
+                ? `/workspaces/${workspaceId}/invitations?status=${status}`
+                : `/workspaces/${workspaceId}/invitations`;
+            const response = await api.get(url);
             set((state) => ({
                 workspaceInvitations: response.data.data || [],
                 loadingStates: { ...state.loadingStates, invitations: false }
@@ -483,7 +549,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         set({ isSaving: true, error: null });
         try {
             await api.delete(`/workspaces/${workspaceId}/invitations/${invitationId}`);
-            await get().loadWorkspaceInvitations(workspaceId);
+            await get().loadWorkspaceInvitations(workspaceId, 'pending');
             set({ isSaving: false });
             toast.success('Invitation Cancelled', {
                 description: 'Invitation has been cancelled.'

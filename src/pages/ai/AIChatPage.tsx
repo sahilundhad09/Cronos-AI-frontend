@@ -42,9 +42,9 @@ const AIChatPage = () => {
     }, [projects, selectedProject]);
 
     return (
-        <div className="h-full flex flex-col bg-[#030408] overflow-hidden">
+        <div className="h-full flex flex-col bg-background text-foreground overflow-hidden">
             {/* Page Header */}
-            <header className="border-b border-white/5 bg-[#030408]/50 backdrop-blur-xl px-6 py-4 flex-shrink-0">
+            <header className="border-b border-border bg-[hsl(var(--app-header-bg))] backdrop-blur-xl px-4 sm:px-6 py-4 flex-shrink-0">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="relative">
@@ -54,7 +54,7 @@ const AIChatPage = () => {
                             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#030408] animate-pulse" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-heading font-black tracking-tighter uppercase italic text-white">
+                            <h1 className="text-2xl sm:text-3xl font-heading font-black tracking-tighter uppercase italic text-foreground">
                                 Neural <span className="text-cyan-400">Engine</span>
                             </h1>
                             <p className="text-slate-500 font-bold uppercase text-[9px] tracking-[0.2em] mt-0.5">
@@ -64,7 +64,7 @@ const AIChatPage = () => {
                     </div>
 
                     {/* Project Selector */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
                         <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest hidden sm:block">
                             Active Neural Link
                         </span>
@@ -72,7 +72,7 @@ const AIChatPage = () => {
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="h-10 px-4 bg-slate-800/50 border-white/10 hover:border-cyan-500/50 text-white font-black uppercase text-[10px] tracking-widest gap-2 transition-all min-w-[200px] justify-between"
+                                    className="h-10 px-4 bg-card border-border hover:border-primary/50 text-foreground font-black uppercase text-[10px] tracking-widest gap-2 transition-all w-full sm:min-w-[200px] justify-between"
                                 >
                                     <div className="flex items-center gap-2">
                                         <Target className="h-3.5 w-3.5 text-cyan-400" />
@@ -83,7 +83,7 @@ const AIChatPage = () => {
                                     <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-72 bg-[#0A0D18] border-white/5 text-white rounded-2xl p-2" align="end">
+                            <DropdownMenuContent className="w-[min(18rem,90vw)] bg-popover border-border text-popover-foreground rounded-2xl p-2" align="end">
                                 <DropdownMenuLabel className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-3 py-2">
                                     Select Project
                                 </DropdownMenuLabel>
@@ -162,7 +162,7 @@ const AIChatPage = () => {
                                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-500/30 rounded-full animate-ping" />
                                 </div>
 
-                                <h2 className="text-2xl font-heading font-black text-white uppercase italic tracking-tighter mb-3">
+                                <h2 className="text-2xl font-heading font-black text-foreground uppercase italic tracking-tighter mb-3">
                                     Awaiting <span className="text-cyan-400">Neural Link</span>
                                 </h2>
                                 <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest leading-relaxed mb-8">
@@ -173,21 +173,21 @@ const AIChatPage = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
                                     <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-cyan-500/20 transition-all group">
                                         <MessageSquare className="h-5 w-5 text-cyan-400 mb-3 group-hover:scale-110 transition-transform" />
-                                        <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-1">Smart Chat</h4>
+                                        <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest mb-1">Smart Chat</h4>
                                         <p className="text-[9px] text-slate-600 font-bold leading-relaxed">
                                             Ask questions about your project status and tasks
                                         </p>
                                     </div>
                                     <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-purple-500/20 transition-all group">
                                         <Sparkles className="h-5 w-5 text-purple-400 mb-3 group-hover:scale-110 transition-transform" />
-                                        <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-1">Task Gen</h4>
+                                        <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest mb-1">Task Gen</h4>
                                         <p className="text-[9px] text-slate-600 font-bold leading-relaxed">
                                             Create and assign tasks using natural language
                                         </p>
                                     </div>
                                     <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-all group">
                                         <Zap className="h-5 w-5 text-emerald-400 mb-3 group-hover:scale-110 transition-transform" />
-                                        <h4 className="text-[10px] font-black text-white uppercase tracking-widest mb-1">Analysis</h4>
+                                        <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest mb-1">Analysis</h4>
                                         <p className="text-[9px] text-slate-600 font-bold leading-relaxed">
                                             Get AI-powered insights on project health
                                         </p>

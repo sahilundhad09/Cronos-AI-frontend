@@ -136,8 +136,8 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+            <div className="flex items-center justify-center py-16">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -145,47 +145,47 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                 <div>
-                    <h2 className="text-lg font-heading font-black text-white uppercase tracking-tight">
+                    <h2 className="text-lg sm:text-xl font-heading font-black text-foreground uppercase tracking-tight italic">
                         Task Statuses
                     </h2>
-                    <p className="text-sm text-slate-400 mt-1">
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-[0.15em] font-black mt-1 sm:mt-1.5 opacity-70 leading-relaxed">
                         Manage the columns in your Kanban board
                     </p>
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black">
+                        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest px-8 shadow-lg shadow-primary/20 h-10">
                             <Plus className="h-4 w-4 mr-2" />
                             New Status
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-slate-900 border-white/10">
+                    <DialogContent className="bg-card border-border shadow-2xl">
                         <DialogHeader>
-                            <DialogTitle className="text-white font-heading font-black uppercase">
+                            <DialogTitle className="text-lg sm:text-xl font-heading font-black uppercase tracking-tight italic text-foreground text-left">
                                 Create New Status
                             </DialogTitle>
-                            <DialogDescription className="text-slate-400">
-                                Add a new status column to your Kanban board.
+                            <DialogDescription className="text-muted-foreground text-[11px] sm:text-xs font-semibold leading-relaxed text-left">
+                                Add a new status column to your Kanban board sector.
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="space-y-4 py-4">
+                        <div className="space-y-6 py-4">
                             <div>
-                                <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
+                                <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
                                     Status Name *
                                 </Label>
                                 <Input
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="e.g., To Do, In Progress, Done"
-                                    className="bg-slate-800/50 border-white/10 text-white"
+                                    className="bg-secondary/30 border-border text-foreground h-11"
                                     maxLength={50}
                                 />
                             </div>
                             <div>
-                                <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
-                                    Color
+                                <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
+                                    Identifier Color
                                 </Label>
                                 <div className="flex items-center gap-2">
                                     <div className="flex flex-wrap gap-2">
@@ -194,8 +194,8 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                                 key={color}
                                                 onClick={() => setFormData({ ...formData, color })}
                                                 className={`w-8 h-8 rounded-lg border-2 transition-all ${formData.color === color
-                                                    ? 'border-white scale-110'
-                                                    : 'border-white/20 hover:border-white/40'
+                                                    ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
+                                                    : 'border-border hover:border-primary/40'
                                                     }`}
                                                 style={{ backgroundColor: color }}
                                                 title={color}
@@ -206,23 +206,23 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                         type="color"
                                         value={formData.color}
                                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                        className="w-16 h-8 bg-slate-800/50 border-white/10"
+                                        className="w-16 h-10 bg-secondary/30 border-border p-1 cursor-pointer"
                                     />
                                 </div>
                             </div>
                         </div>
-                        <DialogFooter>
+                        <DialogFooter className="pt-6">
                             <Button
                                 variant="ghost"
                                 onClick={closeDialog}
-                                className="text-slate-400 hover:text-white"
+                                className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleCreate}
                                 disabled={isSaving || !formData.name.trim()}
-                                className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest h-11 px-8 shadow-lg shadow-primary/20"
                             >
                                 {isSaving ? (
                                     <>
@@ -230,7 +230,7 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                         Creating...
                                     </>
                                 ) : (
-                                    'Create Status'
+                                    'Create Sector'
                                 )}
                             </Button>
                         </DialogFooter>
@@ -239,35 +239,37 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
             </div>
 
             {/* Statuses List */}
-            <div className="bg-slate-900/50 border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-card/30 border border-border rounded-xl shadow-sm overflow-hidden">
                 {sortedStatuses.length === 0 ? (
-                    <div className="p-12 text-center">
-                        <p className="text-slate-500 text-sm">
-                            No statuses yet. Create your first status to set up your Kanban board.
+                    <div className="p-16 text-center">
+                        <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] italic opacity-50">
+                            No active statuses detected. Configure terminal columns.
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-white/5">
+                    <div className="divide-y divide-border/50">
                         {sortedStatuses.map((status) => (
                             <div
                                 key={status.id}
-                                className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group"
+                                className="p-4 sm:p-5 flex flex-col xs:flex-row xs:items-center justify-between hover:bg-secondary/10 transition-colors group gap-3 xs:gap-4"
                             >
-                                <div className="flex items-center gap-3">
-                                    <GripVertical className="h-5 w-5 text-slate-600 cursor-move" />
+                                <div className="flex items-center gap-3 sm:gap-4">
+                                    <GripVertical className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground/30 cursor-grab active:cursor-grabbing shrink-0" />
                                     <div
-                                        className="w-4 h-4 rounded"
+                                        className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full shadow-sm ring-1 ring-border shrink-0"
                                         style={{ backgroundColor: status.color }}
                                     />
-                                    <span className="text-white font-medium">{status.name}</span>
-                                    <Badge
-                                        variant="outline"
-                                        className="text-[10px] border-white/10 text-slate-500"
-                                    >
-                                        Position {status.position + 1}
-                                    </Badge>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="text-foreground font-black uppercase text-[11px] sm:text-[12px] tracking-tight truncate max-w-[120px] sm:max-w-none">{status.name}</span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-[8px] sm:text-[9px] border-border/50 text-muted-foreground font-black uppercase tracking-[0.15em] px-1.5 sm:px-2 py-0 h-4 sm:h-4.5 bg-secondary/20 shrink-0"
+                                        >
+                                            Sector {status.position + 1}
+                                        </Badge>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center justify-end gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                     <Dialog
                                         open={editingStatus?.id === status.id}
                                         onOpenChange={(open) => {
@@ -282,42 +284,42 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="text-slate-400 hover:text-white"
+                                                className="text-muted-foreground hover:text-foreground font-black uppercase text-[9px] sm:text-[10px] tracking-widest h-8"
                                             >
-                                                Edit
+                                                Edit Parameters
                                             </Button>
                                         </DialogTrigger>
-                                        <DialogContent className="bg-slate-900 border-white/10">
+                                        <DialogContent className="bg-card border-border shadow-2xl">
                                             <DialogHeader>
-                                                <DialogTitle className="text-white font-heading font-black uppercase">
-                                                    Edit Status
+                                                <DialogTitle className="text-xl font-heading font-black uppercase tracking-tight italic text-foreground">
+                                                    Refine Status
                                                 </DialogTitle>
                                             </DialogHeader>
-                                            <div className="space-y-4 py-4">
+                                            <div className="space-y-6 py-4">
                                                 <div>
-                                                    <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
+                                                    <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
                                                         Status Name *
                                                     </Label>
                                                     <Input
                                                         value={formData.name}
                                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                        className="bg-slate-800/50 border-white/10 text-white"
+                                                        className="bg-secondary/30 border-border text-foreground h-11"
                                                         maxLength={50}
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
-                                                        Color
+                                                    <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground mb-2.5 block">
+                                                        Identifier Color
                                                     </Label>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-4">
                                                         <div className="flex flex-wrap gap-2">
                                                             {colorPresets.map((color) => (
                                                                 <button
                                                                     key={color}
                                                                     onClick={() => setFormData({ ...formData, color })}
                                                                     className={`w-8 h-8 rounded-lg border-2 transition-all ${formData.color === color
-                                                                        ? 'border-white scale-110'
-                                                                        : 'border-white/20 hover:border-white/40'
+                                                                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-110'
+                                                                        : 'border-border hover:border-primary/40'
                                                                         }`}
                                                                     style={{ backgroundColor: color }}
                                                                 />
@@ -327,31 +329,31 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                                             type="color"
                                                             value={formData.color}
                                                             onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                                            className="w-16 h-8 bg-slate-800/50 border-white/10"
+                                                            className="w-16 h-10 bg-secondary/30 border-border p-1 cursor-pointer"
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
-                                            <DialogFooter>
+                                            <DialogFooter className="pt-6">
                                                 <Button
                                                     variant="ghost"
                                                     onClick={closeDialog}
-                                                    className="text-slate-400 hover:text-white"
+                                                    className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest"
                                                 >
                                                     Cancel
                                                 </Button>
                                                 <Button
                                                     onClick={handleUpdate}
                                                     disabled={isSaving || !formData.name.trim()}
-                                                    className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black"
+                                                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest h-11 px-8 shadow-lg shadow-primary/20"
                                                 >
                                                     {isSaving ? (
                                                         <>
                                                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                            Saving...
+                                                            Syncing...
                                                         </>
                                                     ) : (
-                                                        'Save Changes'
+                                                        'Update Parameters'
                                                     )}
                                                 </Button>
                                             </DialogFooter>
@@ -362,8 +364,8 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                         size="sm"
                                         onClick={() => handleDeleteClick(status)}
                                         disabled={sortedStatuses.length === 1}
-                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 disabled:opacity-50"
-                                        title={sortedStatuses.length === 1 ? 'Cannot delete the last status' : 'Delete status'}
+                                        className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 disabled:opacity-30 transition-all rounded-lg h-8 w-8 p-0 shrink-0"
+                                        title={sortedStatuses.length === 1 ? 'Last status retention active' : 'Terminate status'}
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -376,38 +378,40 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10">
+                <DialogContent className="bg-card border-destructive/20 shadow-2xl max-w-[95vw] sm:max-w-lg rounded-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-white font-heading font-black uppercase">
-                            Delete Status
+                        <DialogTitle className="text-lg sm:text-xl font-heading font-black uppercase tracking-tight italic text-destructive text-left">
+                            Decommission Status
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400">
-                            What should happen to tasks in this status?
+                        <DialogDescription className="text-muted-foreground text-[11px] sm:text-xs font-semibold leading-relaxed text-left">
+                            Terminal operation detected. Re-route active task data to an alternative sector.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="py-4">
-                        <Label className="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 block">
-                            Move tasks to
+                    <div className="py-6 space-y-4">
+                        <Label className="text-[10px] uppercase tracking-[0.15em] font-black text-muted-foreground block">
+                            Target Redirect Sector
                         </Label>
                         <Select value={moveTasksToStatusId} onValueChange={setMoveTasksToStatusId}>
-                            <SelectTrigger className="bg-slate-800/50 border-white/10 text-white">
-                                <SelectValue placeholder="Select a status" />
+                            <SelectTrigger className="bg-secondary/30 border-border text-foreground h-12">
+                                <SelectValue placeholder="Select destination..." />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-white/10">
+                            <SelectContent className="bg-card border-border">
                                 {sortedStatuses
                                     .filter(s => s.id !== statusToDelete?.id)
                                     .map((status) => (
-                                        <SelectItem key={status.id} value={status.id} className="text-white">
+                                        <SelectItem key={status.id} value={status.id} className="text-foreground focus:bg-primary/10 uppercase text-[10px] font-black">
                                             {status.name}
                                         </SelectItem>
                                     ))}
                             </SelectContent>
                         </Select>
-                        <p className="text-xs text-slate-500 mt-2">
-                            All tasks in "{statusToDelete?.name}" will be moved to the selected status.
-                        </p>
+                        <div className="p-4 bg-destructive/5 border border-destructive/10 rounded-xl">
+                            <p className="text-[10px] text-destructive font-black uppercase tracking-widest leading-relaxed">
+                                CRITICAL: All tasks in "{statusToDelete?.name}" will be permanently re-linked to the selected sector.
+                            </p>
+                        </div>
                     </div>
-                    <DialogFooter>
+                     <DialogFooter className="pt-2">
                         <Button
                             variant="ghost"
                             onClick={() => {
@@ -415,22 +419,22 @@ export const StatusManagement: React.FC<StatusManagementProps> = ({ projectId })
                                 setStatusToDelete(null);
                                 setMoveTasksToStatusId('');
                             }}
-                            className="text-slate-400 hover:text-white"
+                            className="text-muted-foreground hover:text-foreground font-black uppercase text-[10px] tracking-widest"
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={handleDeleteConfirm}
                             disabled={isSaving || !moveTasksToStatusId}
-                            className="bg-red-500 hover:bg-red-400 text-white font-black"
+                            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-black uppercase text-[10px] tracking-widest h-11 px-8 shadow-lg shadow-destructive/20"
                         >
                             {isSaving ? (
                                 <>
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Deleting...
+                                    Purging...
                                 </>
                             ) : (
-                                'Delete Status'
+                                'Execute Purchase'
                             )}
                         </Button>
                     </DialogFooter>

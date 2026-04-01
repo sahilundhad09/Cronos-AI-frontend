@@ -20,6 +20,7 @@ interface AuthState {
     logout: () => void;
     updateUser: (user: Partial<User>) => void;
     updateProfile: (data: Partial<User>) => Promise<void>;
+    uploadAvatar: (file: File) => Promise<void>;
     changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
@@ -36,9 +37,9 @@ export const useAuthStore = create<AuthState>()(
                 set({ user, isAuthenticated: true, accessToken, refreshToken });
             },
             logout: () => {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                localStorage.clear();
                 set({ user: null, isAuthenticated: false, accessToken: null, refreshToken: null });
+                window.location.href = '/login';
             },
             updateUser: (updatedUser: Partial<User>) =>
                 set((state) => ({
@@ -46,6 +47,16 @@ export const useAuthStore = create<AuthState>()(
                 })),
             updateProfile: async (data: Partial<User>) => {
                 const response = await api.put('/auth/profile', data);
+                get().updateUser(response.data.data);
+            },
+            uploadAvatar: async (file: File) => {
+                const formData = new FormData();
+                formData.append('avatar', file);
+                const response = await api.post('/auth/profile/avatar', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
                 get().updateUser(response.data.data);
             },
             changePassword: async (currentPassword, newPassword) => {

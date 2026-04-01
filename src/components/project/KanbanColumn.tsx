@@ -1,57 +1,100 @@
 import React from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import StrictModeDroppable from './StrictModeDroppable';
 import { Task, TaskStatus } from '@/store/useTaskStore';
 import TaskCard from './TaskCard';
-import { Plus, MoreVertical } from 'lucide-react';
+import {
+    MoreVertical,
+    Trash2,
+    Plus
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import CreateTaskDialog from './CreateTaskDialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useTaskStore } from '@/store/useTaskStore';
 
 interface KanbanColumnProps {
     status: TaskStatus;
+    projectId: string;
     tasks: Task[];
+    isLead?: boolean;
 }
 
-const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, tasks }) => {
+const KanbanColumn: React.FC<KanbanColumnProps> = ({ status, projectId, tasks, isLead }) => {
+    const { deleteStatus } = useTaskStore();
+
+    const handleDeleteColumn = () => {
+        if (window.confirm(`Are you sure you want to delete the "${status.name}" column? This will not delete the tasks.`)) {
+            deleteStatus(status.id);
+        }
+    };
+
     return (
-        <div className="flex flex-col w-72 sm:w-80 md:w-96 flex-shrink-0 h-full bg-white/[0.03] border border-white/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 backdrop-blur-sm">
-            <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.01]">
+        <div className="flex flex-col w-[86vw] sm:w-80 md:w-96 lg:w-[26rem] flex-shrink-0 h-full bg-card/80 border border-border rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl group/column hover:border-primary/40 transition-all duration-300">
+            <div className="p-3 sm:p-4 flex items-center justify-between border-b border-border bg-muted/20">
                 <div className="flex items-center gap-3">
-                    <div
-                        className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(var(--color))] "
-                        style={{ backgroundColor: status.color, boxShadow: `0 0 8px ${status.color}80` } as React.CSSProperties}
-                    />
-                    <h3 className="text-xs font-black uppercase text-white tracking-widest leading-none">
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+                    <h3 className="text-[11px] sm:text-xs font-black uppercase text-foreground tracking-widest leading-none truncate max-w-[120px] sm:max-w-[180px]">
                         {status.name}
                     </h3>
-                    <span className="text-[10px] font-black text-slate-600 bg-white/5 px-1.5 py-0.5 rounded-md leading-none">
+                    <span className="text-[10px] font-black text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md leading-none">
                         {tasks.length}
                     </span>
                 </div>
                 <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-slate-600 hover:text-white">
-                        <Plus className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-slate-600 hover:text-white">
-                        <MoreVertical className="h-3.5 w-3.5" />
-                    </Button>
+                    <CreateTaskDialog
+                        projectId={projectId}
+                        initialStatusId={status.id}
+                        trigger={
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                            >
+                                <Plus className="h-3.5 w-3.5" />
+                            </Button>
+                        }
+                    />
+                    {isLead && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                                    <MoreVertical className="h-3.5 w-3.5" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground">
+                                <DropdownMenuItem 
+                                    onClick={handleDeleteColumn}
+                                    className="text-[10px] font-black uppercase tracking-widest text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete Column
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
             </div>
 
-            <Droppable droppableId={status.id}>
+            <StrictModeDroppable droppableId={status.id}>
                 {(provided, snapshot) => (
                     <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`flex-1 p-4 overflow-y-auto custom-scrollbar min-h-0 transition-colors ${snapshot.isDraggingOver ? 'bg-cyan-500/5' : ''}`}
+                        className={`flex-1 p-3 sm:p-4 overflow-y-auto custom-scrollbar min-h-0 transition-colors ${snapshot.isDraggingOver ? 'bg-primary/10' : ''}`}
                     >
                         {tasks
                             .sort((a, b) => a.position - b.position)
                             .map((task, index) => (
-                                <TaskCard key={task.id} task={task} index={index} />
+                                <TaskCard key={task.id} task={task} index={index} isLead={isLead} />
                             ))}
                         {provided.placeholder}
                     </div>
                 )}
-            </Droppable>
+            </StrictModeDroppable>
         </div>
     );
 };

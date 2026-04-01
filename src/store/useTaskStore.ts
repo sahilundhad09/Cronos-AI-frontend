@@ -14,7 +14,20 @@ export interface Task {
     completed_at?: string;
     created_at: string;
     updated_at: string;
-    assignees?: any[];
+    comment_count?: number;
+    attachment_count?: number;
+    subtask_count?: number;
+    completed_subtasks?: number;
+    assignees?: {
+        id: string;
+        user: {
+            id: string;
+            name: string;
+            email: string;
+            avatar_url?: string;
+        };
+        assigned_at: string;
+    }[];
     tags?: any[];
 }
 
@@ -39,6 +52,7 @@ interface TaskState {
     deleteTask: (taskId: string) => Promise<void>;
     assignMembers: (taskId: string, memberIds: string[]) => Promise<void>;
     removeAssignee: (taskId: string, userId: string) => Promise<void>;
+    deleteStatus: (statusId: string) => Promise<void>;
 }
 
 export const useTaskStore = create<TaskState>((set, get) => ({
@@ -100,10 +114,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
                 status_id: newStatusId,
                 position: newPosition
             });
-        } catch (error) {
+        } catch (error: any) {
             // Rollback on error
             set({ tasks: previousTasks });
             console.error('Failed to move task', error);
+            toast.error('Move Failed', {
+                description: error?.response?.data?.message || 'Could not move task. Please try again.',
+            });
         }
     },
 
@@ -125,7 +142,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         }
     },
 
-    deleteTask: async (taskId) => {
+    deleteTask: async (taskId: string) => {
         try {
             await api.delete(`/tasks/${taskId}`);
             set((state) => ({
@@ -142,7 +159,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         }
     },
 
-    assignMembers: async (taskId, memberIds) => {
+    assignMembers: async (taskId: string, memberIds: string[]) => {
         try {
             const response = await api.post(`/tasks/${taskId}/assignees`, {
                 project_member_ids: memberIds
@@ -186,6 +203,23 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         } catch (error: any) {
             console.error('Failed to remove assignee', error);
             throw error;
+        }
+    },
+    
+    deleteStatus: async (statusId: string) => {
+        try {
+            await api.delete(`/statuses/${statusId}`);
+            set((state) => ({
+                statuses: state.statuses.filter(s => s.id !== statusId)
+            }));
+            toast.success('Column Removed', {
+                description: 'The task column has been deleted.',
+            });
+        } catch (error: any) {
+            console.error('Failed to delete status', error);
+            toast.error('Failed to Delete Column', {
+                description: error.response?.data?.message || 'Please try again.',
+            });
         }
     }
 }));

@@ -65,33 +65,33 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({ projectId }) 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black h-10 rounded-xl px-6 uppercase tracking-widest text-[10px] shadow-lg shadow-cyan-500/20">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black h-10 rounded-xl px-6 uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
                     <UserPlus className="mr-2 h-4 w-4" /> Invite Specialist
                 </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#0A0D18] border-white/5 text-white rounded-3xl sm:max-w-md">
+            <DialogContent className="bg-card border-border text-foreground rounded-3xl sm:max-w-md shadow-2xl">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-heading font-black italic uppercase tracking-tighter">
-                        Project <span className="text-cyan-400">Expansion</span>
+                        Project <span className="text-primary">Expansion</span>
                     </DialogTitle>
-                    <DialogDescription className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">
+                    <DialogDescription className="text-muted-foreground font-bold uppercase text-[10px] tracking-widest">
                         Authorize a specialist to join this mission orchestration
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-6 py-8">
                     <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                            <Users size={14} className="text-cyan-500" /> Workspace Personnel
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                            <Users size={14} className="text-primary" /> Workspace Personnel
                         </Label>
                         <select
                             value={selectedMemberId}
                             onChange={(e) => setSelectedMemberId(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl h-12 px-4 focus:border-cyan-500/50 transition-all font-bold text-sm appearance-none cursor-pointer"
+                            className="w-full bg-secondary/30 border border-border rounded-xl h-12 px-4 focus:border-primary/50 transition-all font-bold text-sm appearance-none cursor-pointer text-foreground"
                         >
-                            <option value="" className="bg-[#0A0D18]">SELECT SPECIALIST...</option>
+                            <option value="" className="bg-card text-muted-foreground">SELECT SPECIALIST...</option>
                             {workspaceMembers.map((member) => (
-                                <option key={member.id} value={member.id} className="bg-[#0A0D18]">
+                                <option key={member.id} value={member.id} className="bg-card text-foreground">
                                     {member.user.name} ({member.user.email})
                                 </option>
                             ))}
@@ -99,8 +99,8 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({ projectId }) 
                     </div>
 
                     <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                            <Shield size={14} className="text-cyan-500" /> Mission Clearance
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                            <Shield size={14} className="text-primary" /> Mission Clearance
                         </Label>
                         <div className="grid grid-cols-3 gap-3">
                             {(['lead', 'member', 'viewer'] as const).map((r) => (
@@ -108,9 +108,9 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({ projectId }) 
                                     key={r}
                                     type="button"
                                     onClick={() => setRole(r)}
-                                    className={`py-3 rounded-xl border font-black uppercase text-[10px] tracking-widest transition-all ${role === r
-                                            ? 'bg-cyan-500/10 border-cyan-500 text-cyan-400'
-                                            : 'bg-white/5 border-white/5 text-slate-500 hover:border-white/10'
+                                    className={`py-3 rounded-xl border-2 font-black uppercase text-[10px] tracking-widest transition-all ${role === r
+                                            ? 'bg-primary/10 border-primary text-primary shadow-sm shadow-primary/10'
+                                            : 'bg-secondary/20 border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
                                         }`}
                                 >
                                     {r}
@@ -120,17 +120,17 @@ const ProjectInviteDialog: React.FC<ProjectInviteDialogProps> = ({ projectId }) 
                     </div>
 
                     {error && (
-                        <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest text-center">
+                        <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-widest text-center shadow-inner">
                             {error}
                         </div>
                     )}
                 </div>
-
+ 
                 <DialogFooter>
                     <Button
                         onClick={handleInvite}
                         disabled={isLoading || !selectedMemberId}
-                        className="w-full bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black h-12 rounded-xl uppercase tracking-widest text-[11px] shadow-lg shadow-cyan-500/20 gap-3"
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black h-12 rounded-xl uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 gap-3"
                     >
                         {isLoading ? (
                             <>
