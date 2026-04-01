@@ -6,7 +6,6 @@ import {
     Users,
     Bell,
     LogOut,
-    Search,
     ChevronRight,
     Plus,
     Check,
@@ -22,6 +21,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { useProjectStore } from '@/store/useProjectStore';
+import SearchDialog from '@/components/layout/SearchDialog';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -457,14 +457,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
                     <div className="flex items-center gap-6">
                         {/* Command Hub Search */}
-                        <div className="hidden md:flex items-center gap-2 bg-white/[0.03] border border-white/5 px-4 h-11 rounded-xl w-64 focus-within:border-cyan-500/30 focus-within:bg-white/[0.05] transition-all group">
-                            <Search className="h-4 w-4 text-slate-500 group-focus-within:text-cyan-400" />
-                            <input
-                                type="text"
-                                placeholder="COMMAND HUB (⌘K)"
-                                className="bg-transparent border-none outline-none text-xs font-bold text-white placeholder:text-slate-700 w-full"
-                            />
-                        </div>
+                        <SearchDialog />
 
                         {/* Notifications */}
                         <DropdownMenu>

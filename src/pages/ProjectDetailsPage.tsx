@@ -11,7 +11,8 @@ import {
     Clock,
     Shield,
     CheckCircle2,
-    History
+    History,
+    Sparkles
 } from 'lucide-react';
 import { useProjectStore } from '@/store/useProjectStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
@@ -31,6 +32,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { AIChatPanel } from '@/components/ai/AIChatPanel';
 import { useProjectSocket } from '@/hooks/useSocket';
+import AISuggestionsPanel from '@/components/project/AISuggestionsPanel';
 
 const ProjectDetailsPage = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -207,6 +209,12 @@ const ProjectDetailsPage = () => {
                                 >
                                     <Activity className="h-4 w-4 text-emerald-500" /> Stream
                                 </TabsTrigger>
+                                <TabsTrigger
+                                    value="insights"
+                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                                >
+                                    <Sparkles className="h-4 w-4 text-purple-500" /> AI Insights
+                                </TabsTrigger>
                                 <PermissionGate roles={['owner', 'admin']}>
                                     <TabsTrigger
                                         value="settings"
@@ -227,6 +235,10 @@ const ProjectDetailsPage = () => {
 
                             <TabsContent value="orchestrator" className="m-0 flex-1 flex flex-col min-h-0">
                                 <AIOrchestrator projectId={projectId!} />
+                            </TabsContent>
+
+                            <TabsContent value="insights" className="m-0 h-full overflow-y-auto custom-scrollbar w-full py-4">
+                                <AISuggestionsPanel projectId={projectId!} />
                             </TabsContent>
 
                             <TabsContent value="team" className="m-0 flex-1 flex flex-col gap-8 overflow-y-auto custom-scrollbar pr-2">
