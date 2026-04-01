@@ -37,9 +37,9 @@ export const useAuthStore = create<AuthState>()(
                 set({ user, isAuthenticated: true, accessToken, refreshToken });
             },
             logout: () => {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                localStorage.clear();
                 set({ user: null, isAuthenticated: false, accessToken: null, refreshToken: null });
+                window.location.href = '/login';
             },
             updateUser: (updatedUser: Partial<User>) =>
                 set((state) => ({

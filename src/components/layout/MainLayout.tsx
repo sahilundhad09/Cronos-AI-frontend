@@ -286,6 +286,41 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     
     // Robust media query to sync JS with Tailwind's lg breakpoint (1024px)
     const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+    const isCaptureMode = useMemo(() => {
+        const q = new URLSearchParams(location.search);
+        const normalized = new Set(['1', 'true', 'yes', 'full', 'on']);
+
+        const captureValue = (q.get('capture') || '').toLowerCase();
+        const screenshotValue = (q.get('screenshot') || '').toLowerCase();
+        const fullshotValue = (q.get('fullshot') || '').toLowerCase();
+
+        return (
+            normalized.has(captureValue) ||
+            normalized.has(screenshotValue) ||
+            normalized.has(fullshotValue)
+        );
+    }, [location.search]);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        root.classList.toggle('screenshot-mode', isCaptureMode);
+
+        if (isCaptureMode) {
+            root.classList.add('dark');
+            root.classList.remove('light');
+        } else {
+            root.classList.remove('dark');
+            root.classList.remove('light');
+            root.classList.add(mode);
+        }
+
+        return () => {
+            root.classList.remove('screenshot-mode');
+            root.classList.remove('dark');
+            root.classList.remove('light');
+            root.classList.add(mode);
+        };
+    }, [isCaptureMode, mode]);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -372,16 +407,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         toast.success('Logged Out', {
             description: 'You have been successfully logged out.',
         });
-        navigate('/login');
-    }, [logout, navigate]);
+    }, [logout]);
 
     const handleWorkspaceSwitch = useCallback((workspaceId: string) => {
         setActiveWorkspace(workspaceId);
-        navigate('/dashboard');
+        navigate({
+            pathname: isCaptureMode ? location.pathname : '/dashboard',
+            search: isCaptureMode ? location.search : ''
+        });
         if (!isDesktop) {
             setIsMobileMenuOpen(false);
         }
-    }, [setActiveWorkspace, navigate, isDesktop, setIsMobileMenuOpen]);
+    }, [setActiveWorkspace, navigate, isCaptureMode, location.pathname, location.search, isDesktop, setIsMobileMenuOpen]);
 
     const handleCreateWorkspace = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
@@ -482,7 +519,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
     return (
         <ErrorBoundary>
-            <div className="min-h-screen bg-background text-foreground flex overflow-hidden relative">
+            <div className={`min-h-screen bg-background text-foreground flex overflow-hidden relative ${isCaptureMode ? 'screenshot-unlock' : ''}`}>
                 {/* Mobile Backdrop */}
                 <AnimatePresence>
                     {isMobileMenuOpen && (
@@ -497,20 +534,26 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </AnimatePresence>
 
                 {/* Single Instance Sidebar Container */}
-                <motion.aside
-                    initial={false}
-                    animate={{ 
-                        x: isDesktop ? (isSidebarCollapsed ? -288 : 0) : (isMobileMenuOpen ? 0 : -288),
-                        width: isDesktop ? (isSidebarCollapsed ? 0 : 288) : 288
-                    }}
-                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="fixed lg:sticky top-0 left-0 z-50 h-screen flex-shrink-0 border-r border-border bg-[hsl(var(--app-sidebar-bg))] transition-colors duration-300 overflow-hidden"
-                >
-                    <SidebarContent {...sidebarProps} />
-                </motion.aside>
+                {isCaptureMode ? (
+                    <aside className="relative z-40 min-h-screen w-72 flex-shrink-0 border-r border-border bg-[hsl(var(--app-sidebar-bg))] screenshot-unlock">
+                        <SidebarContent {...sidebarProps} />
+                    </aside>
+                ) : (
+                    <motion.aside
+                        initial={false}
+                        animate={{
+                            x: isDesktop ? (isSidebarCollapsed ? -288 : 0) : (isMobileMenuOpen ? 0 : -288),
+                            width: isDesktop ? (isSidebarCollapsed ? 0 : 288) : 288
+                        }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed lg:sticky top-0 left-0 z-50 h-screen flex-shrink-0 border-r border-border bg-[hsl(var(--app-sidebar-bg))] transition-colors duration-300 overflow-hidden"
+                    >
+                        <SidebarContent {...sidebarProps} />
+                    </motion.aside>
+                )}
 
                 {/* Main Content Area */}
-                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                <div className={`flex-1 flex flex-col h-screen overflow-hidden ${isCaptureMode ? 'screenshot-unlock' : ''}`}>
                     {/* Responsive Navbar */}
                     <header className="h-16 sm:h-20 border-b border-border px-3 sm:px-4 md:px-6 flex items-center justify-between bg-[hsl(var(--app-header-bg))] backdrop-blur-xl z-40 gap-2">
                         {/* Left Section - Hamburger & Workspace Info */}
@@ -612,7 +655,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                         )}
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-border/50" />
-                                    <div className="max-h-[350px] sm:max-h-[400px] overflow-y-auto custom-scrollbar">
+                                    <div className={`max-h-[350px] sm:max-h-[400px] overflow-y-auto custom-scrollbar ${isCaptureMode ? 'capture-scroll' : ''}`} data-screenshot-scroll="true">
                                         {notifications.length === 0 ? (
                                             <div className="p-6 sm:p-8 text-center">
                                                 <Bell className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground mx-auto mb-2 sm:mb-3 opacity-30" />
@@ -680,7 +723,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     <CommandHub isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
 
                     {/* Dynamic Page Content */}
-                    <main className="flex-1 overflow-y-auto bg-[linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--card)/0.35)_100%)]">
+                    <main className={`flex-1 overflow-y-auto bg-[linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--card)/0.35)_100%)] ${isCaptureMode ? 'screenshot-unlock' : ''}`}>
                         {children}
                     </main>
                 </div>

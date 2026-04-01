@@ -147,27 +147,27 @@ const StatCard = ({
                 <div className={`absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${a.dot}`}
                     style={{ background: `linear-gradient(90deg, transparent, ${a.glow}, transparent)` }} />
 
-                <CardContent className="p-4 sm:p-5 flex items-start gap-4 relative z-10">
-                    <div className={`p-2.5 rounded-xl border ${a.icon} flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-sm`}>
+                <CardContent className="p-3 sm:p-4 flex items-start gap-3 relative z-10">
+                    <div className={`p-2 rounded-xl border ${a.icon} flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-sm`}>
                         {icon}
                     </div>
                     <div className="min-w-0 flex-1">
                         {isLoading
-                            ? <div className="h-7 w-16 bg-muted animate-pulse rounded-lg" />
+                            ? <div className="h-6 w-16 bg-muted animate-pulse rounded-lg" />
                             : (
                                 <div className="flex items-end gap-1.5">
-                                    <p className={`text-2xl sm:text-3xl font-black text-foreground tracking-tighter tabular-nums leading-none transition-colors group-hover:${a.text.replace('text-', 'text-')}`}>
+                                    <div className={`text-xl sm:text-2xl font-black text-foreground tracking-tighter tabular-nums leading-none transition-colors group-hover:${a.text.replace('text-', 'text-')}`}>
                                         {value}
-                                    </p>
+                                    </div>
                                     {delta && (
-                                        <span className="text-[10px] font-black text-emerald-400 mb-0.5 bg-emerald-500/10 px-1 py-0.5 rounded">
+                                        <span className="text-[8px] font-black text-emerald-400 mb-0.5 bg-emerald-500/10 px-1 py-0 rounded">
                                             {delta}
                                         </span>
                                     )}
                                 </div>
                             )
                         }
-                        <p className="text-[9px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mt-1">{label}</p>
+                        <p className="text-[8px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mt-0.5">{label}</p>
                     </div>
                     <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1 ${isLoading ? 'bg-muted' : a.dot} animate-pulse`} />
                 </CardContent>
@@ -220,8 +220,8 @@ const CompletionRing = ({ percentage, size = 80, strokeWidth = 6 }: {
                 />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-base font-black text-foreground leading-none">{percentage}%</span>
-                <span className="text-[7px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">Done</span>
+                <span className="text-sm font-black text-foreground leading-none">{percentage}%</span>
+                <span className="text-[6px] font-black text-muted-foreground/50 uppercase tracking-widest mt-0.5">Done</span>
             </div>
         </div>
     );
@@ -509,13 +509,13 @@ const DashboardPage = () => {
     }
 
     return (
-        <div className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar bg-background">
-            <div className="px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
+        <div className="min-h-full overflow-x-hidden bg-background">
+            <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-3 sm:py-4">
 
                 {/* ── HEADER ────────────────────────────────────────────────── */}
                 <motion.header
                     variants={stagger} initial="hidden" animate="visible"
-                    className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10"
+                    className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4 sm:mb-5"
                 >
                     <motion.div variants={fadeUp}>
                         {/* Status pill */}
@@ -531,12 +531,12 @@ const DashboardPage = () => {
                             </span>
                         </div>
 
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-foreground leading-none">
+                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tighter text-foreground leading-none">
                             {greeting},{' '}
                             <span className="text-primary">{firstName}</span>
                             <span className="text-muted-foreground/30">.</span>
                         </h1>
-                        <p className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em] mt-1.5">
+                        <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-[0.2em] mt-1">
                             {format(new Date(), 'EEEE, MMMM d · yyyy')}
                         </p>
                     </motion.div>
@@ -561,7 +561,7 @@ const DashboardPage = () => {
 
                 {/* ── STATS ROW ─────────────────────────────────────────────── */}
                 <motion.div variants={stagger} initial="hidden" animate="visible"
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10"
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5"
                 >
                     <StatCard label="Active Projects" value={analytics?.projectCount?.toString() || '0'}                icon={<Layers className="h-4 w-4" />}       accent="primary"  isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
                     <StatCard label="In Progress"     value={analytics?.statusBreakdown?.inProgress?.toString() || '0'} icon={<Zap className="h-4 w-4" />}          accent="teal"     isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
@@ -570,7 +570,7 @@ const DashboardPage = () => {
                 </motion.div>
 
                 {/* ── QUICK ACTIONS ─────────────────────────────────────────── */}
-                <motion.section variants={stagger} initial="hidden" animate="visible" className="mb-8 sm:mb-10">
+                <motion.section variants={stagger} initial="hidden" animate="visible" className="mb-4 sm:mb-5">
                     <SectionHeader
                         icon={<Command className="h-3.5 w-3.5" />}
                         title="Command Center"
@@ -594,10 +594,10 @@ const DashboardPage = () => {
                 </motion.section>
 
                 {/* ── MAIN GRID ─────────────────────────────────────────────── */}
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8 items-start">
+                <div className="grid grid-cols-1 2xl:grid-cols-3 gap-4 sm:gap-5 items-start">
 
                     {/* ── LEFT COL (2/3) ─────────────────────────────────────── */}
-                    <div className="xl:col-span-2 flex flex-col gap-8">
+                    <div className="2xl:col-span-2 flex flex-col gap-4">
 
                         {/* Active Projects */}
                         <section>
@@ -608,7 +608,7 @@ const DashboardPage = () => {
                                 action={() => navigate('/projects')}
                                 actionLabel="View all"
                             />
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {projectsLoading
                                     ? [1, 2, 3, 4].map(i => <ProjectCardSkeleton key={i} />)
                                     : projectsData && projectsData.length > 0
@@ -651,7 +651,7 @@ const DashboardPage = () => {
                                 }
                             />
                             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                                <div className="divide-y divide-border/40 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                    <div className="divide-y divide-border/40 max-h-[250px] overflow-y-auto overscroll-contain custom-scrollbar pb-2 capture-scroll" data-screenshot-scroll="true">
                                     {userPerformance?.pendingTasks && userPerformance.pendingTasks.length > 0
                                         ? userPerformance.pendingTasks
                                             .slice(taskPage * TASKS_PER_PAGE, (taskPage + 1) * TASKS_PER_PAGE)
@@ -725,7 +725,7 @@ const DashboardPage = () => {
                         </section>
 
                         {/* Bottom row: Neural Assistant + Live Activity */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                             {/* Neural Assistant */}
                             <motion.div
@@ -782,7 +782,7 @@ const DashboardPage = () => {
                                     <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 </div>
                                 <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                                    <div className="max-h-[280px] overflow-y-auto custom-scrollbar p-4">
+                                    <div className="max-h-[180px] overflow-y-auto overscroll-contain custom-scrollbar p-3 pb-4 pr-4 capture-scroll" data-screenshot-scroll="true">
                                         <div className="relative border-l border-border/40 ml-2 pl-4 flex flex-col gap-4">
                                             {analyticsLoading
                                                 ? Array.from({ length: 3 }).map((_, i) => (
@@ -815,34 +815,34 @@ const DashboardPage = () => {
                     </div>
 
                     {/* ── RIGHT COL (1/3) ────────────────────────────────────── */}
-                    <div className="flex flex-col gap-6 xl:self-start">
+                    <div className="flex flex-col gap-4 2xl:self-start">
 
                         {/* Personal Stats */}
                         <Card className="bg-card border-border/60">
-                            <CardHeader className="pt-4 pb-2 px-5">
-                                <CardTitle className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                            <CardHeader className="pt-3 pb-1.5 px-4">
+                                <CardTitle className="text-[8px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
                                     <TrendingUp className="h-3 w-3 text-primary" />Personal Stats
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="px-5 pb-5">
-                                <div className="flex items-center gap-4">
-                                    <CompletionRing percentage={userPerformance?.completionRate || 0} />
-                                    <div className="flex-1 min-w-0 space-y-3">
+                            <CardContent className="px-4 pb-4">
+                                <div className="flex items-center gap-3">
+                                    <CompletionRing percentage={userPerformance?.completionRate || 0} size={70} />
+                                    <div className="flex-1 min-w-0 space-y-2">
                                         <div>
-                                            <p className="text-2xl font-black text-foreground tabular-nums leading-none">
+                                            <p className="text-xl font-black text-foreground tabular-nums leading-none">
                                                 {userPerformance?.tasksCompleted || 0}
-                                                <span className="text-muted-foreground/40 text-sm font-bold">/{userPerformance?.tasksAssigned || 0}</span>
+                                                <span className="text-muted-foreground/40 text-xs font-bold">/{userPerformance?.tasksAssigned || 0}</span>
                                             </p>
-                                            <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">Tasks Completed</p>
+                                            <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">Tasks Completed</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
-                                            <div className="bg-muted/50 rounded-xl p-2.5 border border-border/60">
-                                                <p className="text-lg font-black text-foreground leading-none">{userPerformance?.onTimeDelivery || 0}%</p>
-                                                <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">On-Time</p>
+                                            <div className="bg-muted/50 rounded-xl p-2 border border-border/60">
+                                                <p className="text-base font-black text-foreground leading-none">{userPerformance?.onTimeDelivery || 0}%</p>
+                                                <p className="text-[7px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">On-Time</p>
                                             </div>
-                                            <div className="bg-muted/50 rounded-xl p-2.5 border border-border/60">
-                                                <p className="text-lg font-black text-foreground leading-none">{userPerformance?.averageCompletionTime || 0}d</p>
-                                                <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">Avg Time</p>
+                                            <div className="bg-muted/50 rounded-xl p-2 border border-border/60">
+                                                <p className="text-base font-black text-foreground leading-none">{userPerformance?.averageCompletionTime || 0}d</p>
+                                                <p className="text-[7px] font-black text-muted-foreground/40 uppercase tracking-widest mt-0.5">Avg Time</p>
                                             </div>
                                         </div>
                                     </div>
@@ -852,9 +852,9 @@ const DashboardPage = () => {
 
                         {/* Deadlines */}
                         <Card className="bg-card border-border/60">
-                            <CardHeader className="pt-4 pb-2 px-5">
+                            <CardHeader className="pt-3 pb-1.5 px-4">
                                 <div className="flex items-center justify-between">
-                                    <CardTitle className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                                    <CardTitle className="text-[8px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
                                         <Calendar className="h-3 w-3 text-amber-400" />Upcoming Deadlines
                                     </CardTitle>
                                     {overdueCount > 0 && (
@@ -864,7 +864,7 @@ const DashboardPage = () => {
                                     )}
                                 </div>
                             </CardHeader>
-                            <CardContent className="px-5 pb-5 flex flex-col gap-2">
+                            <CardContent className="px-4 pb-4 flex flex-col gap-1.5\">
                                 {upcomingDeadlines.length > 0
                                     ? upcomingDeadlines.map((task: any) => (
                                         <DeadlineItem key={task.id} task={task} onClick={() => navigate(`/projects/${task.project_id}`)} />
@@ -883,46 +883,50 @@ const DashboardPage = () => {
                             <ProjectPulse projectId={projectsData[0].id} canInitialize={isAdmin} />
                         )}
 
-                        {/* AI Analysis Result */}
-                        <AnimatePresence>
-                            {analysisResult && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                                    transition={{ duration: 0.25 }}
-                                >
-                                    <Card className="bg-card border-primary/25" style={{ boxShadow: '0 0 20px -8px rgba(var(--primary),0.15)' }}>
-                                        <CardHeader className="pt-4 pb-2 px-5 border-b border-border/40">
-                                            <div className="flex justify-between items-center">
-                                                <CardTitle className="text-[9px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-1.5">
-                                                    <Sparkles className="h-3 w-3" />Intelligence Report
-                                                </CardTitle>
-                                                <button onClick={() => setAnalysisResult(null)}
-                                                    className="p-1 rounded-lg text-muted-foreground/30 hover:text-foreground hover:bg-accent transition-all"
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent className="p-5">
-                                            <ReactMarkdown components={{
-                                                p:      ({ children }) => <p className="mb-2 last:mb-0 text-xs text-muted-foreground leading-relaxed">{children}</p>,
-                                                strong: ({ children }) => <strong className="text-primary font-black">{children}</strong>,
-                                                ul:     ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                                                li:     ({ children }) => <li className="text-[11px] text-muted-foreground">{children}</li>,
-                                                h2:     ({ children }) => <h2 className="text-xs font-black text-foreground mb-1.5 uppercase tracking-wide">{children}</h2>,
-                                            }}>
-                                                {analysisResult}
-                                            </ReactMarkdown>
-                                        </CardContent>
-                                    </Card>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
                     </div>
                 </div>
+
+                {/* Full-width Intelligence Report (landscape) */}
+                <AnimatePresence>
+                    {analysisResult && (
+                        <motion.section
+                            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                            transition={{ duration: 0.25 }}
+                            className="mt-4 sm:mt-5"
+                        >
+                            <Card className="bg-card border-primary/25" style={{ boxShadow: '0 0 20px -8px rgba(var(--primary),0.15)' }}>
+                                <CardHeader className="pt-4 pb-2 px-5 border-b border-border/40">
+                                    <div className="flex justify-between items-center">
+                                        <CardTitle className="text-[9px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-1.5">
+                                            <Sparkles className="h-3 w-3" />Intelligence Report
+                                        </CardTitle>
+                                        <button
+                                            onClick={() => setAnalysisResult(null)}
+                                            className="p-1 rounded-lg text-muted-foreground/30 hover:text-foreground hover:bg-accent transition-all"
+                                            aria-label="Close intelligence report"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-5 sm:p-6">
+                                    <div className="w-full lg:columns-2 lg:gap-10">
+                                        <ReactMarkdown components={{
+                                            p: ({ children }) => <p className="mb-2 last:mb-0 text-xs text-muted-foreground leading-relaxed break-inside-avoid">{children}</p>,
+                                            strong: ({ children }) => <strong className="text-primary font-black">{children}</strong>,
+                                            ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1 break-inside-avoid">{children}</ul>,
+                                            h2: ({ children }) => <h2 className="text-xs font-black text-foreground mb-1.5 uppercase tracking-wide break-inside-avoid">{children}</h2>,
+                                        }}>
+                                            {analysisResult}
+                                        </ReactMarkdown>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </motion.section>
+                    )}
+                </AnimatePresence>
 
                 <div className="h-8" />
             </div>

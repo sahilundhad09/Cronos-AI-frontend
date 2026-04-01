@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
     Users,
     Settings,
@@ -48,6 +48,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 const ProjectDetailsPage = () => {
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const {
         projects,
         fetchProjects,
@@ -78,6 +79,20 @@ const ProjectDetailsPage = () => {
     const { fetchGenerations } = useAIStore();
     const { tasks, statuses } = useTaskStore();
     const { fetchNotifications, fetchUnreadCount } = useNotificationStore();
+
+    const isCaptureMode = useMemo(() => {
+        const q = new URLSearchParams(location.search || '');
+        const normalized = new Set(['1', 'true', 'yes', 'full', 'on']);
+        const captureValue = (q.get('capture') || '').toLowerCase();
+        const screenshotValue = (q.get('screenshot') || '').toLowerCase();
+        const fullshotValue = (q.get('fullshot') || '').toLowerCase();
+
+        return (
+            normalized.has(captureValue) ||
+            normalized.has(screenshotValue) ||
+            normalized.has(fullshotValue)
+        );
+    }, [location.search]);
 
     const calculateSyncProgress = () => {
         if (tasks.length === 0) return 0;
@@ -369,7 +384,7 @@ const ProjectDetailsPage = () => {
                     </div>
 
                     {/* Content area */}
-                    <div ref={tabScrollRef} className="flex-1 overflow-y-auto custom-scrollbar px-4 sm:px-6 lg:px-8 min-h-0">
+                    <div ref={tabScrollRef} className="flex-1 overflow-y-auto custom-scrollbar px-4 sm:px-6 lg:px-8 min-h-0 capture-scroll" data-screenshot-scroll="true">
                         <div className="h-full w-full flex-1 flex flex-col min-h-0 pt-4 sm:pt-5 pb-4">
 
                             {/* Board */}
@@ -420,7 +435,7 @@ const ProjectDetailsPage = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto capture-scroll" data-screenshot-scroll="true">
                                         {projectMembers.map((member) => (
                                         <Card
                                             key={member.id}
@@ -624,9 +639,12 @@ const ProjectDetailsPage = () => {
                             </TabsContent>
 
                             {/* Settings */}
-                            <TabsContent value="settings" className="m-0 flex-1 min-h-0">
-                                <ScrollArea className="h-full">
-                                    <div className="p-4 sm:p-6 md:p-8 max-w-2xl mx-auto space-y-8">
+                            <TabsContent value="settings" className={`m-0 flex-1 min-h-0 ${isCaptureMode ? 'screenshot-unlock' : ''}`}>
+                                <ScrollArea
+                                    className={isCaptureMode ? 'h-auto overflow-visible screenshot-unlock capture-scroll' : 'h-full'}
+                                    data-screenshot-scroll="true"
+                                >
+                                    <div className={`p-4 sm:p-6 md:p-8 ${isCaptureMode ? 'max-w-4xl space-y-6' : 'max-w-2xl space-y-8'} mx-auto`}>
                                         <div className="space-y-1">
                                             <h3 className="text-lg font-heading font-black text-foreground uppercase italic tracking-[0.2em]">Mission Parameters</h3>
                                             <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Recalibrating sector variables and access overrides...</p>
@@ -638,6 +656,7 @@ const ProjectDetailsPage = () => {
                                                 ref={fileInputRef}
                                                 onChange={handleImageChange}
                                                 accept="image/*"
+                                                aria-label="Upload project emblem"
                                                 className="hidden"
                                             />
 

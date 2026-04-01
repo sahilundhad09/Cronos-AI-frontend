@@ -50,6 +50,7 @@ export interface WorkspaceSwitcherProps {
 }
 
 export interface SidebarNavItemProps {
+    to: any;
     item: any;
     isActive: boolean;
     onClick?: () => void;
@@ -215,9 +216,9 @@ WorkspaceSwitcher.displayName = 'WorkspaceSwitcher';
 
 // ── Nav Item ──
 
-const SidebarNavItem = memo<SidebarNavItemProps>(({ item, isActive, onClick }) => (
+const SidebarNavItem = memo<SidebarNavItemProps>(({ to, item, isActive, onClick }) => (
     <Link
-        to={item.path}
+        to={to}
         onClick={onClick}
         className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group overflow-hidden ${
             isActive
@@ -271,6 +272,27 @@ const SidebarContent = memo<SidebarContentProps>(({
     onToggle
 }) => {
     const { isCollapsed } = useSidebar();
+    const isCaptureMode = React.useMemo(() => {
+        const q = new URLSearchParams(location.search || '');
+        const normalized = new Set(['1', 'true', 'yes', 'full', 'on']);
+        const captureValue = (q.get('capture') || '').toLowerCase();
+        const screenshotValue = (q.get('screenshot') || '').toLowerCase();
+        const fullshotValue = (q.get('fullshot') || '').toLowerCase();
+
+        return (
+            normalized.has(captureValue) ||
+            normalized.has(screenshotValue) ||
+            normalized.has(fullshotValue)
+        );
+    }, [location.search]);
+
+    const withCaptureSearch = React.useCallback((path: string) => {
+        if (!isCaptureMode) return path;
+        return {
+            pathname: path,
+            search: location.search,
+        };
+    }, [isCaptureMode, location.search]);
     
     return (
     <div className="flex flex-col h-full bg-[hsl(var(--app-sidebar-bg))] relative overflow-hidden">
@@ -279,7 +301,7 @@ const SidebarContent = memo<SidebarContentProps>(({
 
         {/* ── Logo ── */}
         <div className="px-5 pt-7 pb-6 flex-shrink-0 flex items-center justify-between relative">
-            <Link to="/" onClick={onClose} className="flex items-center gap-3 group text-left">
+            <Link to={withCaptureSearch('/')} onClick={onClose} className="flex items-center gap-3 group text-left">
                 {/* <div className="bg-gradient-to-br from-primary to-primary/70 p-2 rounded-xl shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all group-hover:scale-105"> */}
                     {/* <Brain className="h-5 w-5 text-primary-foreground" /> */}
                     <img src="/favicon.png" alt="Cronos AI" className="h-10 w-10 rounded-xl" />
@@ -327,6 +349,7 @@ const SidebarContent = memo<SidebarContentProps>(({
             {menuItems.map((item: any) => (
                 <SidebarNavItem
                     key={item.path}
+                    to={withCaptureSearch(item.path)}
                     item={item}
                     isActive={item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path)}
                     onClick={onClose}
@@ -340,7 +363,7 @@ const SidebarContent = memo<SidebarContentProps>(({
             <div className="space-y-0.5 mb-2">
                 <p className="text-[8px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] px-1 mb-2">System</p>
                 <Link
-                    to="/theme-selector"
+                    to={withCaptureSearch('/theme-selector')}
                     onClick={onClose}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
                         location.pathname === '/theme-selector'
@@ -353,7 +376,7 @@ const SidebarContent = memo<SidebarContentProps>(({
                 </Link>
                 <PermissionGate roles={['owner', 'admin']}>
                     <Link
-                        to={activeWorkspace?.id ? `/workspaces/${activeWorkspace.id}/settings` : '/settings'}
+                        to={withCaptureSearch(activeWorkspace?.id ? `/workspaces/${activeWorkspace.id}/settings` : '/settings')}
                         onClick={onClose}
                         className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
                             location.pathname.includes('/settings')
@@ -370,7 +393,7 @@ const SidebarContent = memo<SidebarContentProps>(({
             {/* User profile card */}
             <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-muted/40 border border-border hover:border-primary/30 transition-all group overflow-hidden">
                 <Link 
-                    to="/profile" 
+                    to={withCaptureSearch('/profile')} 
                     onClick={onClose}
                     className="flex items-center gap-3 flex-1 min-w-0 group/profile"
                 >

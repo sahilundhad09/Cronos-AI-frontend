@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { User, Shield, Lock, Save, Loader2, Camera, Trash2, Mail, Phone, Calendar, Award } from 'lucide-react';
+import { User, Shield, Lock, Save, Loader2, Camera, Trash2, Mail, Phone, Award } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
 const ProfilePage: React.FC = () => {
+    const location = useLocation();
     const { user, updateProfile, changePassword, uploadAvatar } = useAuthStore();
     const [isLoading, setIsLoading] = useState(false);
     const [isAvatarUploading, setIsAvatarUploading] = useState(false);
@@ -34,6 +36,20 @@ const ProfilePage: React.FC = () => {
         newPassword: '',
         confirmPassword: ''
     });
+
+    const isCaptureMode = useMemo(() => {
+        const q = new URLSearchParams(location.search || '');
+        const normalized = new Set(['1', 'true', 'yes', 'full', 'on']);
+        const captureValue = (q.get('capture') || '').toLowerCase();
+        const screenshotValue = (q.get('screenshot') || '').toLowerCase();
+        const fullshotValue = (q.get('fullshot') || '').toLowerCase();
+
+        return (
+            normalized.has(captureValue) ||
+            normalized.has(screenshotValue) ||
+            normalized.has(fullshotValue)
+        );
+    }, [location.search]);
 
     // Sync state when user is loaded or changed
     useEffect(() => {
@@ -151,7 +167,6 @@ const ProfilePage: React.FC = () => {
             setTimeout(() => {
                 const { logout } = useAuthStore.getState();
                 logout();
-                window.location.href = '/login';
             }, 2000);
         } catch (error: any) {
             toast.error('Password change failed', {
@@ -162,9 +177,12 @@ const ProfilePage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-secondary/5">
-            <ScrollArea className="h-full">
-                <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 space-y-6 sm:space-y-8">
+        <div className={`min-h-screen bg-gradient-to-b from-background to-secondary/5 ${isCaptureMode ? 'screenshot-unlock' : ''}`}>
+            <ScrollArea
+                className={isCaptureMode ? 'h-auto overflow-visible screenshot-unlock capture-scroll' : 'h-full'}
+                data-screenshot-scroll="true"
+            >
+                <div className={`container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isCaptureMode ? 'py-4 sm:py-5 space-y-4 sm:space-y-5' : 'py-6 sm:py-8 lg:py-12 space-y-6 sm:space-y-8'}`}>
                     
                     {/* Hidden File Input */}
                     <input
@@ -172,6 +190,8 @@ const ProfilePage: React.FC = () => {
                         ref={fileInputRef}
                         onChange={handleFileChange}
                         accept="image/*"
+                        aria-label="Upload avatar"
+                        title="Upload avatar"
                         className="hidden"
                     />
 
@@ -326,7 +346,7 @@ const ProfilePage: React.FC = () => {
 
                     {/* Tabs Section - Responsive */}
                     <Tabs defaultValue="general" className="w-full space-y-6 sm:space-y-8">
-                        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pt-2 pb-4 -mt-2">
+                        <div className={isCaptureMode ? 'pt-1 pb-2' : 'sticky top-0 z-10 bg-background/95 backdrop-blur-sm pt-2 pb-4 -mt-2'}>
                             <TabsList className="bg-card/50 backdrop-blur-md p-1 border border-border rounded-2xl sm:rounded-3xl h-auto min-h-[3rem] sm:h-16 w-full max-w-2xl mx-auto grid grid-cols-2 gap-1">
                                 <TabsTrigger
                                     value="general"
@@ -347,8 +367,8 @@ const ProfilePage: React.FC = () => {
                         </div>
 
                         {/* General Settings */}
-                        <TabsContent value="general" className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <TabsContent value="general" className={`${isCaptureMode ? 'space-y-4 sm:space-y-5' : 'space-y-6 sm:space-y-8'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+                            <div className={`grid grid-cols-1 lg:grid-cols-3 ${isCaptureMode ? 'gap-4 lg:gap-5' : 'gap-6 lg:gap-8'}`}>
                                 {/* Main Form Card */}
                                 <Card className="lg:col-span-2 border-border shadow-xl bg-card/50 backdrop-blur-sm">
                                     <CardHeader className="border-b border-border pb-4 sm:pb-6">
@@ -514,7 +534,7 @@ const ProfilePage: React.FC = () => {
                         </TabsContent>
 
                         {/* Security Settings */}
-                        <TabsContent value="security" className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <TabsContent value="security" className={`${isCaptureMode ? 'space-y-4 sm:space-y-5' : 'space-y-6 sm:space-y-8'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
                             <div className="max-w-2xl mx-auto">
                                 <Card className="border-border shadow-xl bg-card/50 backdrop-blur-sm">
                                     <CardHeader className="text-center border-b border-border pb-6 sm:pb-8">
