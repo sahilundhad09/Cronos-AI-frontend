@@ -24,9 +24,7 @@ import {
     Plus,
     Loader2,
     Upload,
-    X,
-    ChevronDown,
-    ChevronUp
+    X
 } from 'lucide-react';
 import { useTaskStore, Task } from '@/store/useTaskStore';
 import { format } from 'date-fns';
@@ -71,7 +69,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
     const [attachments, setAttachments] = useState<Attachment[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [pendingFile, setPendingFile] = useState<File | null>(null);
-    const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(true);
+    const [_isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(true);
     const [activeMobileTab, setActiveMobileTab] = useState<'details' | 'comments' | 'assets'>('details');
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -296,7 +294,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                             <div className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 rounded-xl sm:rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
                                 <Zap className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary animate-pulse" />
                             </div>
-                            
+
                             <div className="flex-1 min-w-0">
                                 {isEditing ? (
                                     <Input
@@ -316,7 +314,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                             {isEditing ? (
                                 <>
                                     <Button onClick={handleSave} size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-widest text-[9px] sm:text-[10px] h-7 sm:h-8 md:h-9 px-2 sm:px-3 md:px-5 rounded-lg sm:rounded-xl shadow-lg shadow-emerald-500/20">
-                                        <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1" /> 
+                                        <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 mr-1" />
                                         <span className="hidden xs:inline">Save</span>
                                     </Button>
                                     <Button onClick={() => setIsEditing(false)} size="sm" variant="ghost" className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest h-7 sm:h-8 md:h-9 px-2 sm:px-3 md:px-4 rounded-lg sm:rounded-xl">
@@ -333,10 +331,10 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                         <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
                                     </Button>
                                     {/* Mobile Close Button */}
-                                    <Button 
-                                        onClick={onClose} 
-                                        size="sm" 
-                                        variant="ghost" 
+                                    <Button
+                                        onClick={onClose}
+                                        size="sm"
+                                        variant="ghost"
                                         className="lg:hidden h-7 w-7 p-0 hover:bg-primary/10 hover:text-primary rounded-lg transition-all"
                                     >
                                         <X className="h-4 w-4" />
@@ -443,9 +441,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                             }
                                         }}
                                     />
-                                    <Button 
-                                        onClick={handleAddComment} 
-                                        disabled={!newComment.trim()} 
+                                    <Button
+                                        onClick={handleAddComment}
+                                        disabled={!newComment.trim()}
                                         className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/30 sm:w-20 h-10 sm:h-auto rounded-xl flex items-center justify-center transition-all active:scale-95"
                                     >
                                         <Send className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
@@ -569,17 +567,17 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                                 <p className="text-[10px] font-black text-foreground truncate uppercase">{pendingFile.name}</p>
                                                 <p className="text-[8px] font-black text-primary/60 uppercase tracking-widest leading-none mt-1">Staging for Uplink...</p>
                                             </div>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={handleRemovePending}
                                                 className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
                                             >
                                                 <X className="h-4 w-4" />
                                             </Button>
                                         </div>
-                                        
-                                        <Button 
+
+                                        <Button
                                             onClick={handleConfirmUpload}
                                             disabled={isUploading}
                                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-10 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg shadow-primary/20 overflow-hidden relative"
@@ -735,9 +733,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                                 }
                                             }}
                                         />
-                                        <Button 
-                                            onClick={handleAddComment} 
-                                            disabled={!newComment.trim()} 
+                                        <Button
+                                            onClick={handleAddComment}
+                                            disabled={!newComment.trim()}
                                             className="bg-primary hover:bg-primary/90 h-auto rounded-xl px-4"
                                         >
                                             <Send className="h-5 w-5" />
@@ -775,7 +773,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                                                 <X className="h-3.5 w-3.5" />
                                             </Button>
                                         </div>
-                                        <Button 
+                                        <Button
                                             onClick={handleConfirmUpload}
                                             disabled={isUploading}
                                             className="w-full bg-primary h-9 text-[9px] font-black uppercase"
@@ -830,9 +828,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                         </div>
                         <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 italic">Sync-Node: v4.0.0</span>
                     </div>
-                    <Button 
-                        onClick={onClose} 
-                        variant="outline" 
+                    <Button
+                        onClick={onClose}
+                        variant="outline"
                         className="border-border/60 hover:bg-secondary/80 text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] h-8 sm:h-9 md:h-10 px-4 sm:px-6 md:px-8 rounded-xl shadow-md transition-all active:scale-95 w-full sm:w-auto"
                     >
                         <span className="group-hover:opacity-70 transition-opacity">Close Mission</span>

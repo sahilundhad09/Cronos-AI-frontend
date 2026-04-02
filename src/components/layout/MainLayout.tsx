@@ -4,14 +4,9 @@ import { toast } from 'sonner';
 import {
     BarChart3,
     Bell,
-    LogOut,
     ChevronRight,
-    Plus,
-    Check,
     Briefcase,
     Brain,
-    Briefcase,
-    ChevronRight,
     Layers,
     LayoutDashboard,
     Menu,
@@ -27,7 +22,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { useProjectStore } from '@/store/useProjectStore';
-import SearchDialog from '@/components/layout/SearchDialog';
+
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -93,8 +88,8 @@ const useNotificationHandlers = () => {
     const navigate = useNavigate();
 
     const handleAcceptProjectInvite = useCallback(async (
-        projectId: string, 
-        invitationId: string, 
+        projectId: string,
+        invitationId: string,
         notificationId: string
     ) => {
         try {
@@ -167,26 +162,25 @@ const useNotificationHandlers = () => {
 // Memoized Components
 
 // Notification Item Component
-const NotificationItem = memo(({ 
-    notification, 
-    onAcceptProjectInvite, 
-    onAcceptWorkspaceInvite, 
+const NotificationItem = memo(({
+    notification,
+    onAcceptProjectInvite,
+    onAcceptWorkspaceInvite,
     onDeclineWorkspaceInvite,
-    onMarkAsRead 
+    onMarkAsRead
 }: any) => (
     <div
         className={`p-3 rounded-xl transition-colors mb-1 last:mb-0 hover:bg-accent/50 group relative ${!notification.is_read ? 'bg-primary/5' : ''}`}
     >
         <div className="flex gap-3">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                notification.type === 'workspace_invite' ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400' :
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${notification.type === 'workspace_invite' ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400' :
                 notification.type === 'project_invite' ? 'bg-purple-500/10 text-purple-500 dark:text-purple-400' :
-                notification.type === 'task_assigned' ? 'bg-primary/10 text-primary' :
-                'bg-muted text-muted-foreground'
-            }`}>
+                    notification.type === 'task_assigned' ? 'bg-primary/10 text-primary' :
+                        'bg-muted text-muted-foreground'
+                }`}>
                 {notification.type === 'workspace_invite' ? <Briefcase className="h-4 w-4" /> :
-                 notification.type === 'project_invite' ? <Users className="h-4 w-4" /> :
-                 <Bell className="h-4 w-4" />}
+                    notification.type === 'project_invite' ? <Users className="h-4 w-4" /> :
+                        <Bell className="h-4 w-4" />}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start gap-3 mb-1.5 flex-wrap">
@@ -283,13 +277,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const setMode = useThemeStore((state) => state.setMode);
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const { 
-        isCollapsed: isSidebarCollapsed, 
+    const {
+        isCollapsed: isSidebarCollapsed,
         setCollapsed: setIsSidebarCollapsed,
         isMobileMenuOpen,
         setMobileMenuOpen: setIsMobileMenuOpen
     } = useSidebar();
-    
+
     // Robust media query to sync JS with Tailwind's lg breakpoint (1024px)
     const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
     const isCaptureMode = useMemo(() => {
@@ -330,7 +324,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        
+
         const mediaQuery = window.matchMedia('(min-width: 1024px)');
         const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
             setIsDesktop(e.matches);
@@ -359,7 +353,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     // Fetch initial data with cleanup
     useEffect(() => {
         mountedRef.current = true;
-        
+
         const initializeData = async () => {
             try {
                 await fetchWorkspaces();
@@ -432,7 +426,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             toast.error('Workspace name is required');
             return;
         }
-        
+
         try {
             await createWorkspace({ name: newWorkspaceName, description: newWorkspaceDesc });
             setIsCreateDialogOpen(false);
@@ -596,14 +590,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                                 </div>
                             </div>
                         </div>
-                    <div className="flex items-center gap-6">
-                        {/* Command Hub Search */}
-                        <SearchDialog />
 
                         {/* Right Section - Actions */}
                         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 shrink-0">
                             {/* Search / Command Hub - Hidden on smallest screens */}
-                            <button 
+                            <button
                                 onClick={() => setIsSearchOpen(true)}
                                 className="hidden sm:flex items-center gap-2 bg-card border border-border px-2 sm:px-3 md:px-4 h-8 sm:h-9 md:h-10 lg:h-11 rounded-lg sm:rounded-xl w-auto min-w-[120px] sm:min-w-[160px] md:w-48 lg:w-56 xl:w-64 hover:border-primary/40 hover:bg-accent transition-all group text-left shadow-sm"
                             >

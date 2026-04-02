@@ -31,10 +31,7 @@ const fadeUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as any } },
 };
-const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.4 } },
-};
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    ACCENT MAP
@@ -262,9 +259,9 @@ QuickAction.displayName = 'QuickAction';
 const PriorityBadge = ({ priority }: { priority: string }) => {
     const map: Record<string, string> = {
         urgent: 'border-red-500/30 text-red-400 bg-red-500/10',
-        high:   'border-orange-500/30 text-orange-400 bg-orange-500/10',
+        high: 'border-orange-500/30 text-orange-400 bg-orange-500/10',
         medium: 'border-amber-500/30 text-amber-400 bg-amber-500/10',
-        low:    'border-emerald-500/30 text-emerald-400 bg-emerald-500/10',
+        low: 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10',
     };
     return (
         <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border ${map[priority] || map.medium}`}>
@@ -278,17 +275,17 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
 ───────────────────────────────────────────────────────────────────────────── */
 const DeadlineItem = ({ task, onClick }: { task: any; onClick: () => void }) => {
     const dueDate = new Date(task.due_date);
-    const overdue   = isPast(dueDate) && !task.completed_at;
-    const dueToday  = isToday(dueDate);
+    const overdue = isPast(dueDate) && !task.completed_at;
+    const dueToday = isToday(dueDate);
     const dueTomorrow = isTomorrow(dueDate);
 
     const cfg = overdue
         ? { cls: 'border-red-500/20 bg-red-500/[0.03]', text: 'text-red-400', badge: 'bg-red-500/10 text-red-400 border-red-500/20', label: 'Overdue', icon: <AlertTriangle className="h-3 w-3" /> }
         : dueToday
-        ? { cls: 'border-amber-500/20 bg-amber-500/[0.03]', text: 'text-amber-400', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20', label: 'Today', icon: <Flame className="h-3 w-3" /> }
-        : dueTomorrow
-        ? { cls: 'border-orange-500/20 bg-orange-500/[0.03]', text: 'text-orange-400', badge: 'bg-orange-500/10 text-orange-400 border-orange-500/20', label: 'Tomorrow', icon: <Clock className="h-3 w-3" /> }
-        : { cls: 'border-border/60', text: 'text-muted-foreground', badge: 'bg-muted text-muted-foreground border-border/60', label: format(dueDate, 'MMM d'), icon: <Calendar className="h-3 w-3" /> };
+            ? { cls: 'border-amber-500/20 bg-amber-500/[0.03]', text: 'text-amber-400', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20', label: 'Today', icon: <Flame className="h-3 w-3" /> }
+            : dueTomorrow
+                ? { cls: 'border-orange-500/20 bg-orange-500/[0.03]', text: 'text-orange-400', badge: 'bg-orange-500/10 text-orange-400 border-orange-500/20', label: 'Tomorrow', icon: <Clock className="h-3 w-3" /> }
+                : { cls: 'border-border/60', text: 'text-muted-foreground', badge: 'bg-muted text-muted-foreground border-border/60', label: format(dueDate, 'MMM d'), icon: <Calendar className="h-3 w-3" /> };
 
     return (
         <motion.button
@@ -342,10 +339,10 @@ const SectionHeader = ({ icon, title, accent, action, actionLabel, badge }: {
 ───────────────────────────────────────────────────────────────────────────── */
 const ProjectCard = ({ project, idx, onClick }: { project: any; idx: number; onClick: () => void }) => {
     const statusColors: Record<string, string> = {
-        active:    'bg-primary/10 text-primary border-primary/25',
+        active: 'bg-primary/10 text-primary border-primary/25',
         completed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-        paused:    'bg-amber-500/10 text-amber-400 border-amber-500/20',
-        archived:  'bg-muted text-muted-foreground border-border/60',
+        paused: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        archived: 'bg-muted text-muted-foreground border-border/60',
     };
     const statusKey = (project.status || 'active').toLowerCase();
     const statusClass = statusColors[statusKey] || statusColors.active;
@@ -474,14 +471,14 @@ const DashboardPage = () => {
     const isAdmin = activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin';
 
     const quickActions = [
-        { icon: Plus,          label: 'New Project', sub: 'Create',   onClick: () => {},                    accent: 'primary' },
-        { icon: Brain,         label: 'AI Chat',     sub: 'Converse', onClick: () => navigate('/ai-chat'),   accent: 'purple'  },
-        { icon: BarChart3,     label: 'Analytics',   sub: 'Explore',  onClick: () => navigate('/analytics'), accent: 'emerald' },
-        { icon: Users,         label: 'Team',        sub: 'Manage',   onClick: () => navigate('/team'),      accent: 'amber'   },
-        { icon: Target,        label: 'Projects',    sub: 'Browse',   onClick: () => navigate('/projects'),  accent: 'sky'     },
-        { icon: MessageSquare, label: 'Messages',    sub: 'Inbox',    onClick: () => navigate('/ai-chat'),   accent: 'teal'    },
-        { icon: Rocket,        label: 'Deploy',      sub: 'Launch',   onClick: () => toast.info('Deployment engine initializing. Feature available soon.'), accent: 'indigo' },
-        { icon: Zap,           label: 'Quick Task',  sub: 'Add',      onClick: () => {},                    accent: 'rose'    },
+        { icon: Plus, label: 'New Project', sub: 'Create', onClick: () => { }, accent: 'primary' },
+        { icon: Brain, label: 'AI Chat', sub: 'Converse', onClick: () => navigate('/ai-chat'), accent: 'purple' },
+        { icon: BarChart3, label: 'Analytics', sub: 'Explore', onClick: () => navigate('/analytics'), accent: 'emerald' },
+        { icon: Users, label: 'Team', sub: 'Manage', onClick: () => navigate('/team'), accent: 'amber' },
+        { icon: Target, label: 'Projects', sub: 'Browse', onClick: () => navigate('/projects'), accent: 'sky' },
+        { icon: MessageSquare, label: 'Messages', sub: 'Inbox', onClick: () => navigate('/ai-chat'), accent: 'teal' },
+        { icon: Rocket, label: 'Deploy', sub: 'Launch', onClick: () => toast.info('Deployment engine initializing. Feature available soon.'), accent: 'indigo' },
+        { icon: Zap, label: 'Quick Task', sub: 'Add', onClick: () => { }, accent: 'rose' },
     ].filter(a => {
         if (a.label === 'Analytics' || a.label === 'New Project') return isAdmin;
         return true;
@@ -563,10 +560,10 @@ const DashboardPage = () => {
                 <motion.div variants={stagger} initial="hidden" animate="visible"
                     className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5"
                 >
-                    <StatCard label="Active Projects" value={analytics?.projectCount?.toString() || '0'}                icon={<Layers className="h-4 w-4" />}       accent="primary"  isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
-                    <StatCard label="In Progress"     value={analytics?.statusBreakdown?.inProgress?.toString() || '0'} icon={<Zap className="h-4 w-4" />}          accent="teal"     isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
-                    <StatCard label="Completed"       value={analytics?.statusBreakdown?.done?.toString() || '0'}       icon={<CheckCircle2 className="h-4 w-4" />}  accent="emerald"  isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
-                    <StatCard label="Productivity"    value={`${analytics?.completionRate || 0}%`}                      icon={<TrendingUp className="h-4 w-4" />}    accent="indigo"   isLoading={analyticsLoading} onClick={isAdmin ? () => navigate('/analytics') : undefined} />
+                    <StatCard label="Active Projects" value={analytics?.projectCount?.toString() || '0'} icon={<Layers className="h-4 w-4" />} accent="primary" isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
+                    <StatCard label="In Progress" value={analytics?.statusBreakdown?.inProgress?.toString() || '0'} icon={<Zap className="h-4 w-4" />} accent="teal" isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
+                    <StatCard label="Completed" value={analytics?.statusBreakdown?.done?.toString() || '0'} icon={<CheckCircle2 className="h-4 w-4" />} accent="emerald" isLoading={analyticsLoading} onClick={() => navigate('/projects')} />
+                    <StatCard label="Productivity" value={`${analytics?.completionRate || 0}%`} icon={<TrendingUp className="h-4 w-4" />} accent="indigo" isLoading={analyticsLoading} onClick={isAdmin ? () => navigate('/analytics') : undefined} />
                 </motion.div>
 
                 {/* ── QUICK ACTIONS ─────────────────────────────────────────── */}
@@ -612,24 +609,24 @@ const DashboardPage = () => {
                                 {projectsLoading
                                     ? [1, 2, 3, 4].map(i => <ProjectCardSkeleton key={i} />)
                                     : projectsData && projectsData.length > 0
-                                    ? projectsData.map((p: any, idx: number) => (
-                                        <ProjectCard key={p.id} project={p} idx={idx} onClick={() => navigate(`/projects/${p.id}`)} />
-                                    ))
-                                    : (
-                                        <div className="col-span-full flex flex-col items-center justify-center py-14 bg-muted/20 border border-dashed border-border/60 rounded-2xl gap-3">
-                                            <Layers className="h-8 w-8 text-muted-foreground/20" />
-                                            <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">No projects initialized</p>
-                                            {isAdmin ? (
-                                                <CreateProjectDialog trigger={
-                                                    <Button size="sm" className="h-8 bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-black rounded-xl px-3 text-[9px] uppercase tracking-widest border border-primary/20 gap-1.5 transition-all">
-                                                        <Plus className="h-3 w-3" /> Create First Project
-                                                    </Button>
-                                                } />
-                                            ) : (
-                                                <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Awaiting sector initialization by command.</p>
-                                            )}
-                                        </div>
-                                    )
+                                        ? projectsData.map((p: any, idx: number) => (
+                                            <ProjectCard key={p.id} project={p} idx={idx} onClick={() => navigate(`/projects/${p.id}`)} />
+                                        ))
+                                        : (
+                                            <div className="col-span-full flex flex-col items-center justify-center py-14 bg-muted/20 border border-dashed border-border/60 rounded-2xl gap-3">
+                                                <Layers className="h-8 w-8 text-muted-foreground/20" />
+                                                <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">No projects initialized</p>
+                                                {isAdmin ? (
+                                                    <CreateProjectDialog trigger={
+                                                        <Button size="sm" className="h-8 bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-black rounded-xl px-3 text-[9px] uppercase tracking-widest border border-primary/20 gap-1.5 transition-all">
+                                                            <Plus className="h-3 w-3" /> Create First Project
+                                                        </Button>
+                                                    } />
+                                                ) : (
+                                                    <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Awaiting sector initialization by command.</p>
+                                                )}
+                                            </div>
+                                        )
                                 }
                             </div>
                         </section>
@@ -646,12 +643,12 @@ const DashboardPage = () => {
                                     userPerformance?.pendingTasks?.length > 0
                                         ? <span className="ml-2 text-[8px] font-black bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
                                             {userPerformance.pendingTasks.length}
-                                          </span>
+                                        </span>
                                         : undefined
                                 }
                             />
                             <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                                    <div className="divide-y divide-border/40 max-h-[250px] overflow-y-auto overscroll-contain custom-scrollbar pb-2 capture-scroll" data-screenshot-scroll="true">
+                                <div className="divide-y divide-border/40 max-h-[250px] overflow-y-auto overscroll-contain custom-scrollbar pb-2 capture-scroll" data-screenshot-scroll="true">
                                     {userPerformance?.pendingTasks && userPerformance.pendingTasks.length > 0
                                         ? userPerformance.pendingTasks
                                             .slice(taskPage * TASKS_PER_PAGE, (taskPage + 1) * TASKS_PER_PAGE)
@@ -672,14 +669,13 @@ const DashboardPage = () => {
                                                     </div>
                                                     <div className="flex items-center gap-1.5 flex-shrink-0">
                                                         {task.due_date && (
-                                                            <span className={`hidden sm:inline text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg border ${
-                                                                isPast(new Date(task.due_date))    ? 'text-red-400 border-red-500/20 bg-red-500/10'
-                                                                : isToday(new Date(task.due_date)) ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
-                                                                : 'text-muted-foreground/50 border-border/60'
-                                                            }`}>
+                                                            <span className={`hidden sm:inline text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-lg border ${isPast(new Date(task.due_date)) ? 'text-red-400 border-red-500/20 bg-red-500/10'
+                                                                    : isToday(new Date(task.due_date)) ? 'text-amber-400 border-amber-500/20 bg-amber-500/10'
+                                                                        : 'text-muted-foreground/50 border-border/60'
+                                                                }`}>
                                                                 {isPast(new Date(task.due_date)) ? 'Overdue'
                                                                     : isToday(new Date(task.due_date)) ? 'Today'
-                                                                    : format(new Date(task.due_date), 'MMM d')}
+                                                                        : format(new Date(task.due_date), 'MMM d')}
                                                             </span>
                                                         )}
                                                         <PriorityBadge priority={task.priority || 'medium'} />
@@ -707,11 +703,10 @@ const DashboardPage = () => {
                                             >‹</button>
                                             {Array.from({ length: Math.ceil(userPerformance.pendingTasks.length / TASKS_PER_PAGE) }).map((_, i) => (
                                                 <button key={i} onClick={() => setTaskPage(i)}
-                                                    className={`h-6 w-6 flex items-center justify-center rounded-lg text-[9px] font-black transition-all ${
-                                                        taskPage === i
+                                                    className={`h-6 w-6 flex items-center justify-center rounded-lg text-[9px] font-black transition-all ${taskPage === i
                                                             ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                                                             : 'text-muted-foreground/40 hover:text-foreground border border-transparent hover:border-border/60'
-                                                    }`}
+                                                        }`}
                                                 >{i + 1}</button>
                                             ))}
                                             <button onClick={() => setTaskPage(p => Math.min(Math.ceil(userPerformance.pendingTasks.length / TASKS_PER_PAGE) - 1, p + 1))}
@@ -793,19 +788,19 @@ const DashboardPage = () => {
                                                     </div>
                                                 ))
                                                 : analytics?.recentActivity && analytics.recentActivity.length > 0
-                                                ? analytics.recentActivity.map((act: any) => (
-                                                    <div key={act.id || Math.random()} className="relative">
-                                                        <div className="absolute -left-[1.32rem] top-1.5 w-2 h-2 rounded-full bg-primary/60 border-2 border-card" />
-                                                        <p className="text-xs text-foreground font-medium leading-snug">
-                                                            <span className="text-primary font-bold">@{act.actor?.name?.split(' ')[0] || 'System'}</span>{' '}
-                                                            {act.description || act.action?.replace(/_/g, ' ')}
-                                                        </p>
-                                                        <p className="text-[9px] text-muted-foreground/80 font-black uppercase tracking-widest mt-0.5">
-                                                            {formatDistanceToNow(new Date(act.created_at || act.timestamp))} ago
-                                                        </p>
-                                                    </div>
-                                                ))
-                                                : <p className="text-[10px] text-muted-foreground/80 font-bold uppercase tracking-widest italic">No recent activity</p>
+                                                    ? analytics.recentActivity.map((act: any) => (
+                                                        <div key={act.id || Math.random()} className="relative">
+                                                            <div className="absolute -left-[1.32rem] top-1.5 w-2 h-2 rounded-full bg-primary/60 border-2 border-card" />
+                                                            <p className="text-xs text-foreground font-medium leading-snug">
+                                                                <span className="text-primary font-bold">@{act.actor?.name?.split(' ')[0] || 'System'}</span>{' '}
+                                                                {act.description || act.action?.replace(/_/g, ' ')}
+                                                            </p>
+                                                            <p className="text-[9px] text-muted-foreground/80 font-black uppercase tracking-widest mt-0.5">
+                                                                {formatDistanceToNow(new Date(act.created_at || act.timestamp))} ago
+                                                            </p>
+                                                        </div>
+                                                    ))
+                                                    : <p className="text-[10px] text-muted-foreground/80 font-bold uppercase tracking-widest italic">No recent activity</p>
                                             }
                                         </div>
                                     </div>

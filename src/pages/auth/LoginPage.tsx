@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Loader2, Zap, ShieldCheck, Eye, EyeOff, Lock, Key, Shield } from 'lucide-react';
+import { Loader2, Zap, ShieldCheck, Eye, EyeOff, Key, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -27,7 +27,7 @@ type RecoveryStep = 'email' | 'otp' | 'reset';
 const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    
+
     // Recovery States
     const [isRecovering, setIsRecovering] = useState(false);
     const [recoveryStep, setRecoveryStep] = useState<RecoveryStep>('email');
@@ -146,10 +146,10 @@ const LoginPage = () => {
 
         setIsRecoveryLoading(true);
         try {
-            await api.post('/auth/reset-password', { 
-                email: recoveryEmail, 
-                otp: otpCode, 
-                newPassword 
+            await api.post('/auth/reset-password', {
+                email: recoveryEmail,
+                otp: otpCode,
+                newPassword
             });
             toast.success('Protocol Restored', {
                 description: 'Your access code has been updated successfully.',
@@ -279,7 +279,7 @@ const LoginPage = () => {
                                         <Button className="w-full h-16 text-xl font-heading font-black uppercase tracking-widest bg-cyan-500 hover:bg-cyan-400 text-[#030408] rounded-2xl shadow-2xl shadow-cyan-500/20 active:scale-[0.98] transition-all overflow-hidden relative group" type="submit" disabled={isRecoveryLoading}>
                                             {isRecoveryLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : <div className="flex items-center justify-center gap-3">Verify Identity <Shield className="h-5 w-5 fill-[#030408]" /></div>}
                                         </Button>
-                                        
+
                                         <button
                                             type="button"
                                             onClick={() => setRecoveryStep('email')}

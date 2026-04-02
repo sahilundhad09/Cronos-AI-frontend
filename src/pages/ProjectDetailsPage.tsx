@@ -15,7 +15,7 @@ import {
     ChevronRight,
     Trash2,
     MoreVertical,
-    Settings2
+    Settings2,
     Sparkles
 } from 'lucide-react';
 import { useProjectStore } from '@/store/useProjectStore';
@@ -171,10 +171,10 @@ const ProjectDetailsPage = () => {
     const isLead = project.your_role === 'lead' || activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin';
 
     const tabs = [
-        { value: 'kanban',       label: 'Board',          icon: LayoutDashboard, iconClass: 'text-muted-foreground' },
-        { value: 'orchestrator', label: 'AI Orchestrator', icon: Brain,           iconClass: 'text-primary'  },
-        { value: 'team',         label: 'Specialists',     icon: Users,           iconClass: 'text-muted-foreground' },
-        { value: 'activity',     label: 'Stream',          icon: Activity,        iconClass: 'text-emerald-400' },
+        { value: 'kanban', label: 'Board', icon: LayoutDashboard, iconClass: 'text-muted-foreground' },
+        { value: 'orchestrator', label: 'AI Orchestrator', icon: Brain, iconClass: 'text-primary' },
+        { value: 'team', label: 'Specialists', icon: Users, iconClass: 'text-muted-foreground' },
+        { value: 'activity', label: 'Stream', icon: Activity, iconClass: 'text-emerald-400' },
     ].filter(t => t.value !== 'orchestrator' || isLead);
 
     const currentTab = [...tabs, { value: 'settings', label: 'Parameters', icon: Settings, iconClass: 'text-muted-foreground' }]
@@ -201,22 +201,22 @@ const ProjectDetailsPage = () => {
 
                         {/* Project identity */}
                         <div className="flex items-start gap-4 min-w-0">
-                            <div 
+                            <div
                                 className="mt-0.5 w-14 h-14 rounded-2xl border flex-shrink-0 flex items-center justify-center overflow-hidden transition-all duration-500 shadow-xl group/icon"
-                                style={{ 
+                                style={{
                                     backgroundColor: project.color ? `${project.color}15` : 'rgba(var(--primary),0.1)',
                                     borderColor: project.color ? `${project.color}30` : 'rgba(var(--primary),0.2)'
                                 }}
                             >
                                 {project.image_url ? (
-                                    <img 
-                                        src={project.image_url} 
-                                        alt={project.name} 
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover/icon:scale-110" 
+                                    <img
+                                        src={project.image_url}
+                                        alt={project.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover/icon:scale-110"
                                     />
                                 ) : (
-                                    <Target 
-                                        className="h-6 w-6 transition-colors duration-500" 
+                                    <Target
+                                        className="h-6 w-6 transition-colors duration-500"
                                         style={{ color: project.color || 'var(--primary)' }}
                                     />
                                 )}
@@ -315,44 +315,22 @@ const ProjectDetailsPage = () => {
                                         {label}
                                     </TabsTrigger>
                                 ))}
-                                {(activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin' || isLead) && (
-            {/* Tabbed Interface */}
-            <main className="flex-1 overflow-hidden flex flex-col">
-                <Tabs defaultValue="kanban" className="flex-1 flex flex-col min-h-0">
-                    <div className="border-b border-white/5 px-6 flex-shrink-0">
-                        <div className="mx-auto">
-                            <TabsList className="bg-transparent h-12 p-0 gap-6 justify-start">
-                                <TabsTrigger
-                                    value="kanban"
-                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
-                                >
-                                    <LayoutDashboard className="h-4 w-4" /> Board
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="orchestrator"
-                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-14 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
-                                >
-                                    <Brain className="h-4 w-4 text-cyan-500" /> AI Orchestrator
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="team"
-                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
-                                >
-                                    <Users className="h-4 w-4" /> Specialists
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="activity"
-                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
-                                >
-                                    <Activity className="h-4 w-4 text-emerald-500" /> Stream
-                                </TabsTrigger>
                                 <TabsTrigger
                                     value="insights"
-                                    className="bg-transparent border-b-2 border-transparent data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent rounded-none h-12 px-0 text-slate-500 data-[state=active]:text-white font-black uppercase text-[10px] tracking-widest transition-all gap-2"
+                                    className="
+                                            relative flex-shrink-0 mr-6 last:mr-0
+                                            bg-transparent border-0 rounded-none h-11 px-0
+                                            text-muted-foreground data-[state=active]:text-foreground
+                                            font-black uppercase text-[9px] tracking-widest
+                                            transition-colors gap-1.5 hover:text-muted-foreground/80
+                                            after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px]
+                                            after:bg-primary after:rounded-t-full after:scale-x-0
+                                            data-[state=active]:after:scale-x-100 after:transition-transform after:duration-200
+                                        "
                                 >
-                                    <Sparkles className="h-4 w-4 text-purple-500" /> AI Insights
+                                    <Sparkles className="h-3.5 w-3.5 text-purple-500" /> AI Insights
                                 </TabsTrigger>
-                                <PermissionGate roles={['owner', 'admin']}>
+                                {(activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin' || isLead) && (
                                     <TabsTrigger
                                         value="settings"
                                         className="
@@ -393,11 +371,10 @@ const ProjectDetailsPage = () => {
                                     <button
                                         key={value}
                                         onClick={() => { setActiveTab(value); setMobileMenuOpen(false); }}
-                                        className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${
-                                            activeTab === value
-                                                ? 'border-l-primary bg-primary/[0.06] text-foreground'
-                                                : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-accent/50'
-                                        }`}
+                                        className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${activeTab === value
+                                            ? 'border-l-primary bg-primary/[0.06] text-foreground'
+                                            : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                                            }`}
                                     >
                                         <Icon className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === value ? iconClass : 'opacity-20'}`} />
                                         <span className="font-black uppercase text-[10px] tracking-widest">{label}</span>
@@ -407,11 +384,10 @@ const ProjectDetailsPage = () => {
                                 {(activeWorkspace?.role === 'owner' || activeWorkspace?.role === 'admin' || isLead) && (
                                     <button
                                         onClick={() => { setActiveTab('settings'); setMobileMenuOpen(false); }}
-                                        className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${
-                                            activeTab === 'settings'
-                                                ? 'border-l-primary bg-primary/[0.06] text-foreground'
-                                                : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-accent/50'
-                                        }`}
+                                        className={`w-full flex items-center gap-3 px-5 py-3.5 text-left border-l-2 transition-all ${activeTab === 'settings'
+                                            ? 'border-l-primary bg-primary/[0.06] text-foreground'
+                                            : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                                            }`}
                                     >
                                         <Settings className={`h-3.5 w-3.5 flex-shrink-0 ${activeTab === 'settings' ? 'text-primary' : 'opacity-20'}`} />
                                         <span className="font-black uppercase text-[10px] tracking-widest">Parameters</span>
@@ -438,251 +414,247 @@ const ProjectDetailsPage = () => {
                                 </div>
                             </TabsContent>
 
-                            {/* Team */}
-                            <TabsContent value="team" className="m-0 flex-1 min-h-0">
-                            <ScrollArea className="h-full">
-                                <div className="p-4 sm:p-6 md:p-8 space-y-8 max-w-[1600px] mx-auto">
-                                
-                                {/* Header */}
-                                {isLead && (
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                                        <Users className="h-5 w-5 text-cyan-400" />
-                                        </div>
-                                        <div>
-                                        <h2 className="text-lg font-heading font-black text-foreground uppercase italic tracking-tight leading-none">Specialists Assembly</h2>
-                                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1.5">{projectMembers.length} Active · Sector Personnel Management</p>
-                                        </div>
+                            {/* AI Insights */}
                             <TabsContent value="insights" className="m-0 h-full overflow-y-auto custom-scrollbar w-full py-4">
                                 <AISuggestionsPanel projectId={projectId!} />
                             </TabsContent>
 
-                            <TabsContent value="team" className="m-0 flex-1 flex flex-col gap-8 overflow-y-auto custom-scrollbar pr-2">
-                                <div className="flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        <h3 className="text-xl font-heading font-black text-white uppercase italic tracking-tighter">Active Personnel</h3>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Specialists currently assigned to this mission sector</p>
-                                    </div>
-                                    <ProjectInviteDialog projectId={projectId!} />
-                                    </div>
-                                )}
+                            {/* Team */}
+                            <TabsContent value="team" className="m-0 flex-1 min-h-0">
+                                <ScrollArea className="h-full">
+                                    <div className="p-4 sm:p-6 md:p-8 space-y-8 max-w-[1600px] mx-auto">
 
-                                {/* Main Grid */}
-                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                                    
-                                    {/* Active Personnel */}
-                                    <div className={` ${projectInvitations.filter(i => i.status === 'pending').length > 0 ? 'lg:col-span-8' : 'lg:col-span-12'} space-y-6`}>
-                                    <div className="flex items-center gap-3 pl-4 border-l-2 border-primary/40">
-                                        <div>
-                                        <h3 className="text-xs font-black text-foreground uppercase tracking-[0.3em]">Active Personnel</h3>
-                                        <p className="text-[10px] text-primary font-bold uppercase tracking-widest flex items-center gap-2 mt-1">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                                            {projectMembers.length} Authorized Units Synced
-                                        </p>
-                                        </div>
-                                    </div>
+                                        {/* Header */}
+                                        {isLead && (
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-10 w-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                                                        <Users className="h-5 w-5 text-cyan-400" />
+                                                    </div>
+                                                    <div>
+                                                        <h2 className="text-lg font-heading font-black text-foreground uppercase italic tracking-tight leading-none">Specialists Assembly</h2>
+                                                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1.5">{projectMembers.length} Active · Sector Personnel Management</p>
+                                                    </div>
+                                                </div>
+                                                <ProjectInviteDialog projectId={projectId!} />
+                                            </div>
+                                        )}
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto capture-scroll" data-screenshot-scroll="true">
-                                        {projectMembers.map((member) => (
-                                        <Card
-                                            key={member.id}
-                                            className="group bg-card/40 border-primary/40 hover:border-primary/90 transition-all duration-300 rounded-2xl overflow-hidden pt-4"
-                                        >
-                                            <CardContent className="p-5 flex items-center gap-4">
-                                            <div className="relative flex-shrink-0">
-                                                <Avatar className="h-12 w-12 rounded-xl border-2 border-border shadow-xl">
-                                                <AvatarImage src={member.user?.avatar_url} />
-                                                <AvatarFallback className="bg-primary/10 text-primary font-black text-base italic">
-                                                    {member.user?.name?.substring(0, 2).toUpperCase()}
-                                                </AvatarFallback>
-                                                </Avatar>
-                                                <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-background border border-border shadow-md">
-                                                <Shield className="h-2.5 w-2.5 text-primary" />
+                                        {/* Main Grid */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                                            {/* Active Personnel */}
+                                            <div className={` ${projectInvitations.filter(i => i.status === 'pending').length > 0 ? 'lg:col-span-8' : 'lg:col-span-12'} space-y-6`}>
+                                                <div className="flex items-center gap-3 pl-4 border-l-2 border-primary/40">
+                                                    <div>
+                                                        <h3 className="text-xs font-black text-foreground uppercase tracking-[0.3em]">Active Personnel</h3>
+                                                        <p className="text-[10px] text-primary font-bold uppercase tracking-widest flex items-center gap-2 mt-1">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                                            {projectMembers.length} Authorized Units Synced
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4 max-h-[calc(100vh-200px)] overflow-y-auto capture-scroll" data-screenshot-scroll="true">
+                                                    {projectMembers.map((member) => (
+                                                        <Card
+                                                            key={member.id}
+                                                            className="group bg-card/40 border-primary/40 hover:border-primary/90 transition-all duration-300 rounded-2xl overflow-hidden pt-4"
+                                                        >
+                                                            <CardContent className="p-5 flex items-center gap-4">
+                                                                <div className="relative flex-shrink-0">
+                                                                    <Avatar className="h-12 w-12 rounded-xl border-2 border-border shadow-xl">
+                                                                        <AvatarImage src={member.user?.avatar_url} />
+                                                                        <AvatarFallback className="bg-primary/10 text-primary font-black text-base italic">
+                                                                            {member.user?.name?.substring(0, 2).toUpperCase()}
+                                                                        </AvatarFallback>
+                                                                    </Avatar>
+                                                                    <div className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-background border border-border shadow-md">
+                                                                        <Shield className="h-2.5 w-2.5 text-primary" />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <h4 className="text-sm font-black text-foreground uppercase tracking-tight truncate group-hover:text-primary transition-colors">
+                                                                        {member.user?.name}
+                                                                    </h4>
+                                                                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest truncate mt-0.5">
+                                                                        {member.project_role || 'Specialist'}
+                                                                    </p>
+                                                                    <div className="flex items-center gap-1.5 mt-2">
+                                                                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                                        <span className="text-[9px] text-emerald-400/70 font-black uppercase tracking-widest">Active</span>
+                                                                    </div>
+                                                                </div>
+                                                                {isLead && (
+                                                                    <DropdownMenu>
+                                                                        <DropdownMenuTrigger asChild>
+                                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all opacity-0 group-hover:opacity-100">
+                                                                                <MoreVertical className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </DropdownMenuTrigger>
+                                                                        <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground backdrop-blur-2xl p-1.5 rounded-xl min-w-[160px]">
+                                                                            <DropdownMenuItem
+                                                                                onClick={() => navigate(`/projects/${projectId}/settings?tab=members`)}
+                                                                                className="text-[10px] font-black uppercase tracking-widest text-foreground focus:text-foreground focus:bg-accent cursor-pointer rounded-lg h-9"
+                                                                            >
+                                                                                <Settings2 className="h-3.5 w-3.5 mr-2.5" /> Change Role
+                                                                            </DropdownMenuItem>
+                                                                            <DropdownMenuItem
+                                                                                onClick={() => console.log('Remove member')}
+                                                                                className="text-[10px] font-black uppercase tracking-widest text-red-400 focus:text-red-400 focus:bg-red-500/10 cursor-pointer rounded-lg h-9"
+                                                                            >
+                                                                                <Trash2 className="h-3.5 w-3.5 mr-2.5" /> Revoke Access
+                                                                            </DropdownMenuItem>
+                                                                        </DropdownMenuContent>
+                                                                    </DropdownMenu>
+                                                                )}
+                                                            </CardContent>
+                                                        </Card>
+                                                    ))}
                                                 </div>
                                             </div>
-                                            <div className="min-w-0 flex-1">
-                                                <h4 className="text-sm font-black text-foreground uppercase tracking-tight truncate group-hover:text-primary transition-colors">
-                                                {member.user?.name}
-                                                </h4>
-                                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest truncate mt-0.5">
-                                                {member.project_role || 'Specialist'}
-                                                </p>
-                                                <div className="flex items-center gap-1.5 mt-2">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                                <span className="text-[9px] text-emerald-400/70 font-black uppercase tracking-widest">Active</span>
+
+                                            {/* Pending Sidebar */}
+                                            {isLead && projectInvitations.filter(i => i.status === 'pending').length > 0 && (
+                                                <div className="lg:col-span-4 space-y-5 border-l border-border/40 lg:pl-8">
+                                                    <div className="flex items-center gap-3 pl-4 border-l-2 border-amber-500/30">
+                                                        <div>
+                                                            <h3 className="text-xs font-black text-foreground uppercase tracking-[0.3em]">Awaiting Clearance</h3>
+                                                            <p className="text-[10px] text-amber-500/50 font-bold uppercase tracking-widest flex items-center gap-2 mt-1">
+                                                                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                                                {projectInvitations.filter(i => i.status === 'pending').length} Pending Authorizations
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-3">
+                                                        {projectInvitations.filter(i => i.status === 'pending').map((invite) => (
+                                                            <Card
+                                                                key={invite.id}
+                                                                className="group/invite bg-amber-500/[0.02] border border-amber-500/10 hover:border-amber-500/25 transition-all duration-300 rounded-2xl overflow-hidden"
+                                                            >
+                                                                <CardContent className="p-4 space-y-3">
+                                                                    <div className="flex items-center gap-3 pt-4">
+                                                                        <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-background border border-border flex items-center justify-center text-muted-foreground group-hover/invite:text-amber-500/60 transition-colors">
+                                                                            <Users size={16} />
+                                                                        </div>
+                                                                        <div className="min-w-0 flex-1">
+                                                                            <h4 className="text-[11px] font-black text-foreground uppercase truncate tracking-tight">{invite.invitee?.user?.name || 'Inbound User'}</h4>
+                                                                            <p className="text-[9px] text-muted-foreground font-mono truncate mt-0.5">{invite.invitee?.user?.email}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-between pt-3 border-t border-border/40">
+                                                                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted">
+                                                                            <Shield className="h-2.5 w-2.5 text-amber-500/60" />
+                                                                            <span className="text-[9px] text-muted-foreground font-black uppercase tracking-wide">{invite.role}</span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                                                            <span className="text-[9px] text-amber-500 font-black uppercase tracking-widest">Pending</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </CardContent>
+                                                            </Card>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            {isLead && (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-all opacity-0 group-hover:opacity-100">
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground backdrop-blur-2xl p-1.5 rounded-xl min-w-[160px]">
-                                                    <DropdownMenuItem
-                                                        onClick={() => navigate(`/projects/${projectId}/settings?tab=members`)}
-                                                        className="text-[10px] font-black uppercase tracking-widest text-foreground focus:text-foreground focus:bg-accent cursor-pointer rounded-lg h-9"
-                                                    >
-                                                        <Settings2 className="h-3.5 w-3.5 mr-2.5" /> Change Role
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => console.log('Remove member')}
-                                                        className="text-[10px] font-black uppercase tracking-widest text-red-400 focus:text-red-400 focus:bg-red-500/10 cursor-pointer rounded-lg h-9"
-                                                    >
-                                                        <Trash2 className="h-3.5 w-3.5 mr-2.5" /> Revoke Access
-                                                    </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
                                             )}
-                                            </CardContent>
-                                        </Card>
-                                        ))}
-                                    </div>
-                                    </div>
-
-                                    {/* Pending Sidebar */}
-                                    {isLead && projectInvitations.filter(i => i.status === 'pending').length > 0 && (
-                                    <div className="lg:col-span-4 space-y-5 border-l border-border/40 lg:pl-8">
-                                        <div className="flex items-center gap-3 pl-4 border-l-2 border-amber-500/30">
-                                        <div>
-                                            <h3 className="text-xs font-black text-foreground uppercase tracking-[0.3em]">Awaiting Clearance</h3>
-                                            <p className="text-[10px] text-amber-500/50 font-bold uppercase tracking-widest flex items-center gap-2 mt-1">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-                                            {projectInvitations.filter(i => i.status === 'pending').length} Pending Authorizations
-                                            </p>
-                                        </div>
                                         </div>
 
-                                        <div className="space-y-3">
-                                        {projectInvitations.filter(i => i.status === 'pending').map((invite) => (
-                                            <Card
-                                            key={invite.id}
-                                            className="group/invite bg-amber-500/[0.02] border border-amber-500/10 hover:border-amber-500/25 transition-all duration-300 rounded-2xl overflow-hidden"
-                                            >
-                                            <CardContent className="p-4 space-y-3">
-                                                <div className="flex items-center gap-3 pt-4">
-                                                <div className="h-10 w-10 flex-shrink-0 rounded-xl bg-background border border-border flex items-center justify-center text-muted-foreground group-hover/invite:text-amber-500/60 transition-colors">
-                                                    <Users size={16} />
+                                        {/* Invitation Acceptance Guard */}
+                                        {projectInvitations.some(i => i.invitee?.user?.id === user?.id && i.status === 'pending') && (
+                                            <div className="p-8 rounded-2xl bg-cyan-500/[0.03] border border-cyan-500/20 flex flex-col items-center gap-5 text-center animate-in zoom-in-95 duration-500 max-w-lg mx-auto">
+                                                <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg">
+                                                    <Shield size={28} />
                                                 </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <h4 className="text-[11px] font-black text-foreground uppercase truncate tracking-tight">{invite.invitee?.user?.name || 'Inbound User'}</h4>
-                                                    <p className="text-[9px] text-muted-foreground font-mono truncate mt-0.5">{invite.invitee?.user?.email}</p>
+                                                <div className="space-y-2">
+                                                    <h3 className="text-base font-heading font-black text-foreground uppercase italic tracking-tight">Mission Authorization Required</h3>
+                                                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest max-w-xs mx-auto">
+                                                        You have been designated as a specialist. Confirm authorization to access project resources.
+                                                    </p>
                                                 </div>
-                                                </div>
-                                                <div className="flex items-center justify-between pt-3 border-t border-border/40">
-                                                <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted">
-                                                    <Shield className="h-2.5 w-2.5 text-amber-500/60" />
-                                                    <span className="text-[9px] text-muted-foreground font-black uppercase tracking-wide">{invite.role}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-                                                    <span className="text-[9px] text-amber-500 font-black uppercase tracking-widest">Pending</span>
-                                                </div>
-                                                </div>
-                                            </CardContent>
-                                            </Card>
-                                        ))}
-                                        </div>
+                                                <Button
+                                                    onClick={async () => {
+                                                        const invite = projectInvitations.find(i => i.invitee?.user?.id === user?.id && i.status === 'pending');
+                                                        if (invite) {
+                                                            await acceptProjectInvitation(projectId!, invite.id);
+                                                            fetchNotifications();
+                                                            fetchUnreadCount();
+                                                        }
+                                                    }}
+                                                    className="bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black px-8 h-10 rounded-xl uppercase tracking-widest text-[10px] shadow-lg shadow-cyan-500/30 gap-2 transition-all"
+                                                >
+                                                    <CheckCircle2 className="h-4 w-4" /> Confirm Authorization
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
-                                    )}
-                                </div>
-
-                                {/* Invitation Acceptance Guard */}
-                                {projectInvitations.some(i => i.invitee?.user?.id === user?.id && i.status === 'pending') && (
-                                <div className="p-8 rounded-2xl bg-cyan-500/[0.03] border border-cyan-500/20 flex flex-col items-center gap-5 text-center animate-in zoom-in-95 duration-500 max-w-lg mx-auto">
-                                <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg">
-                                    <Shield size={28} />
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-base font-heading font-black text-foreground uppercase italic tracking-tight">Mission Authorization Required</h3>
-                                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest max-w-xs mx-auto">
-                                    You have been designated as a specialist. Confirm authorization to access project resources.
-                                    </p>
-                                </div>
-                                <Button
-                                    onClick={async () => {
-                                    const invite = projectInvitations.find(i => i.invitee?.user?.id === user?.id && i.status === 'pending');
-                                    if (invite) {
-                                        await acceptProjectInvitation(projectId!, invite.id);
-                                        fetchNotifications();
-                                        fetchUnreadCount();
-                                    }
-                                    }}
-                                    className="bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black px-8 h-10 rounded-xl uppercase tracking-widest text-[10px] shadow-lg shadow-cyan-500/30 gap-2 transition-all"
-                                >
-                                    <CheckCircle2 className="h-4 w-4" /> Confirm Authorization
-                                </Button>
-                                </div>
-                                )}
-                                </div>
-                            </ScrollArea>
+                                </ScrollArea>
                             </TabsContent>
 
                             {/* Activity */}
                             <TabsContent value="activity" className="m-0 flex-1 min-h-0 pr-1">
                                 <ScrollArea className="h-full w-full">
-                                <div className="p-4 sm:p-6 md:p-8 space-y-5 w-full border-t border-border">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-base sm:text-lg font-heading font-black text-foreground uppercase italic tracking-tight">Mission Stream</h3>
-                                            <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Real-time chronicle of neural status transitions</p>
-                                        </div>
-                                        <History size={18} className="text-emerald-500/40 flex-shrink-0" />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        {(projectActivities || []).length > 0 ? (
-                                            (projectActivities || []).map((activity: any) => (
-                                                <div
-                                                    key={activity.id}
-                                                    className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border border-l-4 border-l-primary/40 hover:border-l-primary hover:bg-accent/40 transition-all shadow-lg"
-                                                >
-                                                    <div className="h-9 w-9 rounded-xl bg-muted border border-border flex items-center justify-center relative flex-shrink-0">
-                                                        {activity.actor?.avatar_url ? (
-                                                            <img src={activity.actor.avatar_url} alt={activity.actor.name} className="h-full w-full object-cover rounded-xl" />
-                                                        ) : (
-                                                            <span className="text-[11px] font-black text-primary">{activity.actor?.name?.charAt(0)}</span>
-                                                        )}
-                                                        <span className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-background rounded-full flex items-center justify-center">
-                                                            <span className="h-2 w-2 bg-emerald-400 rounded-full shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-start justify-between gap-3">
-                                                            <p className="text-[12px] text-foreground font-medium leading-snug">
-                                                                <span className="text-primary font-black uppercase tracking-tighter">{activity.actor?.name}</span>
-                                                                {' '}transitioned{' '}
-                                                                <span className="text-foreground/90 font-bold">"{activity.meta?.task_title}"</span>
-                                                            </p>
-                                                            <span className="text-[9px] font-black text-muted-foreground/40 uppercase flex-shrink-0 tabular-nums font-mono">
-                                                                {format(new Date(activity.created_at), 'HH:mm')}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 mt-2 flex-wrap">
-                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-muted text-muted-foreground/60 border border-border line-through">
-                                                                {activity.meta?.old_status}
-                                                            </span>
-                                                            <ChevronRight className="h-3 w-3 text-muted-foreground/20" />
-                                                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-primary/15 text-primary border border-primary/20 shadow-[0_0_10px_hsl(var(--primary)/0.1)]">
-                                                                {activity.meta?.new_status}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="py-20 text-center bg-card border border-dashed border-border rounded-3xl flex flex-col items-center justify-center gap-4">
-                                                <Activity className="h-10 w-10 text-emerald-500/20" />
-                                                <div className="space-y-1">
-                                                    <h3 className="text-base font-heading font-black text-muted-foreground uppercase italic tracking-[0.2em]">Neural Silence</h3>
-                                                    <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest">No activity detected in this sector yet.</p>
-                                                </div>
+                                    <div className="p-4 sm:p-6 md:p-8 space-y-5 w-full border-t border-border">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="text-base sm:text-lg font-heading font-black text-foreground uppercase italic tracking-tight">Mission Stream</h3>
+                                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Real-time chronicle of neural status transitions</p>
                                             </div>
-                                        )}
+                                            <History size={18} className="text-emerald-500/40 flex-shrink-0" />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            {(projectActivities || []).length > 0 ? (
+                                                (projectActivities || []).map((activity: any) => (
+                                                    <div
+                                                        key={activity.id}
+                                                        className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border border-l-4 border-l-primary/40 hover:border-l-primary hover:bg-accent/40 transition-all shadow-lg"
+                                                    >
+                                                        <div className="h-9 w-9 rounded-xl bg-muted border border-border flex items-center justify-center relative flex-shrink-0">
+                                                            {activity.actor?.avatar_url ? (
+                                                                <img src={activity.actor.avatar_url} alt={activity.actor.name} className="h-full w-full object-cover rounded-xl" />
+                                                            ) : (
+                                                                <span className="text-[11px] font-black text-primary">{activity.actor?.name?.charAt(0)}</span>
+                                                            )}
+                                                            <span className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-background rounded-full flex items-center justify-center">
+                                                                <span className="h-2 w-2 bg-emerald-400 rounded-full shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-start justify-between gap-3">
+                                                                <p className="text-[12px] text-foreground font-medium leading-snug">
+                                                                    <span className="text-primary font-black uppercase tracking-tighter">{activity.actor?.name}</span>
+                                                                    {' '}transitioned{' '}
+                                                                    <span className="text-foreground/90 font-bold">"{activity.meta?.task_title}"</span>
+                                                                </p>
+                                                                <span className="text-[9px] font-black text-muted-foreground/40 uppercase flex-shrink-0 tabular-nums font-mono">
+                                                                    {format(new Date(activity.created_at), 'HH:mm')}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                                                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-muted text-muted-foreground/60 border border-border line-through">
+                                                                    {activity.meta?.old_status}
+                                                                </span>
+                                                                <ChevronRight className="h-3 w-3 text-muted-foreground/20" />
+                                                                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-primary/15 text-primary border border-primary/20 shadow-[0_0_10px_hsl(var(--primary)/0.1)]">
+                                                                    {activity.meta?.new_status}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="py-20 text-center bg-card border border-dashed border-border rounded-3xl flex flex-col items-center justify-center gap-4">
+                                                    <Activity className="h-10 w-10 text-emerald-500/20" />
+                                                    <div className="space-y-1">
+                                                        <h3 className="text-base font-heading font-black text-muted-foreground uppercase italic tracking-[0.2em]">Neural Silence</h3>
+                                                        <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest">No activity detected in this sector yet.</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
                                 </ScrollArea>
                             </TabsContent>
 
@@ -763,7 +735,7 @@ const ProjectDetailsPage = () => {
                                             <div className="space-y-4 pt-4 border-t border-border">
                                                 <div className="space-y-2">
                                                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Project Name</Label>
-                                                    <Input 
+                                                    <Input
                                                         value={project.name}
                                                         onChange={(e) => updateProject(project.id, { name: e.target.value })}
                                                         className="bg-muted/40 border-border rounded-xl h-12 text-foreground font-bold"
@@ -772,7 +744,7 @@ const ProjectDetailsPage = () => {
 
                                                 <div className="space-y-2">
                                                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Objective Description</Label>
-                                                    <Textarea 
+                                                    <Textarea
                                                         value={project.description || ''}
                                                         onChange={(e) => updateProject(project.id, { description: e.target.value })}
                                                         className="bg-muted/40 border-border rounded-xl min-h-[120px] text-foreground/90 font-bold"
@@ -795,7 +767,7 @@ const ProjectDetailsPage = () => {
                                                             ))}
                                                         </div>
                                                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/40 border border-border">
-                                                            <Input 
+                                                            <Input
                                                                 type="color"
                                                                 value={project.color || '#3B82F6'}
                                                                 onChange={(e) => updateProject(project.id, { color: e.target.value })}
@@ -813,11 +785,10 @@ const ProjectDetailsPage = () => {
                                                             <button
                                                                 key={status}
                                                                 onClick={() => updateProject(project.id, { status })}
-                                                                className={`h-11 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-                                                                    project.status === status 
-                                                                        ? 'bg-primary/10 border-primary/50 text-primary' 
-                                                                        : 'bg-muted/40 border-border text-muted-foreground hover:border-border/60'
-                                                                }`}
+                                                                className={`h-11 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${project.status === status
+                                                                    ? 'bg-primary/10 border-primary/50 text-primary'
+                                                                    : 'bg-muted/40 border-border text-muted-foreground hover:border-border/60'
+                                                                    }`}
                                                             >
                                                                 {status}
                                                             </button>
