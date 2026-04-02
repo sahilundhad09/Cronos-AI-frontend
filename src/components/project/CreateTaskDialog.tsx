@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '@/services/api';
 import {
     Dialog,
@@ -13,14 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Zap, Loader2, Sparkles, Camera, X as CloseIcon, Paperclip, FileText, Flag, ArrowRightLeft } from 'lucide-react';
-import { useRef } from 'react';
-import { Plus, Zap, Loader2, Sparkles, Bot, User } from 'lucide-react';
+import { Plus, Zap, Loader2, Sparkles, Camera, X as CloseIcon, Paperclip, FileText, Flag, ArrowRightLeft, Bot, User } from 'lucide-react';
 import { useTaskStore } from '@/store/useTaskStore';
 import { useAIStore } from '@/store/useAIStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import api from '@/services/api';
 import { toast } from 'sonner';
 
 interface CreateTaskDialogProps {
@@ -31,20 +28,19 @@ interface CreateTaskDialogProps {
     initialStatusId?: string;
 }
 
-const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ 
-    projectId, 
-    trigger, 
-    isOpen: controlledOpen, 
-    onOpenChange: setControlledOpen,
-    initialStatusId 
-}) => {
 interface AssignSuggestion {
     suggested_member_name: string;
     reason: string;
     workload_analysis: string;
 }
 
-const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger }) => {
+const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
+    projectId,
+    trigger,
+    isOpen: controlledOpen,
+    onOpenChange: setControlledOpen,
+    initialStatusId
+}) => {
     const queryClient = useQueryClient();
     const { activeWorkspace } = useWorkspaceStore();
     const { createTask, isLoading, statuses, fetchProjectStatuses } = useTaskStore();
@@ -62,6 +58,8 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [isSuggesting, setIsSuggesting] = useState(false);
+    const [suggestion, setSuggestion] = useState<AssignSuggestion | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -74,8 +72,6 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
             }
         }
     };
-    const [isSuggesting, setIsSuggesting] = useState(false);
-    const [suggestion, setSuggestion] = useState<AssignSuggestion | null>(null);
 
     const handleAIDetail = async () => {
         if (!title.trim()) return;
@@ -134,7 +130,6 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
             }) as any;
 
             if (task && selectedFile) {
-                // Upload attachment after creation
                 const formData = new FormData();
                 formData.append('file', selectedFile);
                 await api.post(`/tasks/${task.id}/attachments`, formData, {
@@ -142,7 +137,6 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                 });
             }
 
-            // Invalidate analytics and dashboard queries
             if (activeWorkspace) {
                 queryClient.invalidateQueries({ queryKey: ['workspace-analytics', activeWorkspace.id] });
             }
@@ -279,8 +273,8 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                                     onChange={handleFileChange}
                                     className="hidden"
                                 />
-                                
-                                <div 
+
+                                <div
                                     onClick={() => !selectedFile && fileInputRef.current?.click()}
                                     className={`
                                         relative h-20 w-full rounded-2xl border-2 border-dashed 
@@ -303,10 +297,10 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                                                 </div>
                                             )}
                                             <div className="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 hover:opacity-100 transition-opacity rounded-2xl">
-                                                <Button 
+                                                <Button
                                                     type="button"
-                                                    variant="secondary" 
-                                                    size="sm" 
+                                                    variant="secondary"
+                                                    size="sm"
                                                     onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                                                     className="h-7 text-[8px] font-black uppercase tracking-widest rounded-lg bg-card shadow-sm border border-border/40"
                                                 >
@@ -331,6 +325,50 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                                         </>
                                     )}
                                 </div>
+                            </div>
+
+                            {/* AI Auto-Assign Suggestion */}
+                            <div className="space-y-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleSuggestAssignment}
+                                    disabled={isSuggesting || !title.trim()}
+                                    className="w-full h-10 border-purple-500/20 hover:border-purple-500/40 bg-purple-500/5 hover:bg-purple-500/10 text-[10px] font-black uppercase tracking-widest gap-2 rounded-xl transition-all"
+                                >
+                                    {isSuggesting ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-400" />
+                                    ) : (
+                                        <Bot className="h-3.5 w-3.5 text-purple-400" />
+                                    )}
+                                    {isSuggesting ? 'Analyzing Team...' : '🤖 AI Suggest Assignee'}
+                                </Button>
+
+                                {suggestion && (
+                                    <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/15 space-y-2 animate-in slide-in-from-top-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-7 w-7 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                                <User className="h-3.5 w-3.5 text-purple-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-black text-purple-300 uppercase tracking-wide">
+                                                    {suggestion.suggested_member_name}
+                                                </p>
+                                                <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">
+                                                    Recommended by AI
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 leading-relaxed pl-9">
+                                            {suggestion.reason}
+                                        </p>
+                                        {suggestion.workload_analysis && (
+                                            <p className="text-[9px] text-cyan-400/60 font-bold pl-9">
+                                                📊 {suggestion.workload_analysis}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -360,68 +398,6 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
                         </DialogFooter>
                     </form>
                 </ScrollArea>
-                        {/* AI Auto-Assign Suggestion */}
-                        <div className="space-y-2">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handleSuggestAssignment}
-                                disabled={isSuggesting || !title.trim()}
-                                className="w-full h-10 border-purple-500/20 hover:border-purple-500/40 bg-purple-500/5 hover:bg-purple-500/10 text-[10px] font-black uppercase tracking-widest gap-2 rounded-xl transition-all"
-                            >
-                                {isSuggesting ? (
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-400" />
-                                ) : (
-                                    <Bot className="h-3.5 w-3.5 text-purple-400" />
-                                )}
-                                {isSuggesting ? 'Analyzing Team...' : '🤖 AI Suggest Assignee'}
-                            </Button>
-
-                            {suggestion && (
-                                <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/15 space-y-2 animate-in slide-in-from-top-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-7 w-7 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                                            <User className="h-3.5 w-3.5 text-purple-400" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-black text-purple-300 uppercase tracking-wide">
-                                                {suggestion.suggested_member_name}
-                                            </p>
-                                            <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">
-                                                Recommended by AI
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 leading-relaxed pl-9">
-                                        {suggestion.reason}
-                                    </p>
-                                    {suggestion.workload_analysis && (
-                                        <p className="text-[9px] text-cyan-400/60 font-bold pl-9">
-                                            📊 {suggestion.workload_analysis}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            type="submit"
-                            disabled={isLoading || !statusId}
-                            className="w-full bg-cyan-500 hover:bg-cyan-400 text-[#030408] font-black h-12 rounded-xl uppercase tracking-widest text-[11px] shadow-lg shadow-cyan-500/20 gap-3"
-                        >
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" /> SYNCHRONIZING...
-                                </>
-                            ) : (
-                                <>
-                                    <Zap className="h-4 w-4" /> INITIALIZE TASK
-                                </>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </form>
             </DialogContent>
         </Dialog>
     );
@@ -429,4 +405,3 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({ projectId, trigger 
 
 export { CreateTaskDialog };
 export default CreateTaskDialog;
-
